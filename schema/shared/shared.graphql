@@ -1,10 +1,16 @@
+scalar Time
+
 type Deli {
+	ID: String!
 	restaurantName: String!
 	telephone: String!
 	delicacies: [String!]!
 	verified: Boolean!
 	rating: Float!
 	reviews: [String!]!
+	createdAt: Time
+	updatedAt: Time
+	deletedAt: Time
 }
 
 input AddDeli {

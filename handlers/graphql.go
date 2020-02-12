@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/3dw1nM0535/deli/db"
 	graph "github.com/3dw1nM0535/deli/graph/generated"
 	resolver "github.com/3dw1nM0535/deli/resolvers"
 	"github.com/99designs/gqlgen/handler"
@@ -8,10 +9,12 @@ import (
 )
 
 // GraphQL : /graphql handler
-func GraphQL() gin.HandlerFunc {
+func GraphQL(orm *db.DB) gin.HandlerFunc {
 	// Pass Configs
 	cfg := graph.Config{
-		Resolvers: &resolver.Resolver{},
+		Resolvers: &resolver.Resolver{
+			DB: orm,
+		},
 	}
 
 	h := handler.GraphQL(graph.NewExecutableSchema(cfg))

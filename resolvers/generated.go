@@ -3,6 +3,7 @@ package resolvers
 import (
 	"context"
 
+	"github.com/3dw1nM0535/deli/db"
 	graph "github.com/3dw1nM0535/deli/graph/generated"
 	"github.com/3dw1nM0535/deli/models"
 )
@@ -10,7 +11,7 @@ import (
 // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
 
 type Resolver struct {
-	delis []*models.Deli
+	DB *db.DB
 }
 
 func (r *Resolver) Mutation() graph.MutationResolver {
@@ -28,12 +29,14 @@ func (r *mutationResolver) AddDeli(ctx context.Context, input models.AddDeli) (*
 		Telephone:      input.Telephone,
 		Delicacies:     input.Delicacies,
 	}
-	r.delis = append(r.delis, deli)
+	r.DB.Create(&deli)
 	return deli, nil
 }
 
 type queryResolver struct{ *Resolver }
 
 func (r *queryResolver) GetDeli(ctx context.Context) ([]*models.Deli, error) {
-	return r.delis, nil
+	delis := []*models.Deli{}
+	r.DB.Find(&delis)
+	return delis, nil
 }

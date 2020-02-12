@@ -2,6 +2,10 @@
 
 package models
 
+import (
+	"time"
+)
+
 type AddDeli struct {
 	RestaurantName string   `json:"restaurantName"`
 	Telephone      string   `json:"telephone"`
@@ -9,10 +13,14 @@ type AddDeli struct {
 }
 
 type Deli struct {
-	RestaurantName string   `json:"restaurantName"`
-	Telephone      string   `json:"telephone"`
-	Delicacies     []string `json:"delicacies"`
-	Verified       bool     `json:"verified"`
-	Rating         float64  `json:"rating"`
-	Reviews        []string `json:"reviews"`
+	ID             string     `json:"ID"`
+	RestaurantName string     `json:"restaurantName"`
+	Telephone      string     `json:"telephone"`
+	Delicacies     []string   `json:"delicacies"`
+	Verified       bool       `json:"verified"`
+	Rating         float64    `json:"rating"`
+	Reviews        []string   `json:"reviews"`
+	CreatedAt      *time.Time `json:"createdAt"`
+	UpdatedAt      *time.Time `json:"updatedAt"`
+	DeletedAt      *time.Time `json:"deletedAt"`
 }

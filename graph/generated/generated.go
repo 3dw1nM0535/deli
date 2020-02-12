@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/3dw1nM0535/deli/models"
 	"github.com/99designs/gqlgen/graphql"
@@ -44,11 +45,15 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Deli struct {
+		CreatedAt      func(childComplexity int) int
+		DeletedAt      func(childComplexity int) int
 		Delicacies     func(childComplexity int) int
+		ID             func(childComplexity int) int
 		Rating         func(childComplexity int) int
 		RestaurantName func(childComplexity int) int
 		Reviews        func(childComplexity int) int
 		Telephone      func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
 		Verified       func(childComplexity int) int
 	}
 
@@ -83,12 +88,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Deli.createdAt":
+		if e.complexity.Deli.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Deli.CreatedAt(childComplexity), true
+
+	case "Deli.deletedAt":
+		if e.complexity.Deli.DeletedAt == nil {
+			break
+		}
+
+		return e.complexity.Deli.DeletedAt(childComplexity), true
+
 	case "Deli.delicacies":
 		if e.complexity.Deli.Delicacies == nil {
 			break
 		}
 
 		return e.complexity.Deli.Delicacies(childComplexity), true
+
+	case "Deli.ID":
+		if e.complexity.Deli.ID == nil {
+			break
+		}
+
+		return e.complexity.Deli.ID(childComplexity), true
 
 	case "Deli.rating":
 		if e.complexity.Deli.Rating == nil {
@@ -117,6 +143,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Deli.Telephone(childComplexity), true
+
+	case "Deli.updatedAt":
+		if e.complexity.Deli.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Deli.UpdatedAt(childComplexity), true
 
 	case "Deli.verified":
 		if e.complexity.Deli.Verified == nil {
@@ -212,13 +245,19 @@ var parsedSchema = gqlparser.MustLoadSchema(
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	getDeli: [Deli!]!
 }`},
-	&ast.Source{Name: "schema/shared/shared.graphql", Input: `type Deli {
+	&ast.Source{Name: "schema/shared/shared.graphql", Input: `scalar Time
+
+type Deli {
+	ID: String!
 	restaurantName: String!
 	telephone: String!
 	delicacies: [String!]!
 	verified: Boolean!
 	rating: Float!
 	reviews: [String!]!
+	createdAt: Time
+	updatedAt: Time
+	deletedAt: Time
 }
 
 input AddDeli {
@@ -296,6 +335,43 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Deli_ID(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Deli",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Deli_restaurantName(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
@@ -517,6 +593,108 @@ func (ec *executionContext) _Deli_reviews(ctx context.Context, field graphql.Col
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Deli_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Deli",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Deli_updatedAt(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Deli",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Deli_deletedAt(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Deli",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addDeli(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1875,6 +2053,11 @@ func (ec *executionContext) _Deli(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Deli")
+		case "ID":
+			out.Values[i] = ec._Deli_ID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "restaurantName":
 			out.Values[i] = ec._Deli_restaurantName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -1905,6 +2088,12 @@ func (ec *executionContext) _Deli(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createdAt":
+			out.Values[i] = ec._Deli_createdAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._Deli_updatedAt(ctx, field, obj)
+		case "deletedAt":
+			out.Values[i] = ec._Deli_deletedAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2632,6 +2821,29 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return ec.marshalOString2string(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	return graphql.UnmarshalTime(v)
+}
+
+func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	return graphql.MarshalTime(v)
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOTime2timeᚐTime(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOTime2timeᚐTime(ctx, sel, *v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
