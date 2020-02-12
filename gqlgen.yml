@@ -1,0 +1,35 @@
+# .gqlgen.yml example
+#
+# Refer to https://gqlgen.com/config/
+# for detailed .gqlgen.yml documentation.
+
+# Default Schema directory
+schema:
+- schema/**/*.graphql
+
+# Generated GraphQL server
+exec:
+  filename: graph/generated/generated.go
+  package: graph
+
+# Generated models for GraphQL server
+model:
+  filename: models/generated.go
+  package: models
+
+# Generated Resolver for GraphQL server
+resolver:
+  filename: resolvers/generated.go
+  type: Resolver
+  package: resolvers
+
+# Turns on binding to field names by tag provided
+struct_tag: json
+
+# Automatically bind any models matching types
+autobind: []
+
+# # Tell graph about any existing models to be reused in graphql
+# models:
+#   Deli:
+#     model: models.Deli

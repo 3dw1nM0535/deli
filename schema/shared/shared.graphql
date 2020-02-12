@@ -1,0 +1,14 @@
+type Deli {
+	restaurantName: String!
+	telephone: String!
+	delicacies: [String!]!
+	verified: Boolean!
+	rating: Float!
+	reviews: [String!]!
+}
+
+input AddDeli {
+	restaurantName: String!
+	telephone: String!
+	delicacies: [String!]!
+}
