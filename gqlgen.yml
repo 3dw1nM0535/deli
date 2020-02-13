@@ -27,9 +27,10 @@ resolver:
 struct_tag: json
 
 # Automatically bind any models matching types
-autobind: []
+autobind:
+  - "github.com/3dw1nM0535/deli/db/models"
 
-# # Tell graph about any existing models to be reused in graphql
-# models:
-#   Deli:
-#     model: models.Deli
+# Tell graph about any existing models to be reused in graphql
+models:
+  Deli:
+    model: models.Deli

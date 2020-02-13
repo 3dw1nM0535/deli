@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	models1 "github.com/3dw1nM0535/deli/db/models"
 	"github.com/3dw1nM0535/deli/models"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -36,6 +37,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Deli() DeliResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -66,11 +68,21 @@ type ComplexityRoot struct {
 	}
 }
 
+type DeliResolver interface {
+	ID(ctx context.Context, obj *models1.Deli) (string, error)
+
+	Delicacies(ctx context.Context, obj *models1.Deli) ([]string, error)
+
+	Reviews(ctx context.Context, obj *models1.Deli) ([]string, error)
+	CreatedAt(ctx context.Context, obj *models1.Deli) (*time.Time, error)
+	UpdatedAt(ctx context.Context, obj *models1.Deli) (*time.Time, error)
+	DeletedAt(ctx context.Context, obj *models1.Deli) (*time.Time, error)
+}
 type MutationResolver interface {
-	AddDeli(ctx context.Context, input models.AddDeli) (*models.Deli, error)
+	AddDeli(ctx context.Context, input models.AddDeli) (*models1.Deli, error)
 }
 type QueryResolver interface {
-	GetDeli(ctx context.Context) ([]*models.Deli, error)
+	GetDeli(ctx context.Context) ([]*models1.Deli, error)
 }
 
 type executableSchema struct {
@@ -336,7 +348,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Deli_ID(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+func (ec *executionContext) _Deli_ID(ctx context.Context, field graphql.CollectedField, obj *models1.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -349,13 +361,13 @@ func (ec *executionContext) _Deli_ID(ctx context.Context, field graphql.Collecte
 		Object:   "Deli",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return ec.resolvers.Deli().ID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -373,7 +385,7 @@ func (ec *executionContext) _Deli_ID(ctx context.Context, field graphql.Collecte
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Deli_restaurantName(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+func (ec *executionContext) _Deli_restaurantName(ctx context.Context, field graphql.CollectedField, obj *models1.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -410,7 +422,7 @@ func (ec *executionContext) _Deli_restaurantName(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Deli_telephone(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+func (ec *executionContext) _Deli_telephone(ctx context.Context, field graphql.CollectedField, obj *models1.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -447,7 +459,7 @@ func (ec *executionContext) _Deli_telephone(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Deli_delicacies(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+func (ec *executionContext) _Deli_delicacies(ctx context.Context, field graphql.CollectedField, obj *models1.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -460,13 +472,13 @@ func (ec *executionContext) _Deli_delicacies(ctx context.Context, field graphql.
 		Object:   "Deli",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Delicacies, nil
+		return ec.resolvers.Deli().Delicacies(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -484,7 +496,7 @@ func (ec *executionContext) _Deli_delicacies(ctx context.Context, field graphql.
 	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Deli_verified(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+func (ec *executionContext) _Deli_verified(ctx context.Context, field graphql.CollectedField, obj *models1.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -521,7 +533,7 @@ func (ec *executionContext) _Deli_verified(ctx context.Context, field graphql.Co
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Deli_rating(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+func (ec *executionContext) _Deli_rating(ctx context.Context, field graphql.CollectedField, obj *models1.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -558,7 +570,7 @@ func (ec *executionContext) _Deli_rating(ctx context.Context, field graphql.Coll
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Deli_reviews(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+func (ec *executionContext) _Deli_reviews(ctx context.Context, field graphql.CollectedField, obj *models1.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -571,13 +583,13 @@ func (ec *executionContext) _Deli_reviews(ctx context.Context, field graphql.Col
 		Object:   "Deli",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Reviews, nil
+		return ec.resolvers.Deli().Reviews(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -595,7 +607,7 @@ func (ec *executionContext) _Deli_reviews(ctx context.Context, field graphql.Col
 	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Deli_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+func (ec *executionContext) _Deli_createdAt(ctx context.Context, field graphql.CollectedField, obj *models1.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -608,13 +620,13 @@ func (ec *executionContext) _Deli_createdAt(ctx context.Context, field graphql.C
 		Object:   "Deli",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedAt, nil
+		return ec.resolvers.Deli().CreatedAt(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -629,7 +641,7 @@ func (ec *executionContext) _Deli_createdAt(ctx context.Context, field graphql.C
 	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Deli_updatedAt(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+func (ec *executionContext) _Deli_updatedAt(ctx context.Context, field graphql.CollectedField, obj *models1.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -642,13 +654,13 @@ func (ec *executionContext) _Deli_updatedAt(ctx context.Context, field graphql.C
 		Object:   "Deli",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UpdatedAt, nil
+		return ec.resolvers.Deli().UpdatedAt(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -663,7 +675,7 @@ func (ec *executionContext) _Deli_updatedAt(ctx context.Context, field graphql.C
 	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Deli_deletedAt(ctx context.Context, field graphql.CollectedField, obj *models.Deli) (ret graphql.Marshaler) {
+func (ec *executionContext) _Deli_deletedAt(ctx context.Context, field graphql.CollectedField, obj *models1.Deli) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -676,13 +688,13 @@ func (ec *executionContext) _Deli_deletedAt(ctx context.Context, field graphql.C
 		Object:   "Deli",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DeletedAt, nil
+		return ec.resolvers.Deli().DeletedAt(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -735,10 +747,10 @@ func (ec *executionContext) _Mutation_addDeli(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.Deli)
+	res := resTmp.(*models1.Deli)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNDeli2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeli(ctx, field.Selections, res)
+	return ec.marshalNDeli2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDeli(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getDeli(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -772,10 +784,10 @@ func (ec *executionContext) _Query_getDeli(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.Deli)
+	res := resTmp.([]*models1.Deli)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNDeli2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeliᚄ(ctx, field.Selections, res)
+	return ec.marshalNDeli2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDeliᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2044,7 +2056,7 @@ func (ec *executionContext) unmarshalInputAddDeli(ctx context.Context, obj inter
 
 var deliImplementors = []string{"Deli"}
 
-func (ec *executionContext) _Deli(ctx context.Context, sel ast.SelectionSet, obj *models.Deli) graphql.Marshaler {
+func (ec *executionContext) _Deli(ctx context.Context, sel ast.SelectionSet, obj *models1.Deli) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, deliImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -2054,46 +2066,100 @@ func (ec *executionContext) _Deli(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Deli")
 		case "ID":
-			out.Values[i] = ec._Deli_ID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Deli_ID(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "restaurantName":
 			out.Values[i] = ec._Deli_restaurantName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "telephone":
 			out.Values[i] = ec._Deli_telephone(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "delicacies":
-			out.Values[i] = ec._Deli_delicacies(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Deli_delicacies(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "verified":
 			out.Values[i] = ec._Deli_verified(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "rating":
 			out.Values[i] = ec._Deli_rating(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "reviews":
-			out.Values[i] = ec._Deli_reviews(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Deli_reviews(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "createdAt":
-			out.Values[i] = ec._Deli_createdAt(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Deli_createdAt(ctx, field, obj)
+				return res
+			})
 		case "updatedAt":
-			out.Values[i] = ec._Deli_updatedAt(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Deli_updatedAt(ctx, field, obj)
+				return res
+			})
 		case "deletedAt":
-			out.Values[i] = ec._Deli_deletedAt(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Deli_deletedAt(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2443,11 +2509,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNDeli2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeli(ctx context.Context, sel ast.SelectionSet, v models.Deli) graphql.Marshaler {
+func (ec *executionContext) marshalNDeli2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDeli(ctx context.Context, sel ast.SelectionSet, v models1.Deli) graphql.Marshaler {
 	return ec._Deli(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNDeli2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeliᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Deli) graphql.Marshaler {
+func (ec *executionContext) marshalNDeli2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDeliᚄ(ctx context.Context, sel ast.SelectionSet, v []*models1.Deli) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2471,7 +2537,7 @@ func (ec *executionContext) marshalNDeli2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeli�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNDeli2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeli(ctx, sel, v[i])
+			ret[i] = ec.marshalNDeli2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDeli(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2484,7 +2550,7 @@ func (ec *executionContext) marshalNDeli2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeli�
 	return ret
 }
 
-func (ec *executionContext) marshalNDeli2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeli(ctx context.Context, sel ast.SelectionSet, v *models.Deli) graphql.Marshaler {
+func (ec *executionContext) marshalNDeli2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDeli(ctx context.Context, sel ast.SelectionSet, v *models1.Deli) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

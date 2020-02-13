@@ -2,25 +2,8 @@
 
 package models
 
-import (
-	"time"
-)
-
 type AddDeli struct {
 	RestaurantName string   `json:"restaurantName"`
 	Telephone      string   `json:"telephone"`
 	Delicacies     []string `json:"delicacies"`
-}
-
-type Deli struct {
-	ID             string     `json:"ID"`
-	RestaurantName string     `json:"restaurantName"`
-	Telephone      string     `json:"telephone"`
-	Delicacies     []string   `json:"delicacies"`
-	Verified       bool       `json:"verified"`
-	Rating         float64    `json:"rating"`
-	Reviews        []string   `json:"reviews"`
-	CreatedAt      *time.Time `json:"createdAt"`
-	UpdatedAt      *time.Time `json:"updatedAt"`
-	DeletedAt      *time.Time `json:"deletedAt"`
 }
