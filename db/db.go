@@ -17,7 +17,7 @@ type DB struct {
 func Factory() (*DB, error) {
 	dbm, err := gorm.Open("postgres", "host=localhost port=5432 user=demo password=demo1234 dbname=deli sslmode=disable")
 	if err != nil {
-		fmt.Printf("Error connecting to database:" + err.Error())
+		fmt.Printf("Error connecting to database: " + err.Error())
 	}
 
 	return &DB{dbm}, nil
