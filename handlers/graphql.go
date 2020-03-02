@@ -26,7 +26,7 @@ func GraphQL(orm *db.DB) gin.HandlerFunc {
 
 // Playground : return graphql playground
 func Playground() gin.HandlerFunc {
-	h := handler.Playground("GraphQL", "/query")
+	h := handler.Playground("Interactive GraphQL Playground", "/query")
 
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
