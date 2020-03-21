@@ -15,6 +15,7 @@ type BaseModel struct {
 type Deli struct {
 	BaseModel
 	RestaurantName string `gorm:"not_null;type:varchar(100)"`
+	About          string `gorm:"not_null;type:text;"`
 	Telephone      string `gorm:"not_null;type:varchar(50)"`
 	Verified       bool   `gorm:"default:false;not_null"`
 }
