@@ -1,3 +1,3 @@
 # Deli
 
-Food movement at your palm
+Healthier food. Greener delivery.
