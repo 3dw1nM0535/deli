@@ -11,8 +11,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-var dbHost, dbPort, dbUser, dbPassword, dbName string
-var sslMode bool
+var dbHost, dbPort, dbUser, dbPassword, dbName, sslMode string
 
 func init() {
 	godotenv.Load()
@@ -21,23 +20,22 @@ func init() {
 	dbUser = utils.MustGetEnv("DBUSER")
 	dbPassword = utils.MustGetEnv("DBPASS")
 	dbName = utils.MustGetEnv("DBNAME")
-	sslMode = utils.MustGetEnvBool("SSLMODE_ENABLED")
+	sslMode = utils.MustGetEnv("SSLMODE_ENABLED")
 
 }
 
-// DB : database structure
-type DB struct {
-	*gorm.DB
+// ORM : database structure
+type ORM struct {
+	DB *gorm.DB
 }
 
 // Factory : open a database connection
-func Factory() (*DB, error) {
-	dbm, err := gorm.Open("postgres",
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		dbHost, dbPort, dbUser, dbPassword, dbName, sslMode)
+func Factory() (*ORM, error) {
+	dbURI := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", dbHost, dbPort, dbUser, dbPassword, dbName, sslMode)
+	dbm, err := gorm.Open("postgres", dbURI)
 	if err != nil {
 		fmt.Printf("Error connecting to database: " + err.Error())
 	}
 
-	return &DB{dbm}, nil
+	return &ORM{DB: dbm}, nil
 }

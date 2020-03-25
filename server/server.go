@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 
+	"github.com/3dw1nM0535/deli/db"
 	handler "github.com/3dw1nM0535/deli/handlers"
 	"github.com/3dw1nM0535/deli/utils"
 	"github.com/gin-gonic/gin"
@@ -18,17 +19,17 @@ func init() {
 }
 
 // SetupRouter : set routing paths
-func SetupRouter() *gin.Engine {
+func SetupRouter(orm *db.ORM) *gin.Engine {
 	r := gin.Default()
-	r.POST("/query", handler.GraphQL())
+	r.POST("/query", handler.GraphQL(orm))
 	r.GET("/graphql", handler.Playground())
 	r.GET("/", handler.Ping())
 	return r
 }
 
 // Run : spins the server
-func Run() {
-	r := SetupRouter()
+func Run(orm *db.ORM) {
+	r := SetupRouter(orm)
 
 	log.Fatal(r.Run(host + ":" + port))
 }

@@ -1,0 +1,17 @@
+scalar Time
+
+type Restaurant {
+  id: ID
+  restaurantName: String!
+  about: String!
+  telephone: String!
+  verified: Boolean!
+  createdAt: Time
+  updatedAt: Time
+}
+
+input RestaurantInput {
+  restaurantName: String!
+  about: String!
+  telephone: String!
+}

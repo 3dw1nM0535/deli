@@ -6,11 +6,11 @@ import (
 )
 
 func migrate() error {
-	dbm, err := db.Factory()
+	orm, err := db.Factory()
 
-	defer dbm.Close()
+	defer orm.DB.Close()
 
-	err = dbm.AutoMigrate(&models.Deli{}).Error
+	err = orm.DB.AutoMigrate(&models.Restaurant{}).Error
 	if err != nil {
 		return err
 	}

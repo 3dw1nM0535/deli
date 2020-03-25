@@ -32,5 +32,5 @@ autobind:
 
 # Tell graph about any existing models to be reused in graphql
 models:
-  Deli:
-    model: models.Deli
+  Restaurant:
+    model: models.Restaurant
