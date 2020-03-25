@@ -8,6 +8,13 @@ import (
 	"github.com/3dw1nM0535/deli/models"
 )
 
+// ID : return ID as string value
+func (r *restaurantResolver) ID(ctx context.Context, obj *models1.Restaurant) (*string, error) {
+	id := obj.ID.String()
+	return &id, nil
+}
+
+// AddRestaurant : create and save restaurant to the database
 func (r *mutationResolver) AddRestaurant(ctx context.Context, input models.RestaurantInput) (*models1.Restaurant, error) {
 	if input.RestaurantName == "" {
 		err := errors.New("restaurant name cannot be empty")
