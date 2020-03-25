@@ -12,6 +12,7 @@ import (
 )
 
 var dbHost, dbPort, dbUser, dbPassword, dbName, sslMode string
+var logMode bool
 
 func init() {
 	godotenv.Load()
@@ -21,6 +22,7 @@ func init() {
 	dbPassword = utils.MustGetEnv("DBPASS")
 	dbName = utils.MustGetEnv("DBNAME")
 	sslMode = utils.MustGetEnv("SSLMODE_ENABLED")
+	logMode = utils.MustGetEnvBool("LOGGING_STATUS")
 
 }
 
@@ -36,6 +38,7 @@ func Factory() (*ORM, error) {
 	if err != nil {
 		fmt.Printf("Error connecting to database: " + err.Error())
 	}
+	dbm.LogMode(logMode)
 
 	return &ORM{DB: dbm}, nil
 }
