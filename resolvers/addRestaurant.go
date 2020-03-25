@@ -21,7 +21,7 @@ func (r *mutationResolver) AddRestaurant(ctx context.Context, input models.Resta
 		return &models1.Restaurant{}, err
 	}
 	if input.About == "" {
-		err := errors.New("restaurant breif description cannot bt empty")
+		err := errors.New("restaurant brief description cannot be empty")
 		return &models1.Restaurant{}, err
 	}
 	if input.Telephone == "" {

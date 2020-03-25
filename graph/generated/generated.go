@@ -51,7 +51,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		FindRestaurant func(childComplexity int, id *string) int
+		FindRestaurant func(childComplexity int, id string) int
 		Hello          func(childComplexity int) int
 	}
 
@@ -71,7 +71,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
-	FindRestaurant(ctx context.Context, id *string) (*models1.Restaurant, error)
+	FindRestaurant(ctx context.Context, id string) (*models1.Restaurant, error)
 }
 type RestaurantResolver interface {
 	ID(ctx context.Context, obj *models1.Restaurant) (*string, error)
@@ -114,7 +114,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.FindRestaurant(childComplexity, args["id"].(*string)), true
+		return e.complexity.Query.FindRestaurant(childComplexity, args["id"].(string)), true
 
 	case "Query.hello":
 		if e.complexity.Query.Hello == nil {
@@ -239,7 +239,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
 }`},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	hello: String!
-	findRestaurant(id: ID): Restaurant!
+	findRestaurant(id: ID!): Restaurant!
 }`},
 	&ast.Source{Name: "schema/shared/shared.graphql", Input: `scalar Time
 
@@ -296,9 +296,9 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_findRestaurant_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
-		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -450,7 +450,7 @@ func (ec *executionContext) _Query_findRestaurant(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().FindRestaurant(rctx, args["id"].(*string))
+		return ec.resolvers.Query().FindRestaurant(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2379,6 +2379,20 @@ func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interf
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
 	res := graphql.MarshalBoolean(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
+	return graphql.UnmarshalID(v)
+}
+
+func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalID(v)
 	if res == graphql.Null {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
