@@ -1,4 +1,5 @@
 type Query {
 	hello: String!
 	findRestaurant(id: ID!): Restaurant!
+	findRestaurants: [Restaurant!]!
 }

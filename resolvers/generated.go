@@ -35,6 +35,9 @@ type queryResolver struct{ *Resolver }
 // func (r *queryResolver) FindRestaurant(ctx context.Context, id string) (*models1.Restaurant, error) {
 // 	panic("not implemented")
 // }
+// func (r *queryResolver) FindRestaurants(ctx context.Context) ([]*models1.Restaurant, error) {
+// 	panic("not implemented")
+// }
 
 type restaurantResolver struct{ *Resolver }
 
