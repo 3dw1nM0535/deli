@@ -3,18 +3,22 @@ package resolvers
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	models1 "github.com/3dw1nM0535/deli/db/models"
 )
 
+// FindRestaurant : find restaurant partner using its id
 func (r *queryResolver) FindRestaurant(ctx context.Context, id string) (*models1.Restaurant, error) {
 	if id == "" {
-		return &models1.Restaurant{}, errors.New("id cannot be empty")
+		err := errors.New("id field cannot be empty")
+		return &models1.Restaurant{}, err
 	}
 	var restaurant = &models1.Restaurant{}
 	r.ORM.DB.Where("id = ?", id).First(&restaurant)
 	if restaurant.ID.String() == "00000000-0000-0000-0000-000000000000" {
-		return &models1.Restaurant{}, errors.New("cannot find the request restaurant")
+		err := fmt.Errorf("restaurant with id '%s' cannot be found", id)
+		return &models1.Restaurant{}, err
 	}
 	return restaurant, nil
 }

@@ -16,8 +16,8 @@ type BaseModel struct {
 // Restaurant : restaurant data model
 type Restaurant struct {
 	BaseModel
-	RestaurantName string `gorm:"not_null;type:varchar(100)"`
+	RestaurantName string `gorm:"unique_index:idx_restaurant;not_null;type:varchar(100)"`
 	About          string `gorm:"not_null;type:text"`
-	Telephone      string `gorm:"not_null;type:varchar(50)"`
-	Verified       bool   `gorm:"default:false;not_null"`
+	Telephone      string `gorm:"unique_index:idx_telephone;unique;not_null;type:varchar(50)"`
+	Verified       bool   `gorm:"unique_index:idx_verfied;default:false;not_null"`
 }
