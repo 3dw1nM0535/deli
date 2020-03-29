@@ -1,3 +1,4 @@
 type Mutation {
   addRestaurant(input: RestaurantInput!): Restaurant!
+  registerAddress(input: AddressInput!): Address!
 }

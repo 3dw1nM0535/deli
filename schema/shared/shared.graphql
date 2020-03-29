@@ -1,17 +1,41 @@
 scalar Time
 
 type Restaurant {
-  id: ID
+  id: ID!
   restaurantName: String!
   about: String!
   telephone: String!
   verified: Boolean!
   createdAt: Time
   updatedAt: Time
+  addresses: [Address!]
 }
 
 input RestaurantInput {
   restaurantName: String!
   about: String!
   telephone: String!
+}
+
+type Address {
+  postalCode: String!
+  postalTown: String!
+  buildingName: String!
+  streetName: String!
+  lon: Float!
+  lat: Float!
+  RestaurantID: ID!
+  createdAt: Time
+  updatedAt: Time
+  restaurants: [Restaurant!]!
+}
+
+input AddressInput {
+  postalCode: String!
+  postalTown: String!
+  buildingName: String!
+  streetName: String!
+  lon: Float!
+  lat: Float!
+  restaurantID: ID!
 }

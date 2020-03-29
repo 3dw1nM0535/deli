@@ -37,6 +37,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Address() AddressResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Restaurant() RestaurantResolver
@@ -46,8 +47,22 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Address struct {
+		BuildingName func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		Lat          func(childComplexity int) int
+		Lon          func(childComplexity int) int
+		PostalCode   func(childComplexity int) int
+		PostalTown   func(childComplexity int) int
+		RestaurantID func(childComplexity int) int
+		Restaurants  func(childComplexity int) int
+		StreetName   func(childComplexity int) int
+		UpdatedAt    func(childComplexity int) int
+	}
+
 	Mutation struct {
-		AddRestaurant func(childComplexity int, input models.RestaurantInput) int
+		AddRestaurant   func(childComplexity int, input models.RestaurantInput) int
+		RegisterAddress func(childComplexity int, input models.AddressInput) int
 	}
 
 	Query struct {
@@ -58,6 +73,7 @@ type ComplexityRoot struct {
 
 	Restaurant struct {
 		About          func(childComplexity int) int
+		Addresses      func(childComplexity int) int
 		CreatedAt      func(childComplexity int) int
 		ID             func(childComplexity int) int
 		RestaurantName func(childComplexity int) int
@@ -67,8 +83,14 @@ type ComplexityRoot struct {
 	}
 }
 
+type AddressResolver interface {
+	RestaurantID(ctx context.Context, obj *models1.Address) (string, error)
+
+	Restaurants(ctx context.Context, obj *models1.Address) ([]*models1.Restaurant, error)
+}
 type MutationResolver interface {
 	AddRestaurant(ctx context.Context, input models.RestaurantInput) (*models1.Restaurant, error)
+	RegisterAddress(ctx context.Context, input models.AddressInput) (*models1.Address, error)
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
@@ -76,7 +98,9 @@ type QueryResolver interface {
 	FindRestaurants(ctx context.Context) ([]*models1.Restaurant, error)
 }
 type RestaurantResolver interface {
-	ID(ctx context.Context, obj *models1.Restaurant) (*string, error)
+	ID(ctx context.Context, obj *models1.Restaurant) (string, error)
+
+	Addresses(ctx context.Context, obj *models1.Restaurant) ([]*models1.Address, error)
 }
 
 type executableSchema struct {
@@ -94,6 +118,76 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Address.buildingName":
+		if e.complexity.Address.BuildingName == nil {
+			break
+		}
+
+		return e.complexity.Address.BuildingName(childComplexity), true
+
+	case "Address.createdAt":
+		if e.complexity.Address.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Address.CreatedAt(childComplexity), true
+
+	case "Address.lat":
+		if e.complexity.Address.Lat == nil {
+			break
+		}
+
+		return e.complexity.Address.Lat(childComplexity), true
+
+	case "Address.lon":
+		if e.complexity.Address.Lon == nil {
+			break
+		}
+
+		return e.complexity.Address.Lon(childComplexity), true
+
+	case "Address.postalCode":
+		if e.complexity.Address.PostalCode == nil {
+			break
+		}
+
+		return e.complexity.Address.PostalCode(childComplexity), true
+
+	case "Address.postalTown":
+		if e.complexity.Address.PostalTown == nil {
+			break
+		}
+
+		return e.complexity.Address.PostalTown(childComplexity), true
+
+	case "Address.RestaurantID":
+		if e.complexity.Address.RestaurantID == nil {
+			break
+		}
+
+		return e.complexity.Address.RestaurantID(childComplexity), true
+
+	case "Address.restaurants":
+		if e.complexity.Address.Restaurants == nil {
+			break
+		}
+
+		return e.complexity.Address.Restaurants(childComplexity), true
+
+	case "Address.streetName":
+		if e.complexity.Address.StreetName == nil {
+			break
+		}
+
+		return e.complexity.Address.StreetName(childComplexity), true
+
+	case "Address.updatedAt":
+		if e.complexity.Address.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Address.UpdatedAt(childComplexity), true
+
 	case "Mutation.addRestaurant":
 		if e.complexity.Mutation.AddRestaurant == nil {
 			break
@@ -105,6 +199,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddRestaurant(childComplexity, args["input"].(models.RestaurantInput)), true
+
+	case "Mutation.registerAddress":
+		if e.complexity.Mutation.RegisterAddress == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_registerAddress_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RegisterAddress(childComplexity, args["input"].(models.AddressInput)), true
 
 	case "Query.findRestaurant":
 		if e.complexity.Query.FindRestaurant == nil {
@@ -138,6 +244,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Restaurant.About(childComplexity), true
+
+	case "Restaurant.addresses":
+		if e.complexity.Restaurant.Addresses == nil {
+			break
+		}
+
+		return e.complexity.Restaurant.Addresses(childComplexity), true
 
 	case "Restaurant.createdAt":
 		if e.complexity.Restaurant.CreatedAt == nil {
@@ -245,6 +358,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 var parsedSchema = gqlparser.MustLoadSchema(
 	&ast.Source{Name: "schema/mutation/mutation.graphql", Input: `type Mutation {
   addRestaurant(input: RestaurantInput!): Restaurant!
+  registerAddress(input: AddressInput!): Address!
 }`},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	hello: String!
@@ -254,19 +368,43 @@ var parsedSchema = gqlparser.MustLoadSchema(
 	&ast.Source{Name: "schema/shared/shared.graphql", Input: `scalar Time
 
 type Restaurant {
-  id: ID
+  id: ID!
   restaurantName: String!
   about: String!
   telephone: String!
   verified: Boolean!
   createdAt: Time
   updatedAt: Time
+  addresses: [Address!]
 }
 
 input RestaurantInput {
   restaurantName: String!
   about: String!
   telephone: String!
+}
+
+type Address {
+  postalCode: String!
+  postalTown: String!
+  buildingName: String!
+  streetName: String!
+  lon: Float!
+  lat: Float!
+  RestaurantID: ID!
+  createdAt: Time
+  updatedAt: Time
+  restaurants: [Restaurant!]!
+}
+
+input AddressInput {
+  postalCode: String!
+  postalTown: String!
+  buildingName: String!
+  streetName: String!
+  lon: Float!
+  lat: Float!
+  restaurantID: ID!
 }
 `},
 )
@@ -281,6 +419,20 @@ func (ec *executionContext) field_Mutation_addRestaurant_args(ctx context.Contex
 	var arg0 models.RestaurantInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNRestaurantInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐRestaurantInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_registerAddress_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.AddressInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNAddressInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐAddressInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -353,6 +505,370 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _Address_postalCode(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Address",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PostalCode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Address_postalTown(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Address",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PostalTown, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Address_buildingName(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Address",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BuildingName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Address_streetName(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Address",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StreetName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Address_lon(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Address",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Lon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Address_lat(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Address",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Lat, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Address_RestaurantID(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Address",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Address().RestaurantID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Address_createdAt(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Address",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Address_updatedAt(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Address",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Address_restaurants(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Address",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Address().Restaurants(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Restaurant)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNRestaurant2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurantᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_addRestaurant(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -395,6 +911,50 @@ func (ec *executionContext) _Mutation_addRestaurant(ctx context.Context, field g
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNRestaurant2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurant(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_registerAddress(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_registerAddress_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RegisterAddress(rctx, args["input"].(models.AddressInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.Address)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNAddress2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐAddress(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -616,12 +1176,15 @@ func (ec *executionContext) _Restaurant_id(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Restaurant_restaurantName(ctx context.Context, field graphql.CollectedField, obj *models1.Restaurant) (ret graphql.Marshaler) {
@@ -838,6 +1401,40 @@ func (ec *executionContext) _Restaurant_updatedAt(ctx context.Context, field gra
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Restaurant_addresses(ctx context.Context, field graphql.CollectedField, obj *models1.Restaurant) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Restaurant",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Restaurant().Addresses(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Address)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOAddress2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐAddressᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -1991,6 +2588,60 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAddressInput(ctx context.Context, obj interface{}) (models.AddressInput, error) {
+	var it models.AddressInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "postalCode":
+			var err error
+			it.PostalCode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "postalTown":
+			var err error
+			it.PostalTown, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "buildingName":
+			var err error
+			it.BuildingName, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "streetName":
+			var err error
+			it.StreetName, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lon":
+			var err error
+			it.Lon, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lat":
+			var err error
+			it.Lat, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "restaurantID":
+			var err error
+			it.RestaurantID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRestaurantInput(ctx context.Context, obj interface{}) (models.RestaurantInput, error) {
 	var it models.RestaurantInput
 	var asMap = obj.(map[string]interface{})
@@ -2029,6 +2680,90 @@ func (ec *executionContext) unmarshalInputRestaurantInput(ctx context.Context, o
 
 // region    **************************** object.gotpl ****************************
 
+var addressImplementors = []string{"Address"}
+
+func (ec *executionContext) _Address(ctx context.Context, sel ast.SelectionSet, obj *models1.Address) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, addressImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Address")
+		case "postalCode":
+			out.Values[i] = ec._Address_postalCode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "postalTown":
+			out.Values[i] = ec._Address_postalTown(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "buildingName":
+			out.Values[i] = ec._Address_buildingName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "streetName":
+			out.Values[i] = ec._Address_streetName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "lon":
+			out.Values[i] = ec._Address_lon(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "lat":
+			out.Values[i] = ec._Address_lat(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "RestaurantID":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Address_RestaurantID(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "createdAt":
+			out.Values[i] = ec._Address_createdAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._Address_updatedAt(ctx, field, obj)
+		case "restaurants":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Address_restaurants(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2046,6 +2781,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "addRestaurant":
 			out.Values[i] = ec._Mutation_addRestaurant(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "registerAddress":
+			out.Values[i] = ec._Mutation_registerAddress(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2152,6 +2892,9 @@ func (ec *executionContext) _Restaurant(ctx context.Context, sel ast.SelectionSe
 					}
 				}()
 				res = ec._Restaurant_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "restaurantName":
@@ -2178,6 +2921,17 @@ func (ec *executionContext) _Restaurant(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = ec._Restaurant_createdAt(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._Restaurant_updatedAt(ctx, field, obj)
+		case "addresses":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Restaurant_addresses(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2434,12 +3188,44 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAddress2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐAddress(ctx context.Context, sel ast.SelectionSet, v models1.Address) graphql.Marshaler {
+	return ec._Address(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAddress2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐAddress(ctx context.Context, sel ast.SelectionSet, v *models1.Address) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Address(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNAddressInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐAddressInput(ctx context.Context, v interface{}) (models.AddressInput, error) {
+	return ec.unmarshalInputAddressInput(ctx, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
 }
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
 	res := graphql.MarshalBoolean(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	return graphql.UnmarshalFloat(v)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloat(v)
 	if res == graphql.Null {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2757,6 +3543,46 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
+func (ec *executionContext) marshalOAddress2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐAddressᚄ(ctx context.Context, sel ast.SelectionSet, v []*models1.Address) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAddress2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐAddress(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
 }
@@ -2778,29 +3604,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
-}
-
-func (ec *executionContext) unmarshalOID2string(ctx context.Context, v interface{}) (string, error) {
-	return graphql.UnmarshalID(v)
-}
-
-func (ec *executionContext) marshalOID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	return graphql.MarshalID(v)
-}
-
-func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOID2string(ctx, v)
-	return &res, err
-}
-
-func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec.marshalOID2string(ctx, sel, *v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

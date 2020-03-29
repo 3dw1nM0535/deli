@@ -10,7 +10,7 @@ func migrate() error {
 
 	defer orm.DB.Close()
 
-	err = orm.DB.AutoMigrate(&models.Restaurant{}).Error
+	err = orm.DB.AutoMigrate(&models.Restaurant{}, &models.Address{}).Error
 	if err != nil {
 		return err
 	}

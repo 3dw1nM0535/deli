@@ -22,3 +22,7 @@ func (r *queryResolver) FindRestaurant(ctx context.Context, id string) (*models1
 	}
 	return restaurant, nil
 }
+
+// func (r *queryResolver) FindRestaurant(ctx context.Context, id string) (*models1.Restaurant, error) {
+
+// }
