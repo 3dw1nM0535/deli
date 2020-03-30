@@ -54,7 +54,6 @@ type ComplexityRoot struct {
 		Lon          func(childComplexity int) int
 		PostalCode   func(childComplexity int) int
 		PostalTown   func(childComplexity int) int
-		RestaurantID func(childComplexity int) int
 		Restaurants  func(childComplexity int) int
 		StreetName   func(childComplexity int) int
 		UpdatedAt    func(childComplexity int) int
@@ -84,8 +83,6 @@ type ComplexityRoot struct {
 }
 
 type AddressResolver interface {
-	RestaurantID(ctx context.Context, obj *models1.Address) (string, error)
-
 	Restaurants(ctx context.Context, obj *models1.Address) ([]*models1.Restaurant, error)
 }
 type MutationResolver interface {
@@ -159,13 +156,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Address.PostalTown(childComplexity), true
-
-	case "Address.RestaurantID":
-		if e.complexity.Address.RestaurantID == nil {
-			break
-		}
-
-		return e.complexity.Address.RestaurantID(childComplexity), true
 
 	case "Address.restaurants":
 		if e.complexity.Address.Restaurants == nil {
@@ -391,7 +381,6 @@ type Address {
   streetName: String!
   lon: Float!
   lat: Float!
-  RestaurantID: ID!
   createdAt: Time
   updatedAt: Time
   restaurants: [Restaurant!]!
@@ -725,43 +714,6 @@ func (ec *executionContext) _Address_lat(ctx context.Context, field graphql.Coll
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Address_RestaurantID(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "Address",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Address().RestaurantID(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Address_createdAt(ctx context.Context, field graphql.CollectedField, obj *models1.Address) (ret graphql.Marshaler) {
@@ -2721,20 +2673,6 @@ func (ec *executionContext) _Address(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "RestaurantID":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Address_RestaurantID(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
 		case "createdAt":
 			out.Values[i] = ec._Address_createdAt(ctx, field, obj)
 		case "updatedAt":

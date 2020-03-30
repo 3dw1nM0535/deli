@@ -9,12 +9,12 @@ import (
 
 // Addresses : find addresses belonging to a restaurant
 func (r *restaurantResolver) Addresses(ctx context.Context, obj *models.Restaurant) ([]*models.Address, error) {
-	var addr []*models.Address
+	var addresses []*models.Address
 	restaurant := obj
 	r.ORM.DB.First(&restaurant, "id = ?", obj.ID)
 	log.Println(restaurant)
-	r.ORM.DB.Model(&restaurant).Related(&addr, "Addresses")
-	return addr, nil
+	r.ORM.DB.Model(&restaurant).Related(&addresses, "Address")
+	return addresses, nil
 }
 
 // Restaurants : find restaurants belonging to an address

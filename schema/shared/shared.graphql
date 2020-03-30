@@ -24,7 +24,6 @@ type Address {
   streetName: String!
   lon: Float!
   lat: Float!
-  RestaurantID: ID!
   createdAt: Time
   updatedAt: Time
   restaurants: [Restaurant!]!

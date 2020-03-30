@@ -9,6 +9,11 @@ import (
 	"github.com/3dw1nM0535/deli/models"
 )
 
+func (r *restaurantResolver) ID(ctx context.Context, obj *models1.Restaurant) (string, error) {
+	id := obj.ID.String()
+	return id, nil
+}
+
 // AddRestaurant : create and save restaurant to the database
 func (r *mutationResolver) AddRestaurant(ctx context.Context, input models.RestaurantInput) (*models1.Restaurant, error) {
 	// validate required input information

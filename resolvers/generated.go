@@ -1,10 +1,7 @@
 package resolvers
 
 import (
-	"context"
-
 	"github.com/3dw1nM0535/deli/db"
-	"github.com/3dw1nM0535/deli/db/models"
 	graph "github.com/3dw1nM0535/deli/graph/generated"
 )
 
@@ -28,11 +25,6 @@ func (r *Resolver) Restaurant() graph.RestaurantResolver {
 }
 
 type addressResolver struct{ *Resolver }
-
-func (r *addressResolver) RestaurantID(ctx context.Context, obj *models.Address) (string, error) {
-	id := obj.ID.String()
-	return id, nil
-}
 
 // func (r *addressResolver) Restaurants(ctx context.Context, obj *models.Address) ([]*models.Restaurant, error) {
 // 	panic("not implemented")
@@ -61,11 +53,9 @@ type queryResolver struct{ *Resolver }
 
 type restaurantResolver struct{ *Resolver }
 
-func (r *restaurantResolver) ID(ctx context.Context, obj *models.Restaurant) (string, error) {
-	id := obj.ID.String()
-	return id, nil
-}
-
+// func (r *restaurantResolver) ID(ctx context.Context, obj *models.Restaurant) (string, error) {
+// 	panic("not implemented")
+// }
 // func (r *restaurantResolver) Addresses(ctx context.Context, obj *models.Restaurant) ([]*models.Address, error) {
 // 	panic("not implemented")
 // }
