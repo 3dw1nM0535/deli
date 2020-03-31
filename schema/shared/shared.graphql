@@ -11,12 +11,6 @@ type Restaurant {
   addresses: [Address!]
 }
 
-input RestaurantInput {
-  restaurantName: String!
-  about: String!
-  telephone: String!
-}
-
 type Address {
   postalCode: String!
   postalTown: String!
@@ -29,12 +23,8 @@ type Address {
   restaurants: [Restaurant!]!
 }
 
-input AddressInput {
-  postalCode: String!
-  postalTown: String!
-  buildingName: String!
-  streetName: String!
-  lon: Float!
-  lat: Float!
-  restaurantID: ID!
+type File {
+  name: String!
+  content: String!
+  conteType: String!
 }

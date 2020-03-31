@@ -12,6 +12,12 @@ type AddressInput struct {
 	RestaurantID string  `json:"restaurantID"`
 }
 
+type File struct {
+	Name      string `json:"name"`
+	Content   string `json:"content"`
+	ConteType string `json:"conteType"`
+}
+
 type RestaurantInput struct {
 	RestaurantName string `json:"restaurantName"`
 	About          string `json:"about"`

@@ -38,6 +38,9 @@ type mutationResolver struct{ *Resolver }
 // func (r *mutationResolver) RegisterAddress(ctx context.Context, input models1.AddressInput) (*models.Address, error) {
 // 	panic("not implemented")
 // }
+// func (r *mutationResolver) UploadLicense(ctx context.Context, file graphql.Upload) (*models1.File, error) {
+// 	panic("not implemented")
+// }
 
 type queryResolver struct{ *Resolver }
 

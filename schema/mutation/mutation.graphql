@@ -1,4 +1,23 @@
+scalar Upload
+
 type Mutation {
   addRestaurant(input: RestaurantInput!): Restaurant!
   registerAddress(input: AddressInput!): Address!
+  uploadLicense(file: Upload!): File!
+}
+
+input RestaurantInput {
+  restaurantName: String!
+  about: String!
+  telephone: String!
+}
+
+input AddressInput {
+  postalCode: String!
+  postalTown: String!
+  buildingName: String!
+  streetName: String!
+  lon: Float!
+  lat: Float!
+  restaurantID: ID!
 }
