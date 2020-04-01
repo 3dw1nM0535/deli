@@ -10,9 +10,18 @@ func migrate() error {
 
 	defer orm.DB.Close()
 
-	orm.DB.DropTableIfExists(&models.RestaurantAddresses{}, &models.Restaurant{}, &models.Address{})
+	orm.DB.DropTableIfExists(
+		&models.License{},
+		&models.RestaurantAddresses{},
+		&models.Address{},
+		&models.Restaurant{},
+	)
 
-	err = orm.DB.AutoMigrate(&models.Restaurant{}, &models.Address{}).Error
+	err = orm.DB.AutoMigrate(
+		&models.Restaurant{},
+		&models.Address{},
+		&models.License{},
+	).Error
 	if err != nil {
 		return err
 	}
@@ -20,6 +29,7 @@ func migrate() error {
 	// Add foreign keys
 	orm.DB.Model(&models.RestaurantAddresses{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.RestaurantAddresses{}).AddForeignKey("address_id", "addresses(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.License{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
 
 	return nil
 }

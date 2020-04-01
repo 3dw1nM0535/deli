@@ -2,6 +2,10 @@
 
 package models
 
+import (
+	"github.com/99designs/gqlgen/graphql"
+)
+
 type AddressInput struct {
 	PostalCode   string  `json:"postalCode"`
 	PostalTown   string  `json:"postalTown"`
@@ -12,14 +16,13 @@ type AddressInput struct {
 	RestaurantID string  `json:"restaurantID"`
 }
 
-type File struct {
-	Name      string `json:"name"`
-	Content   string `json:"content"`
-	ConteType string `json:"conteType"`
-}
-
 type RestaurantInput struct {
 	RestaurantName string `json:"restaurantName"`
 	About          string `json:"about"`
 	Telephone      string `json:"telephone"`
+}
+
+type UploadLicense struct {
+	RestaurantID string         `json:"restaurantID"`
+	File         graphql.Upload `json:"file"`
 }

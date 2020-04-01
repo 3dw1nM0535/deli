@@ -3,7 +3,7 @@ scalar Upload
 type Mutation {
   addRestaurant(input: RestaurantInput!): Restaurant!
   registerAddress(input: AddressInput!): Address!
-  uploadLicense(file: Upload!): File!
+  uploadLicense(input: UploadLicense!): License!
 }
 
 input RestaurantInput {
@@ -20,4 +20,9 @@ input AddressInput {
   lon: Float!
   lat: Float!
   restaurantID: ID!
+}
+
+input UploadLicense {
+  restaurantID: ID!
+  file: Upload!
 }

@@ -37,7 +37,3 @@ func (r *mutationResolver) RegisterAddress(ctx context.Context, input models.Add
 	err := fmt.Errorf("postal town '%s' doesn't exist", input.PostalTown)
 	return &models1.Address{}, err
 }
-
-// func (r *mutationResolver) RegisterAddress(ctx context.Context, input models.AddressInput) (*models1.Address, error) {
-
-// }

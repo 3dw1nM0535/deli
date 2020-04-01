@@ -38,6 +38,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Address() AddressResolver
+	License() LicenseResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Restaurant() RestaurantResolver
@@ -59,16 +60,19 @@ type ComplexityRoot struct {
 		UpdatedAt    func(childComplexity int) int
 	}
 
-	File struct {
-		ConteType func(childComplexity int) int
+	License struct {
 		Content   func(childComplexity int) int
-		Name      func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Media     func(childComplexity int) int
+		Size      func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 	}
 
 	Mutation struct {
 		AddRestaurant   func(childComplexity int, input models.RestaurantInput) int
 		RegisterAddress func(childComplexity int, input models.AddressInput) int
-		UploadLicense   func(childComplexity int, file graphql.Upload) int
+		UploadLicense   func(childComplexity int, input models.UploadLicense) int
 	}
 
 	Query struct {
@@ -82,6 +86,7 @@ type ComplexityRoot struct {
 		Addresses      func(childComplexity int) int
 		CreatedAt      func(childComplexity int) int
 		ID             func(childComplexity int) int
+		License        func(childComplexity int) int
 		RestaurantName func(childComplexity int) int
 		Telephone      func(childComplexity int) int
 		UpdatedAt      func(childComplexity int) int
@@ -92,10 +97,13 @@ type ComplexityRoot struct {
 type AddressResolver interface {
 	Restaurants(ctx context.Context, obj *models1.Address) ([]*models1.Restaurant, error)
 }
+type LicenseResolver interface {
+	ID(ctx context.Context, obj *models1.License) (string, error)
+}
 type MutationResolver interface {
 	AddRestaurant(ctx context.Context, input models.RestaurantInput) (*models1.Restaurant, error)
 	RegisterAddress(ctx context.Context, input models.AddressInput) (*models1.Address, error)
-	UploadLicense(ctx context.Context, file graphql.Upload) (*models.File, error)
+	UploadLicense(ctx context.Context, input models.UploadLicense) (*models1.License, error)
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
@@ -106,6 +114,7 @@ type RestaurantResolver interface {
 	ID(ctx context.Context, obj *models1.Restaurant) (string, error)
 
 	Addresses(ctx context.Context, obj *models1.Restaurant) ([]*models1.Address, error)
+	License(ctx context.Context, obj *models1.Restaurant) (*models1.License, error)
 }
 
 type executableSchema struct {
@@ -186,26 +195,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Address.UpdatedAt(childComplexity), true
 
-	case "File.conteType":
-		if e.complexity.File.ConteType == nil {
+	case "License.content":
+		if e.complexity.License.Content == nil {
 			break
 		}
 
-		return e.complexity.File.ConteType(childComplexity), true
+		return e.complexity.License.Content(childComplexity), true
 
-	case "File.content":
-		if e.complexity.File.Content == nil {
+	case "License.createdAt":
+		if e.complexity.License.CreatedAt == nil {
 			break
 		}
 
-		return e.complexity.File.Content(childComplexity), true
+		return e.complexity.License.CreatedAt(childComplexity), true
 
-	case "File.name":
-		if e.complexity.File.Name == nil {
+	case "License.id":
+		if e.complexity.License.ID == nil {
 			break
 		}
 
-		return e.complexity.File.Name(childComplexity), true
+		return e.complexity.License.ID(childComplexity), true
+
+	case "License.media":
+		if e.complexity.License.Media == nil {
+			break
+		}
+
+		return e.complexity.License.Media(childComplexity), true
+
+	case "License.size":
+		if e.complexity.License.Size == nil {
+			break
+		}
+
+		return e.complexity.License.Size(childComplexity), true
+
+	case "License.updatedAt":
+		if e.complexity.License.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.License.UpdatedAt(childComplexity), true
 
 	case "Mutation.addRestaurant":
 		if e.complexity.Mutation.AddRestaurant == nil {
@@ -241,7 +271,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UploadLicense(childComplexity, args["file"].(graphql.Upload)), true
+		return e.complexity.Mutation.UploadLicense(childComplexity, args["input"].(models.UploadLicense)), true
 
 	case "Query.findRestaurant":
 		if e.complexity.Query.FindRestaurant == nil {
@@ -296,6 +326,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Restaurant.ID(childComplexity), true
+
+	case "Restaurant.license":
+		if e.complexity.Restaurant.License == nil {
+			break
+		}
+
+		return e.complexity.Restaurant.License(childComplexity), true
 
 	case "Restaurant.restaurantName":
 		if e.complexity.Restaurant.RestaurantName == nil {
@@ -392,7 +429,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
 type Mutation {
   addRestaurant(input: RestaurantInput!): Restaurant!
   registerAddress(input: AddressInput!): Address!
-  uploadLicense(file: Upload!): File!
+  uploadLicense(input: UploadLicense!): License!
 }
 
 input RestaurantInput {
@@ -409,6 +446,11 @@ input AddressInput {
   lon: Float!
   lat: Float!
   restaurantID: ID!
+}
+
+input UploadLicense {
+  restaurantID: ID!
+  file: Upload!
 }`},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	hello: String!
@@ -426,6 +468,7 @@ type Restaurant {
   createdAt: Time
   updatedAt: Time
   addresses: [Address!]
+  license: License!
 }
 
 type Address {
@@ -440,10 +483,13 @@ type Address {
   restaurants: [Restaurant!]!
 }
 
-type File {
-  name: String!
+type License {
+  id: ID!
+  media: String!
   content: String!
-  conteType: String!
+  size: Int!
+  createdAt: Time
+  updatedAt: Time
 }
 `},
 )
@@ -483,14 +529,14 @@ func (ec *executionContext) field_Mutation_registerAddress_args(ctx context.Cont
 func (ec *executionContext) field_Mutation_uploadLicense_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 graphql.Upload
-	if tmp, ok := rawArgs["file"]; ok {
-		arg0, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	var arg0 models.UploadLicense
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNUploadLicense2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐUploadLicense(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["file"] = arg0
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -885,7 +931,7 @@ func (ec *executionContext) _Address_restaurants(ctx context.Context, field grap
 	return ec.marshalNRestaurant2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurantᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _File_name(ctx context.Context, field graphql.CollectedField, obj *models.File) (ret graphql.Marshaler) {
+func (ec *executionContext) _License_id(ctx context.Context, field graphql.CollectedField, obj *models1.License) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -895,7 +941,44 @@ func (ec *executionContext) _File_name(ctx context.Context, field graphql.Collec
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "File",
+		Object:   "License",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.License().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _License_media(ctx context.Context, field graphql.CollectedField, obj *models1.License) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "License",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -904,7 +987,7 @@ func (ec *executionContext) _File_name(ctx context.Context, field graphql.Collec
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
+		return obj.Media, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -922,7 +1005,7 @@ func (ec *executionContext) _File_name(ctx context.Context, field graphql.Collec
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _File_content(ctx context.Context, field graphql.CollectedField, obj *models.File) (ret graphql.Marshaler) {
+func (ec *executionContext) _License_content(ctx context.Context, field graphql.CollectedField, obj *models1.License) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -932,7 +1015,7 @@ func (ec *executionContext) _File_content(ctx context.Context, field graphql.Col
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "File",
+		Object:   "License",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -959,7 +1042,7 @@ func (ec *executionContext) _File_content(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _File_conteType(ctx context.Context, field graphql.CollectedField, obj *models.File) (ret graphql.Marshaler) {
+func (ec *executionContext) _License_size(ctx context.Context, field graphql.CollectedField, obj *models1.License) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -969,7 +1052,7 @@ func (ec *executionContext) _File_conteType(ctx context.Context, field graphql.C
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "File",
+		Object:   "License",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -978,7 +1061,7 @@ func (ec *executionContext) _File_conteType(ctx context.Context, field graphql.C
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ConteType, nil
+		return obj.Size, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -990,10 +1073,78 @@ func (ec *executionContext) _File_conteType(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _License_createdAt(ctx context.Context, field graphql.CollectedField, obj *models1.License) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "License",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _License_updatedAt(ctx context.Context, field graphql.CollectedField, obj *models1.License) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "License",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addRestaurant(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1110,7 +1261,7 @@ func (ec *executionContext) _Mutation_uploadLicense(ctx context.Context, field g
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UploadLicense(rctx, args["file"].(graphql.Upload))
+		return ec.resolvers.Mutation().UploadLicense(rctx, args["input"].(models.UploadLicense))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1122,10 +1273,10 @@ func (ec *executionContext) _Mutation_uploadLicense(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.File)
+	res := resTmp.(*models1.License)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNFile2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐFile(ctx, field.Selections, res)
+	return ec.marshalNLicense2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐLicense(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1606,6 +1757,43 @@ func (ec *executionContext) _Restaurant_addresses(ctx context.Context, field gra
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOAddress2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐAddressᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Restaurant_license(ctx context.Context, field graphql.CollectedField, obj *models1.Restaurant) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Restaurant",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Restaurant().License(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.License)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNLicense2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐLicense(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -2843,6 +3031,30 @@ func (ec *executionContext) unmarshalInputRestaurantInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUploadLicense(ctx context.Context, obj interface{}) (models.UploadLicense, error) {
+	var it models.UploadLicense
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "restaurantID":
+			var err error
+			it.RestaurantID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "file":
+			var err error
+			it.File, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2921,32 +3133,50 @@ func (ec *executionContext) _Address(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
-var fileImplementors = []string{"File"}
+var licenseImplementors = []string{"License"}
 
-func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj *models.File) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.RequestContext, sel, fileImplementors)
+func (ec *executionContext) _License(ctx context.Context, sel ast.SelectionSet, obj *models1.License) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, licenseImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("File")
-		case "name":
-			out.Values[i] = ec._File_name(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("License")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._License_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "media":
+			out.Values[i] = ec._License_media(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "content":
-			out.Values[i] = ec._File_content(ctx, field, obj)
+			out.Values[i] = ec._License_content(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
-		case "conteType":
-			out.Values[i] = ec._File_conteType(ctx, field, obj)
+		case "size":
+			out.Values[i] = ec._License_size(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
+		case "createdAt":
+			out.Values[i] = ec._License_createdAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._License_updatedAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3129,6 +3359,20 @@ func (ec *executionContext) _Restaurant(ctx context.Context, sel ast.SelectionSe
 					}
 				}()
 				res = ec._Restaurant_addresses(ctx, field, obj)
+				return res
+			})
+		case "license":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Restaurant_license(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		default:
@@ -3419,20 +3663,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNFile2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐFile(ctx context.Context, sel ast.SelectionSet, v models.File) graphql.Marshaler {
-	return ec._File(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNFile2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐFile(ctx context.Context, sel ast.SelectionSet, v *models.File) graphql.Marshaler {
-	if v == nil {
-		if !ec.HasError(graphql.GetResolverContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._File(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
 	return graphql.UnmarshalFloat(v)
 }
@@ -3459,6 +3689,34 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int64(ctx context.Context, v interface{}) (int64, error) {
+	return graphql.UnmarshalInt64(v)
+}
+
+func (ec *executionContext) marshalNInt2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
+	res := graphql.MarshalInt64(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) marshalNLicense2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐLicense(ctx context.Context, sel ast.SelectionSet, v models1.License) graphql.Marshaler {
+	return ec._License(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNLicense2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐLicense(ctx context.Context, sel ast.SelectionSet, v *models1.License) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._License(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNRestaurant2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurant(ctx context.Context, sel ast.SelectionSet, v models1.Restaurant) graphql.Marshaler {
@@ -3542,6 +3800,10 @@ func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋg
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUploadLicense2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐUploadLicense(ctx context.Context, v interface{}) (models.UploadLicense, error) {
+	return ec.unmarshalInputUploadLicense(ctx, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

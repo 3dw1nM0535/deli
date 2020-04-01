@@ -9,6 +9,7 @@ type Restaurant {
   createdAt: Time
   updatedAt: Time
   addresses: [Address!]
+  license: License!
 }
 
 type Address {
@@ -23,8 +24,11 @@ type Address {
   restaurants: [Restaurant!]!
 }
 
-type File {
-  name: String!
+type License {
+  id: ID!
+  media: String!
   content: String!
-  conteType: String!
+  size: Int!
+  createdAt: Time
+  updatedAt: Time
 }

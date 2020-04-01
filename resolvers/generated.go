@@ -14,6 +14,9 @@ type Resolver struct {
 func (r *Resolver) Address() graph.AddressResolver {
 	return &addressResolver{r}
 }
+func (r *Resolver) License() graph.LicenseResolver {
+	return &licenseResolver{r}
+}
 func (r *Resolver) Mutation() graph.MutationResolver {
 	return &mutationResolver{r}
 }
@@ -30,6 +33,12 @@ type addressResolver struct{ *Resolver }
 // 	panic("not implemented")
 // }
 
+type licenseResolver struct{ *Resolver }
+
+// func (r *licenseResolver) ID(ctx context.Context, obj *models.License) (string, error) {
+// 	panic("not implemented")
+// }
+
 type mutationResolver struct{ *Resolver }
 
 // func (r *mutationResolver) AddRestaurant(ctx context.Context, input models1.RestaurantInput) (*models.Restaurant, error) {
@@ -38,7 +47,7 @@ type mutationResolver struct{ *Resolver }
 // func (r *mutationResolver) RegisterAddress(ctx context.Context, input models1.AddressInput) (*models.Address, error) {
 // 	panic("not implemented")
 // }
-// func (r *mutationResolver) UploadLicense(ctx context.Context, file graphql.Upload) (*models1.File, error) {
+// func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models.License, error) {
 // 	panic("not implemented")
 // }
 
@@ -60,5 +69,8 @@ type restaurantResolver struct{ *Resolver }
 // 	panic("not implemented")
 // }
 // func (r *restaurantResolver) Addresses(ctx context.Context, obj *models.Restaurant) ([]*models.Address, error) {
+// 	panic("not implemented")
+// }
+// func (r *restaurantResolver) License(ctx context.Context, obj *models.Restaurant) (*models.License, error) {
 // 	panic("not implemented")
 // }

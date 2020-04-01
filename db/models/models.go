@@ -13,6 +13,11 @@ type BaseModel struct {
 	UpdatedAt time.Time
 }
 
+// LicenseModel : override gorm.Model createAt, updatedAt
+type LicenseModel struct {
+	ID uuid.UUID `gorm:"primary_key;type:uuid;default:uuid_generate_v4()"`
+}
+
 // Restaurant : restaurant data model
 type Restaurant struct {
 	BaseModel
@@ -21,6 +26,7 @@ type Restaurant struct {
 	Telephone      string     `gorm:"not_null;type:varchar(50);"`
 	Verified       bool       `gorm:"default:false;not_null;"`
 	Address        []*Address `gorm:"many2many:restaurant_addresses;"` // Back-Reference
+	License        *License
 }
 
 // Address : address data model
@@ -39,4 +45,15 @@ type Address struct {
 type RestaurantAddresses struct {
 	RestaurantID uuid.UUID
 	AddressID    uuid.UUID
+}
+
+// License : restaurant licence data mode
+type License struct {
+	LicenseModel
+	Media        string `gorm:"not_null;text;"`
+	Content      string `gorm:"type:varchar(255);not_null;"`
+	Size         int64  `gorm:"type:integer;not_null;"`
+	RestaurantID uuid.UUID
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
