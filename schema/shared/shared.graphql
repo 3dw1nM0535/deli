@@ -10,6 +10,7 @@ type Restaurant {
   updatedAt: Time
   addresses: [Address!]
   license: License!
+  menu: [Menu!]!
 }
 
 type Address {
@@ -31,4 +32,19 @@ type License {
   size: Int!
   createdAt: Time
   updatedAt: Time
+}
+
+type Dish {
+  id: ID!
+  title: String!
+  description: String!
+  price: Float!
+  image: String
+  addOns: [String!]!
+}
+
+type Menu {
+  id: ID!
+  headline: String!
+  dishes: [Dish!]!
 }

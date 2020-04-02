@@ -26,8 +26,10 @@ func Upload(ctx context.Context, r io.Reader, bucketName, credPath, projectID, f
 
 	bh := client.Bucket(bucketName)
 	// check if bucket exists
-	if _, err := bh.Attrs(ctx); err != nil {
-		return nil, nil, err
+	if bkt, _ := bh.Attrs(ctx); bkt == nil {
+		if err := bh.Create(ctx, projectID, nil); err != nil {
+			return nil, nil, err
+		}
 	}
 
 	obj := bh.Object(filename)

@@ -4,6 +4,8 @@ type Mutation {
   addRestaurant(input: RestaurantInput!): Restaurant!
   registerAddress(input: AddressInput!): Address!
   uploadLicense(input: UploadLicense!): License!
+  addMenu(input: MenuInput!): Menu!
+  addDish(input: [DishInput!]!): [Dish!]!
 }
 
 input RestaurantInput {
@@ -25,4 +27,18 @@ input AddressInput {
 input UploadLicense {
   restaurantID: ID!
   file: Upload!
+}
+
+input DishInput {
+  title: String!
+  description: String!
+  price: Float!
+  image: Upload!
+  addOns: [String!]!
+  menuId: ID!
+}
+
+input MenuInput {
+  menuHeadline: String!
+  restaurantId: ID!
 }

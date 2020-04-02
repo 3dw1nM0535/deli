@@ -38,7 +38,9 @@ type Config struct {
 
 type ResolverRoot interface {
 	Address() AddressResolver
+	Dish() DishResolver
 	License() LicenseResolver
+	Menu() MenuResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Restaurant() RestaurantResolver
@@ -60,6 +62,15 @@ type ComplexityRoot struct {
 		UpdatedAt    func(childComplexity int) int
 	}
 
+	Dish struct {
+		AddOns      func(childComplexity int) int
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Image       func(childComplexity int) int
+		Price       func(childComplexity int) int
+		Title       func(childComplexity int) int
+	}
+
 	License struct {
 		Content   func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
@@ -69,7 +80,15 @@ type ComplexityRoot struct {
 		UpdatedAt func(childComplexity int) int
 	}
 
+	Menu struct {
+		Dishes   func(childComplexity int) int
+		Headline func(childComplexity int) int
+		ID       func(childComplexity int) int
+	}
+
 	Mutation struct {
+		AddDish         func(childComplexity int, input []*models.DishInput) int
+		AddMenu         func(childComplexity int, input models.MenuInput) int
 		AddRestaurant   func(childComplexity int, input models.RestaurantInput) int
 		RegisterAddress func(childComplexity int, input models.AddressInput) int
 		UploadLicense   func(childComplexity int, input models.UploadLicense) int
@@ -87,6 +106,7 @@ type ComplexityRoot struct {
 		CreatedAt      func(childComplexity int) int
 		ID             func(childComplexity int) int
 		License        func(childComplexity int) int
+		Menu           func(childComplexity int) int
 		RestaurantName func(childComplexity int) int
 		Telephone      func(childComplexity int) int
 		UpdatedAt      func(childComplexity int) int
@@ -97,13 +117,25 @@ type ComplexityRoot struct {
 type AddressResolver interface {
 	Restaurants(ctx context.Context, obj *models1.Address) ([]*models1.Restaurant, error)
 }
+type DishResolver interface {
+	ID(ctx context.Context, obj *models1.Dish) (string, error)
+
+	AddOns(ctx context.Context, obj *models1.Dish) ([]string, error)
+}
 type LicenseResolver interface {
 	ID(ctx context.Context, obj *models1.License) (string, error)
+}
+type MenuResolver interface {
+	ID(ctx context.Context, obj *models1.Menu) (string, error)
+
+	Dishes(ctx context.Context, obj *models1.Menu) ([]*models1.Dish, error)
 }
 type MutationResolver interface {
 	AddRestaurant(ctx context.Context, input models.RestaurantInput) (*models1.Restaurant, error)
 	RegisterAddress(ctx context.Context, input models.AddressInput) (*models1.Address, error)
 	UploadLicense(ctx context.Context, input models.UploadLicense) (*models1.License, error)
+	AddMenu(ctx context.Context, input models.MenuInput) (*models1.Menu, error)
+	AddDish(ctx context.Context, input []*models.DishInput) ([]*models1.Dish, error)
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
@@ -115,6 +147,7 @@ type RestaurantResolver interface {
 
 	Addresses(ctx context.Context, obj *models1.Restaurant) ([]*models1.Address, error)
 	License(ctx context.Context, obj *models1.Restaurant) (*models1.License, error)
+	Menu(ctx context.Context, obj *models1.Restaurant) ([]*models1.Menu, error)
 }
 
 type executableSchema struct {
@@ -195,6 +228,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Address.UpdatedAt(childComplexity), true
 
+	case "Dish.addOns":
+		if e.complexity.Dish.AddOns == nil {
+			break
+		}
+
+		return e.complexity.Dish.AddOns(childComplexity), true
+
+	case "Dish.description":
+		if e.complexity.Dish.Description == nil {
+			break
+		}
+
+		return e.complexity.Dish.Description(childComplexity), true
+
+	case "Dish.id":
+		if e.complexity.Dish.ID == nil {
+			break
+		}
+
+		return e.complexity.Dish.ID(childComplexity), true
+
+	case "Dish.image":
+		if e.complexity.Dish.Image == nil {
+			break
+		}
+
+		return e.complexity.Dish.Image(childComplexity), true
+
+	case "Dish.price":
+		if e.complexity.Dish.Price == nil {
+			break
+		}
+
+		return e.complexity.Dish.Price(childComplexity), true
+
+	case "Dish.title":
+		if e.complexity.Dish.Title == nil {
+			break
+		}
+
+		return e.complexity.Dish.Title(childComplexity), true
+
 	case "License.content":
 		if e.complexity.License.Content == nil {
 			break
@@ -236,6 +311,51 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.License.UpdatedAt(childComplexity), true
+
+	case "Menu.dishes":
+		if e.complexity.Menu.Dishes == nil {
+			break
+		}
+
+		return e.complexity.Menu.Dishes(childComplexity), true
+
+	case "Menu.headline":
+		if e.complexity.Menu.Headline == nil {
+			break
+		}
+
+		return e.complexity.Menu.Headline(childComplexity), true
+
+	case "Menu.id":
+		if e.complexity.Menu.ID == nil {
+			break
+		}
+
+		return e.complexity.Menu.ID(childComplexity), true
+
+	case "Mutation.addDish":
+		if e.complexity.Mutation.AddDish == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addDish_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddDish(childComplexity, args["input"].([]*models.DishInput)), true
+
+	case "Mutation.addMenu":
+		if e.complexity.Mutation.AddMenu == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addMenu_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddMenu(childComplexity, args["input"].(models.MenuInput)), true
 
 	case "Mutation.addRestaurant":
 		if e.complexity.Mutation.AddRestaurant == nil {
@@ -334,6 +454,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Restaurant.License(childComplexity), true
 
+	case "Restaurant.menu":
+		if e.complexity.Restaurant.Menu == nil {
+			break
+		}
+
+		return e.complexity.Restaurant.Menu(childComplexity), true
+
 	case "Restaurant.restaurantName":
 		if e.complexity.Restaurant.RestaurantName == nil {
 			break
@@ -430,6 +557,8 @@ type Mutation {
   addRestaurant(input: RestaurantInput!): Restaurant!
   registerAddress(input: AddressInput!): Address!
   uploadLicense(input: UploadLicense!): License!
+  addMenu(input: MenuInput!): Menu!
+  addDish(input: [DishInput!]!): [Dish!]!
 }
 
 input RestaurantInput {
@@ -451,6 +580,20 @@ input AddressInput {
 input UploadLicense {
   restaurantID: ID!
   file: Upload!
+}
+
+input DishInput {
+  title: String!
+  description: String!
+  price: Float!
+  image: Upload!
+  addOns: [String!]!
+  menuId: ID!
+}
+
+input MenuInput {
+  menuHeadline: String!
+  restaurantId: ID!
 }`},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	hello: String!
@@ -469,6 +612,7 @@ type Restaurant {
   updatedAt: Time
   addresses: [Address!]
   license: License!
+  menu: [Menu!]!
 }
 
 type Address {
@@ -491,12 +635,55 @@ type License {
   createdAt: Time
   updatedAt: Time
 }
+
+type Dish {
+  id: ID!
+  title: String!
+  description: String!
+  price: Float!
+  image: String
+  addOns: [String!]!
+}
+
+type Menu {
+  id: ID!
+  headline: String!
+  dishes: [Dish!]!
+}
 `},
 )
 
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_addDish_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*models.DishInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNDishInput2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addMenu_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.MenuInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNMenuInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐMenuInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_addRestaurant_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -931,6 +1118,225 @@ func (ec *executionContext) _Address_restaurants(ctx context.Context, field grap
 	return ec.marshalNRestaurant2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurantᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Dish_id(ctx context.Context, field graphql.CollectedField, obj *models1.Dish) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Dish",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Dish().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Dish_title(ctx context.Context, field graphql.CollectedField, obj *models1.Dish) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Dish",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Dish_description(ctx context.Context, field graphql.CollectedField, obj *models1.Dish) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Dish",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Dish_price(ctx context.Context, field graphql.CollectedField, obj *models1.Dish) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Dish",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Price, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Dish_image(ctx context.Context, field graphql.CollectedField, obj *models1.Dish) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Dish",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Image, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Dish_addOns(ctx context.Context, field graphql.CollectedField, obj *models1.Dish) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Dish",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Dish().AddOns(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _License_id(ctx context.Context, field graphql.CollectedField, obj *models1.License) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -1147,6 +1553,117 @@ func (ec *executionContext) _License_updatedAt(ctx context.Context, field graphq
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Menu_id(ctx context.Context, field graphql.CollectedField, obj *models1.Menu) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Menu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Menu().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_headline(ctx context.Context, field graphql.CollectedField, obj *models1.Menu) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Menu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Headline, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_dishes(ctx context.Context, field graphql.CollectedField, obj *models1.Menu) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Menu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Menu().Dishes(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Dish)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNDish2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDishᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_addRestaurant(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -1277,6 +1794,94 @@ func (ec *executionContext) _Mutation_uploadLicense(ctx context.Context, field g
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNLicense2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐLicense(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addMenu(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addMenu_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddMenu(rctx, args["input"].(models.MenuInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.Menu)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNMenu2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐMenu(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addDish(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addDish_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddDish(rctx, args["input"].([]*models.DishInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Dish)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNDish2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDishᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1794,6 +2399,43 @@ func (ec *executionContext) _Restaurant_license(ctx context.Context, field graph
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNLicense2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐLicense(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Restaurant_menu(ctx context.Context, field graphql.CollectedField, obj *models1.Restaurant) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Restaurant",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Restaurant().Menu(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Menu)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNMenu2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐMenuᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3001,6 +3643,78 @@ func (ec *executionContext) unmarshalInputAddressInput(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDishInput(ctx context.Context, obj interface{}) (models.DishInput, error) {
+	var it models.DishInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "title":
+			var err error
+			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+			it.Description, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "price":
+			var err error
+			it.Price, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "image":
+			var err error
+			it.Image, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "addOns":
+			var err error
+			it.AddOns, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "menuId":
+			var err error
+			it.MenuID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputMenuInput(ctx context.Context, obj interface{}) (models.MenuInput, error) {
+	var it models.MenuInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "menuHeadline":
+			var err error
+			it.MenuHeadline, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "restaurantId":
+			var err error
+			it.RestaurantID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRestaurantInput(ctx context.Context, obj interface{}) (models.RestaurantInput, error) {
 	var it models.RestaurantInput
 	var asMap = obj.(map[string]interface{})
@@ -3133,6 +3847,73 @@ func (ec *executionContext) _Address(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var dishImplementors = []string{"Dish"}
+
+func (ec *executionContext) _Dish(ctx context.Context, sel ast.SelectionSet, obj *models1.Dish) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, dishImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Dish")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Dish_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "title":
+			out.Values[i] = ec._Dish_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "description":
+			out.Values[i] = ec._Dish_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "price":
+			out.Values[i] = ec._Dish_price(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "image":
+			out.Values[i] = ec._Dish_image(ctx, field, obj)
+		case "addOns":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Dish_addOns(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var licenseImplementors = []string{"License"}
 
 func (ec *executionContext) _License(ctx context.Context, sel ast.SelectionSet, obj *models1.License) graphql.Marshaler {
@@ -3188,6 +3969,61 @@ func (ec *executionContext) _License(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var menuImplementors = []string{"Menu"}
+
+func (ec *executionContext) _Menu(ctx context.Context, sel ast.SelectionSet, obj *models1.Menu) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, menuImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Menu")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Menu_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "headline":
+			out.Values[i] = ec._Menu_headline(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "dishes":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Menu_dishes(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3215,6 +4051,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "uploadLicense":
 			out.Values[i] = ec._Mutation_uploadLicense(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addMenu":
+			out.Values[i] = ec._Mutation_addMenu(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addDish":
+			out.Values[i] = ec._Mutation_addDish(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3370,6 +4216,20 @@ func (ec *executionContext) _Restaurant(ctx context.Context, sel ast.SelectionSe
 					}
 				}()
 				res = ec._Restaurant_license(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "menu":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Restaurant_menu(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3663,6 +4523,89 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNDish2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDish(ctx context.Context, sel ast.SelectionSet, v models1.Dish) graphql.Marshaler {
+	return ec._Dish(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDish2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDishᚄ(ctx context.Context, sel ast.SelectionSet, v []*models1.Dish) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDish2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDish(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNDish2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDish(ctx context.Context, sel ast.SelectionSet, v *models1.Dish) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Dish(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDishInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishInput(ctx context.Context, v interface{}) (models.DishInput, error) {
+	return ec.unmarshalInputDishInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNDishInput2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishInputᚄ(ctx context.Context, v interface{}) ([]*models.DishInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*models.DishInput, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNDishInput2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNDishInput2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishInput(ctx context.Context, v interface{}) (*models.DishInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNDishInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishInput(ctx, v)
+	return &res, err
+}
+
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
 	return graphql.UnmarshalFloat(v)
 }
@@ -3717,6 +4660,61 @@ func (ec *executionContext) marshalNLicense2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeli�
 		return graphql.Null
 	}
 	return ec._License(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMenu2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐMenu(ctx context.Context, sel ast.SelectionSet, v models1.Menu) graphql.Marshaler {
+	return ec._Menu(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMenu2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐMenuᚄ(ctx context.Context, sel ast.SelectionSet, v []*models1.Menu) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMenu2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐMenu(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNMenu2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐMenu(ctx context.Context, sel ast.SelectionSet, v *models1.Menu) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Menu(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNMenuInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐMenuInput(ctx context.Context, v interface{}) (models.MenuInput, error) {
+	return ec.unmarshalInputMenuInput(ctx, v)
 }
 
 func (ec *executionContext) marshalNRestaurant2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurant(ctx context.Context, sel ast.SelectionSet, v models1.Restaurant) graphql.Marshaler {
@@ -3786,6 +4784,35 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {

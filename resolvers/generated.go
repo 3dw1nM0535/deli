@@ -14,8 +14,14 @@ type Resolver struct {
 func (r *Resolver) Address() graph.AddressResolver {
 	return &addressResolver{r}
 }
+func (r *Resolver) Dish() graph.DishResolver {
+	return &dishResolver{r}
+}
 func (r *Resolver) License() graph.LicenseResolver {
 	return &licenseResolver{r}
+}
+func (r *Resolver) Menu() graph.MenuResolver {
+	return &menuResolver{r}
 }
 func (r *Resolver) Mutation() graph.MutationResolver {
 	return &mutationResolver{r}
@@ -33,9 +39,27 @@ type addressResolver struct{ *Resolver }
 // 	panic("not implemented")
 // }
 
+type dishResolver struct{ *Resolver }
+
+// func (r *dishResolver) ID(ctx context.Context, obj *models.Dish) (string, error) {
+// 	panic("not implemented")
+// }
+// func (r *dishResolver) AddOns(ctx context.Context, obj *models.Dish) ([]string, error) {
+// 	panic("not implemented")
+// }
+
 type licenseResolver struct{ *Resolver }
 
 // func (r *licenseResolver) ID(ctx context.Context, obj *models.License) (string, error) {
+// 	panic("not implemented")
+// }
+
+type menuResolver struct{ *Resolver }
+
+// func (r *menuResolver) ID(ctx context.Context, obj *models.Menu) (string, error) {
+// 	panic("not implemented")
+// }
+// func (r *menuResolver) Dishes(ctx context.Context, obj *models.Menu) ([]*models.Dish, error) {
 // 	panic("not implemented")
 // }
 
@@ -48,6 +72,12 @@ type mutationResolver struct{ *Resolver }
 // 	panic("not implemented")
 // }
 // func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models.License, error) {
+// 	panic("not implemented")
+// }
+// func (r *mutationResolver) AddMenu(ctx context.Context, input models1.MenuInput) (*models.Menu, error) {
+// 	panic("not implemented")
+// }
+// func (r *mutationResolver) AddDish(ctx context.Context, input []*models1.DishInput) ([]*models.Dish, error) {
 // 	panic("not implemented")
 // }
 
@@ -72,5 +102,8 @@ type restaurantResolver struct{ *Resolver }
 // 	panic("not implemented")
 // }
 // func (r *restaurantResolver) License(ctx context.Context, obj *models.Restaurant) (*models.License, error) {
+// 	panic("not implemented")
+// }
+// func (r *restaurantResolver) Menu(ctx context.Context, obj *models.Restaurant) ([]*models.Menu, error) {
 // 	panic("not implemented")
 // }

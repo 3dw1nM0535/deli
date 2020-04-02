@@ -11,9 +11,34 @@ func (r *restaurantResolver) ID(ctx context.Context, obj *models.Restaurant) (st
 	return id, nil
 }
 
+func (r *dishResolver) ID(ctx context.Context, obj *models.Dish) (string, error) {
+	id := obj.ID.String()
+	return id, nil
+}
+
 func (r *licenseResolver) ID(ctx context.Context, obj *models.License) (string, error) {
 	id := obj.ID.String()
 	return id, nil
+}
+
+func (r *dishResolver) AddOns(ctx context.Context, obj *models.Dish) ([]string, error) {
+	var addOns []string
+	addOns = obj.AddOns
+	return addOns, nil
+}
+
+func (r *menuResolver) ID(ctx context.Context, obj *models.Menu) (string, error) {
+	id := obj.ID.String()
+	return id, nil
+}
+
+// Dishes : find dishes belonging to a menu
+func (r *menuResolver) Dishes(ctx context.Context, obj *models.Menu) ([]*models.Dish, error) {
+	dishes := []*models.Dish{}
+	menu := obj
+	r.ORM.DB.First(&menu, "id = ?", obj.ID)
+	r.ORM.DB.Model(&menu).Related(&dishes)
+	return dishes, nil
 }
 
 // Addresses : find addresses belonging to a restaurant
@@ -39,4 +64,13 @@ func (r *restaurantResolver) License(ctx context.Context, obj *models.Restaurant
 	license := &models.License{}
 	r.ORM.DB.Model(&obj).Related(&license)
 	return license, nil
+}
+
+// Menu : find menu belonging to a restaurant
+func (r *restaurantResolver) Menu(ctx context.Context, obj *models.Restaurant) ([]*models.Menu, error) {
+	menu := []*models.Menu{}
+	restaurant := obj
+	r.ORM.DB.First(&restaurant, "id = ?", obj.ID)
+	r.ORM.DB.Model(&restaurant).Related(&menu)
+	return menu, nil
 }

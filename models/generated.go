@@ -16,6 +16,20 @@ type AddressInput struct {
 	RestaurantID string  `json:"restaurantID"`
 }
 
+type DishInput struct {
+	Title       string         `json:"title"`
+	Description string         `json:"description"`
+	Price       float64        `json:"price"`
+	Image       graphql.Upload `json:"image"`
+	AddOns      []string       `json:"addOns"`
+	MenuID      string         `json:"menuId"`
+}
+
+type MenuInput struct {
+	MenuHeadline string `json:"menuHeadline"`
+	RestaurantID string `json:"restaurantId"`
+}
+
 type RestaurantInput struct {
 	RestaurantName string `json:"restaurantName"`
 	About          string `json:"about"`

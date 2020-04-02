@@ -7,17 +7,17 @@ import (
 	"github.com/3dw1nM0535/deli/db/models"
 	models1 "github.com/3dw1nM0535/deli/models"
 	"github.com/3dw1nM0535/deli/utils"
-	"github.com/gofrs/uuid"
 	"github.com/joho/godotenv"
 )
 
-var credPath, projectID, bucketName string
+var credPath, projectID, licenseBucketName, dishesBucketName string
 
 func init() {
 	godotenv.Load()
 	credPath = utils.MustGetEnv("GOOGLE_APPLICATION_CREDENTIALS")
 	projectID = utils.MustGetEnv("GOOGLE_PROJECT_ID")
-	bucketName = utils.MustGetEnv("LICENSE_BUCKET_NAME")
+	licenseBucketName = utils.MustGetEnv("LICENSE_BUCKET_NAME")
+	dishesBucketName = utils.MustGetEnv("DISHES_BUCKET_NAME")
 }
 
 func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models.License, error) {
@@ -26,7 +26,7 @@ func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.Uplo
 		return &models.License{}, errors.New("restaurant id cannot be empty")
 	}
 
-	var id = uuid.Must(uuid.FromString(input.RestaurantID))
+	var id = utils.ParseUUID(input.RestaurantID)
 
 	// check that restaurant is already in our database
 	// before attaching its license
@@ -46,7 +46,7 @@ func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.Uplo
 
 	// upload to google cloud storage and return object attributes
 	ctx = context.Background()
-	_, attr, err := utils.Upload(ctx, input.File.File, bucketName, credPath, projectID, input.File.Filename)
+	_, attr, err := utils.Upload(ctx, input.File.File, licenseBucketName, credPath, projectID, input.File.Filename)
 	if err != nil {
 		return &models.License{}, err
 	}
