@@ -17,7 +17,7 @@ func init() {
 	godotenv.Load()
 	credPath = utils.MustGetEnv("GOOGLE_APPLICATION_CREDENTIALS")
 	projectID = utils.MustGetEnv("GOOGLE_PROJECT_ID")
-	bucketName = utils.MustGetEnv("GOOGLE_BUCKET_NAME")
+	bucketName = utils.MustGetEnv("LICENSE_BUCKET_NAME")
 }
 
 func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models.License, error) {
