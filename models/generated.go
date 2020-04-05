@@ -25,9 +25,22 @@ type DishInput struct {
 	MenuID      string         `json:"menuId"`
 }
 
+type DishNote struct {
+	DishID      string   `json:"dishId"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	AddOns      []string `json:"addOns"`
+}
+
 type MenuInput struct {
 	MenuHeadline string `json:"menuHeadline"`
 	RestaurantID string `json:"restaurantId"`
+}
+
+type OrderInput struct {
+	OrderNotes      []*DishNote `json:"orderNotes"`
+	RestaurantNotes string      `json:"restaurantNotes"`
+	RestaurantID    string      `json:"restaurantId"`
 }
 
 type RestaurantInput struct {

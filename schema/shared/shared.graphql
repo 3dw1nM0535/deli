@@ -11,6 +11,7 @@ type Restaurant {
   addresses: [Address!]
   license: License!
   menu: [Menu!]!
+  orders: [Order!]!
 }
 
 type Address {
@@ -47,4 +48,17 @@ type Menu {
   id: ID!
   headline: String!
   dishes: [Dish!]!
+}
+
+type DishOrder {
+  id: ID!
+  title: String!
+  description: String!
+  addOns: [String!]!
+}
+
+type Order {
+  id: ID!
+  notes: [DishOrder!]!
+  restaurantNotes: String!
 }

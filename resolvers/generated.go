@@ -17,6 +17,9 @@ func (r *Resolver) Address() graph.AddressResolver {
 func (r *Resolver) Dish() graph.DishResolver {
 	return &dishResolver{r}
 }
+func (r *Resolver) DishOrder() graph.DishOrderResolver {
+	return &dishOrderResolver{r}
+}
 func (r *Resolver) License() graph.LicenseResolver {
 	return &licenseResolver{r}
 }
@@ -25,6 +28,9 @@ func (r *Resolver) Menu() graph.MenuResolver {
 }
 func (r *Resolver) Mutation() graph.MutationResolver {
 	return &mutationResolver{r}
+}
+func (r *Resolver) Order() graph.OrderResolver {
+	return &orderResolver{r}
 }
 func (r *Resolver) Query() graph.QueryResolver {
 	return &queryResolver{r}
@@ -45,6 +51,15 @@ type dishResolver struct{ *Resolver }
 // 	panic("not implemented")
 // }
 // func (r *dishResolver) AddOns(ctx context.Context, obj *models.Dish) ([]string, error) {
+// 	panic("not implemented")
+// }
+
+type dishOrderResolver struct{ *Resolver }
+
+// func (r *dishOrderResolver) ID(ctx context.Context, obj *models.DishOrder) (string, error) {
+// 	panic("not implemented")
+// }
+// func (r *dishOrderResolver) AddOns(ctx context.Context, obj *models.DishOrder) ([]string, error) {
 // 	panic("not implemented")
 // }
 
@@ -80,6 +95,18 @@ type mutationResolver struct{ *Resolver }
 // func (r *mutationResolver) AddDish(ctx context.Context, input []*models1.DishInput) ([]*models.Dish, error) {
 // 	panic("not implemented")
 // }
+// func (r *mutationResolver) MakeOrder(ctx context.Context, input models1.OrderInput) (*models.Order, error) {
+// 	panic("not implemented")
+// }
+
+type orderResolver struct{ *Resolver }
+
+// func (r *orderResolver) ID(ctx context.Context, obj *models.Order) (string, error) {
+// 	panic("not implemented")
+// }
+// func (r *orderResolver) Notes(ctx context.Context, obj *models.Order) ([]*models.DishOrder, error) {
+// 	panic("not implemented")
+// }
 
 type queryResolver struct{ *Resolver }
 
@@ -105,5 +132,8 @@ type restaurantResolver struct{ *Resolver }
 // 	panic("not implemented")
 // }
 // func (r *restaurantResolver) Menu(ctx context.Context, obj *models.Restaurant) ([]*models.Menu, error) {
+// 	panic("not implemented")
+// }
+// func (r *restaurantResolver) Orders(ctx context.Context, obj *models.Restaurant) ([]*models.Order, error) {
 // 	panic("not implemented")
 // }

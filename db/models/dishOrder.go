@@ -1,0 +1,16 @@
+package models
+
+import (
+	"github.com/gofrs/uuid"
+	"github.com/lib/pq"
+)
+
+// DishOrder : ordered dish struct
+type DishOrder struct {
+	BaseModel
+	DishID      uuid.UUID
+	Title       string         `gorm:"type:varchar(100);not_null;"`
+	Description string         `gorm:"text;not_null;"`
+	AddOns      pq.StringArray `gorm:"type:varchar(100)[]"`
+	OrderID     uuid.UUID
+}

@@ -6,6 +6,11 @@ import (
 	"github.com/3dw1nM0535/deli/db/models"
 )
 
+func (r *orderResolver) ID(ctx context.Context, obj *models.Order) (string, error) {
+	id := obj.ID.String()
+	return id, nil
+}
+
 func (r *restaurantResolver) ID(ctx context.Context, obj *models.Restaurant) (string, error) {
 	id := obj.ID.String()
 	return id, nil
@@ -73,4 +78,31 @@ func (r *restaurantResolver) Menu(ctx context.Context, obj *models.Restaurant) (
 	r.ORM.DB.First(&restaurant, "id = ?", obj.ID)
 	r.ORM.DB.Model(&restaurant).Related(&menu)
 	return menu, nil
+}
+
+func (r *dishOrderResolver) ID(ctx context.Context, obj *models.DishOrder) (string, error) {
+	id := obj.ID.String()
+	return id, nil
+}
+func (r *dishOrderResolver) AddOns(ctx context.Context, obj *models.DishOrder) ([]string, error) {
+	addons := obj.AddOns
+	return addons, nil
+}
+
+// Notes : find notes belonging to an order
+func (r *orderResolver) Notes(ctx context.Context, obj *models.Order) ([]*models.DishOrder, error) {
+	notes := []*models.DishOrder{}
+	order := obj
+	r.ORM.DB.First(&order, "id = ?", obj.ID)
+	r.ORM.DB.Model(&order).Related(&notes)
+	return notes, nil
+}
+
+// Orders : find order belonging to a restaurant
+func (r *restaurantResolver) Orders(ctx context.Context, obj *models.Restaurant) ([]*models.Order, error) {
+	orders := []*models.Order{}
+	restaurant := obj
+	r.ORM.DB.First(&restaurant, "id = ?", obj.ID)
+	r.ORM.DB.Model(&restaurant).Related(&orders)
+	return orders, nil
 }

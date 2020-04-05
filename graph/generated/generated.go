@@ -39,9 +39,11 @@ type Config struct {
 type ResolverRoot interface {
 	Address() AddressResolver
 	Dish() DishResolver
+	DishOrder() DishOrderResolver
 	License() LicenseResolver
 	Menu() MenuResolver
 	Mutation() MutationResolver
+	Order() OrderResolver
 	Query() QueryResolver
 	Restaurant() RestaurantResolver
 }
@@ -71,6 +73,13 @@ type ComplexityRoot struct {
 		Title       func(childComplexity int) int
 	}
 
+	DishOrder struct {
+		AddOns      func(childComplexity int) int
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Title       func(childComplexity int) int
+	}
+
 	License struct {
 		Content   func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
@@ -90,8 +99,15 @@ type ComplexityRoot struct {
 		AddDish         func(childComplexity int, input []*models.DishInput) int
 		AddMenu         func(childComplexity int, input models.MenuInput) int
 		AddRestaurant   func(childComplexity int, input models.RestaurantInput) int
+		MakeOrder       func(childComplexity int, input models.OrderInput) int
 		RegisterAddress func(childComplexity int, input models.AddressInput) int
 		UploadLicense   func(childComplexity int, input models.UploadLicense) int
+	}
+
+	Order struct {
+		ID              func(childComplexity int) int
+		Notes           func(childComplexity int) int
+		RestaurantNotes func(childComplexity int) int
 	}
 
 	Query struct {
@@ -107,6 +123,7 @@ type ComplexityRoot struct {
 		ID             func(childComplexity int) int
 		License        func(childComplexity int) int
 		Menu           func(childComplexity int) int
+		Orders         func(childComplexity int) int
 		RestaurantName func(childComplexity int) int
 		Telephone      func(childComplexity int) int
 		UpdatedAt      func(childComplexity int) int
@@ -122,6 +139,11 @@ type DishResolver interface {
 
 	AddOns(ctx context.Context, obj *models1.Dish) ([]string, error)
 }
+type DishOrderResolver interface {
+	ID(ctx context.Context, obj *models1.DishOrder) (string, error)
+
+	AddOns(ctx context.Context, obj *models1.DishOrder) ([]string, error)
+}
 type LicenseResolver interface {
 	ID(ctx context.Context, obj *models1.License) (string, error)
 }
@@ -136,6 +158,11 @@ type MutationResolver interface {
 	UploadLicense(ctx context.Context, input models.UploadLicense) (*models1.License, error)
 	AddMenu(ctx context.Context, input models.MenuInput) (*models1.Menu, error)
 	AddDish(ctx context.Context, input []*models.DishInput) ([]*models1.Dish, error)
+	MakeOrder(ctx context.Context, input models.OrderInput) (*models1.Order, error)
+}
+type OrderResolver interface {
+	ID(ctx context.Context, obj *models1.Order) (string, error)
+	Notes(ctx context.Context, obj *models1.Order) ([]*models1.DishOrder, error)
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
@@ -148,6 +175,7 @@ type RestaurantResolver interface {
 	Addresses(ctx context.Context, obj *models1.Restaurant) ([]*models1.Address, error)
 	License(ctx context.Context, obj *models1.Restaurant) (*models1.License, error)
 	Menu(ctx context.Context, obj *models1.Restaurant) ([]*models1.Menu, error)
+	Orders(ctx context.Context, obj *models1.Restaurant) ([]*models1.Order, error)
 }
 
 type executableSchema struct {
@@ -270,6 +298,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Dish.Title(childComplexity), true
 
+	case "DishOrder.addOns":
+		if e.complexity.DishOrder.AddOns == nil {
+			break
+		}
+
+		return e.complexity.DishOrder.AddOns(childComplexity), true
+
+	case "DishOrder.description":
+		if e.complexity.DishOrder.Description == nil {
+			break
+		}
+
+		return e.complexity.DishOrder.Description(childComplexity), true
+
+	case "DishOrder.id":
+		if e.complexity.DishOrder.ID == nil {
+			break
+		}
+
+		return e.complexity.DishOrder.ID(childComplexity), true
+
+	case "DishOrder.title":
+		if e.complexity.DishOrder.Title == nil {
+			break
+		}
+
+		return e.complexity.DishOrder.Title(childComplexity), true
+
 	case "License.content":
 		if e.complexity.License.Content == nil {
 			break
@@ -369,6 +425,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddRestaurant(childComplexity, args["input"].(models.RestaurantInput)), true
 
+	case "Mutation.makeOrder":
+		if e.complexity.Mutation.MakeOrder == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_makeOrder_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MakeOrder(childComplexity, args["input"].(models.OrderInput)), true
+
 	case "Mutation.registerAddress":
 		if e.complexity.Mutation.RegisterAddress == nil {
 			break
@@ -392,6 +460,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UploadLicense(childComplexity, args["input"].(models.UploadLicense)), true
+
+	case "Order.id":
+		if e.complexity.Order.ID == nil {
+			break
+		}
+
+		return e.complexity.Order.ID(childComplexity), true
+
+	case "Order.notes":
+		if e.complexity.Order.Notes == nil {
+			break
+		}
+
+		return e.complexity.Order.Notes(childComplexity), true
+
+	case "Order.restaurantNotes":
+		if e.complexity.Order.RestaurantNotes == nil {
+			break
+		}
+
+		return e.complexity.Order.RestaurantNotes(childComplexity), true
 
 	case "Query.findRestaurant":
 		if e.complexity.Query.FindRestaurant == nil {
@@ -460,6 +549,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Restaurant.Menu(childComplexity), true
+
+	case "Restaurant.orders":
+		if e.complexity.Restaurant.Orders == nil {
+			break
+		}
+
+		return e.complexity.Restaurant.Orders(childComplexity), true
 
 	case "Restaurant.restaurantName":
 		if e.complexity.Restaurant.RestaurantName == nil {
@@ -559,6 +655,7 @@ type Mutation {
   uploadLicense(input: UploadLicense!): License!
   addMenu(input: MenuInput!): Menu!
   addDish(input: [DishInput!]!): [Dish!]!
+  makeOrder(input: OrderInput!): Order!
 }
 
 input RestaurantInput {
@@ -594,7 +691,21 @@ input DishInput {
 input MenuInput {
   menuHeadline: String!
   restaurantId: ID!
-}`},
+}
+
+input DishNote {
+  dishId: ID!
+  title: String!
+  description: String!
+  addOns: [String!]!
+}
+
+input OrderInput {
+  orderNotes: [DishNote!]!
+  restaurantNotes: String!
+  restaurantId: ID!
+}
+`},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	hello: String!
 	findRestaurant(id: ID!): Restaurant!
@@ -613,6 +724,7 @@ type Restaurant {
   addresses: [Address!]
   license: License!
   menu: [Menu!]!
+  orders: [Order!]!
 }
 
 type Address {
@@ -649,6 +761,19 @@ type Menu {
   id: ID!
   headline: String!
   dishes: [Dish!]!
+}
+
+type DishOrder {
+  id: ID!
+  title: String!
+  description: String!
+  addOns: [String!]!
+}
+
+type Order {
+  id: ID!
+  notes: [DishOrder!]!
+  restaurantNotes: String!
 }
 `},
 )
@@ -691,6 +816,20 @@ func (ec *executionContext) field_Mutation_addRestaurant_args(ctx context.Contex
 	var arg0 models.RestaurantInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNRestaurantInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐRestaurantInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_makeOrder_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.OrderInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNOrderInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐOrderInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1337,6 +1476,154 @@ func (ec *executionContext) _Dish_addOns(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _DishOrder_id(ctx context.Context, field graphql.CollectedField, obj *models1.DishOrder) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "DishOrder",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DishOrder().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DishOrder_title(ctx context.Context, field graphql.CollectedField, obj *models1.DishOrder) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "DishOrder",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DishOrder_description(ctx context.Context, field graphql.CollectedField, obj *models1.DishOrder) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "DishOrder",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DishOrder_addOns(ctx context.Context, field graphql.CollectedField, obj *models1.DishOrder) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "DishOrder",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DishOrder().AddOns(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _License_id(ctx context.Context, field graphql.CollectedField, obj *models1.License) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -1882,6 +2169,161 @@ func (ec *executionContext) _Mutation_addDish(ctx context.Context, field graphql
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNDish2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDishᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_makeOrder(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_makeOrder_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MakeOrder(rctx, args["input"].(models.OrderInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.Order)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNOrder2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐOrder(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Order_id(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Order().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Order_notes(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Order().Notes(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.DishOrder)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNDishOrder2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDishOrderᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Order_restaurantNotes(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RestaurantNotes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2436,6 +2878,43 @@ func (ec *executionContext) _Restaurant_menu(ctx context.Context, field graphql.
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNMenu2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐMenuᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Restaurant_orders(ctx context.Context, field graphql.CollectedField, obj *models1.Restaurant) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Restaurant",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Restaurant().Orders(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Order)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNOrder2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐOrderᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3691,6 +4170,42 @@ func (ec *executionContext) unmarshalInputDishInput(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDishNote(ctx context.Context, obj interface{}) (models.DishNote, error) {
+	var it models.DishNote
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "dishId":
+			var err error
+			it.DishID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+			it.Description, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "addOns":
+			var err error
+			it.AddOns, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputMenuInput(ctx context.Context, obj interface{}) (models.MenuInput, error) {
 	var it models.MenuInput
 	var asMap = obj.(map[string]interface{})
@@ -3700,6 +4215,36 @@ func (ec *executionContext) unmarshalInputMenuInput(ctx context.Context, obj int
 		case "menuHeadline":
 			var err error
 			it.MenuHeadline, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "restaurantId":
+			var err error
+			it.RestaurantID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputOrderInput(ctx context.Context, obj interface{}) (models.OrderInput, error) {
+	var it models.OrderInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "orderNotes":
+			var err error
+			it.OrderNotes, err = ec.unmarshalNDishNote2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishNoteᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "restaurantNotes":
+			var err error
+			it.RestaurantNotes, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3914,6 +4459,66 @@ func (ec *executionContext) _Dish(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var dishOrderImplementors = []string{"DishOrder"}
+
+func (ec *executionContext) _DishOrder(ctx context.Context, sel ast.SelectionSet, obj *models1.DishOrder) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, dishOrderImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DishOrder")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DishOrder_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "title":
+			out.Values[i] = ec._DishOrder_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "description":
+			out.Values[i] = ec._DishOrder_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "addOns":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DishOrder_addOns(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var licenseImplementors = []string{"License"}
 
 func (ec *executionContext) _License(ctx context.Context, sel ast.SelectionSet, obj *models1.License) graphql.Marshaler {
@@ -4063,6 +4668,66 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_addDish(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
+			}
+		case "makeOrder":
+			out.Values[i] = ec._Mutation_makeOrder(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var orderImplementors = []string{"Order"}
+
+func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, obj *models1.Order) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, orderImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Order")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Order_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "notes":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Order_notes(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "restaurantNotes":
+			out.Values[i] = ec._Order_restaurantNotes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -4230,6 +4895,20 @@ func (ec *executionContext) _Restaurant(ctx context.Context, sel ast.SelectionSe
 					}
 				}()
 				res = ec._Restaurant_menu(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "orders":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Restaurant_orders(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -4606,6 +5285,89 @@ func (ec *executionContext) unmarshalNDishInput2ᚖgithubᚗcomᚋ3dw1nM0535ᚋd
 	return &res, err
 }
 
+func (ec *executionContext) unmarshalNDishNote2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishNote(ctx context.Context, v interface{}) (models.DishNote, error) {
+	return ec.unmarshalInputDishNote(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNDishNote2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishNoteᚄ(ctx context.Context, v interface{}) ([]*models.DishNote, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*models.DishNote, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNDishNote2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishNote(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNDishNote2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishNote(ctx context.Context, v interface{}) (*models.DishNote, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNDishNote2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDishNote(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalNDishOrder2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDishOrder(ctx context.Context, sel ast.SelectionSet, v models1.DishOrder) graphql.Marshaler {
+	return ec._DishOrder(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDishOrder2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDishOrderᚄ(ctx context.Context, sel ast.SelectionSet, v []*models1.DishOrder) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDishOrder2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDishOrder(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNDishOrder2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDishOrder(ctx context.Context, sel ast.SelectionSet, v *models1.DishOrder) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DishOrder(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
 	return graphql.UnmarshalFloat(v)
 }
@@ -4715,6 +5477,61 @@ func (ec *executionContext) marshalNMenu2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋd
 
 func (ec *executionContext) unmarshalNMenuInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐMenuInput(ctx context.Context, v interface{}) (models.MenuInput, error) {
 	return ec.unmarshalInputMenuInput(ctx, v)
+}
+
+func (ec *executionContext) marshalNOrder2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐOrder(ctx context.Context, sel ast.SelectionSet, v models1.Order) graphql.Marshaler {
+	return ec._Order(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNOrder2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐOrderᚄ(ctx context.Context, sel ast.SelectionSet, v []*models1.Order) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNOrder2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐOrder(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNOrder2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐOrder(ctx context.Context, sel ast.SelectionSet, v *models1.Order) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Order(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNOrderInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐOrderInput(ctx context.Context, v interface{}) (models.OrderInput, error) {
+	return ec.unmarshalInputOrderInput(ctx, v)
 }
 
 func (ec *executionContext) marshalNRestaurant2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurant(ctx context.Context, sel ast.SelectionSet, v models1.Restaurant) graphql.Marshaler {

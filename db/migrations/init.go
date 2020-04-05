@@ -17,6 +17,8 @@ func migrate() error {
 		&models.Menu{},
 		&models.Restaurant{},
 		&models.Dish{},
+		&models.Order{},
+		&models.DishOrder{},
 	)
 
 	err = orm.DB.AutoMigrate(
@@ -25,6 +27,8 @@ func migrate() error {
 		&models.License{},
 		&models.Menu{},
 		&models.Dish{},
+		&models.DishOrder{},
+		&models.Order{},
 	).Error
 	if err != nil {
 		return err
@@ -36,6 +40,9 @@ func migrate() error {
 	orm.DB.Model(&models.License{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.Menu{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.Dish{}).AddForeignKey("menu_id", "menus(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.DishOrder{}).AddForeignKey("order_id", "orders(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.DishOrder{}).AddForeignKey("dish_id", "dishes(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.Order{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
 
 	return nil
 }
