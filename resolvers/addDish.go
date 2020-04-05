@@ -35,37 +35,37 @@ func mapItemsToDish(items []*models1.DishInput) ([]*models.Dish, error) {
 		return []*models.Dish{}, errors.New("dishes cannot be empty")
 	}
 
-	for index := range items {
-		if items[index].Title == "" {
+	for i := range items {
+		if items[i].Title == "" {
 			return []*models.Dish{}, errors.New("dish title cannot be empty")
 		}
-		if items[index].Description == "" {
+		if items[i].Description == "" {
 			return []*models.Dish{}, errors.New("dish description cannot be empty")
 		}
-		if items[index].Image.Filename == "" {
+		if items[i].Image.Filename == "" {
 			return []*models.Dish{}, errors.New("you must provide dish image")
 		}
-		if fmt.Sprintf("%.2f", float64(items[index].Price)) == "0.00" {
+		if fmt.Sprintf("%.2f", float64(items[i].Price)) == "0.00" {
 			return []*models.Dish{}, errors.New("dish price must be known to customers")
 		}
-		if menuExists(items[index].MenuID) == false {
+		if menuExists(items[i].MenuID) == false {
 			return []*models.Dish{}, errors.New("dish must belong to a menu. provide a valid menu id")
 		}
 
-		file := items[index].Image.File
-		fileName := items[index].Image.Filename
+		file := items[i].Image.File
+		fileName := items[i].Image.Filename
 		_, attr, err := utils.Upload(ctx, file, dishesBucketName, credPath, projectID, fileName)
 		if err != nil {
 			return []*models.Dish{}, err
 		}
 
 		d := &models.Dish{
-			Title:       items[index].Title,
-			Description: items[index].Description,
-			Price:       items[index].Price,
+			Title:       items[i].Title,
+			Description: items[i].Description,
+			Price:       items[i].Price,
 			Image:       attr.MediaLink,
-			AddOns:      items[index].AddOns,
-			MenuID:      utils.ParseUUID(items[index].MenuID),
+			AddOns:      items[i].AddOns,
+			MenuID:      utils.ParseUUID(items[i].MenuID),
 		}
 		dishes = append(dishes, d)
 	}
