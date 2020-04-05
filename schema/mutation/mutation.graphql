@@ -49,6 +49,9 @@ input DishNote {
   title: String!
   description: String!
   addOns: [String!]!
+  price: Float!
+  count: Int!
+  subtotal: Float!
 }
 
 input OrderInput {

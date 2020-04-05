@@ -93,7 +93,7 @@ func (r *dishOrderResolver) AddOns(ctx context.Context, obj *models.DishOrder) (
 func (r *orderResolver) Notes(ctx context.Context, obj *models.Order) ([]*models.DishOrder, error) {
 	notes := []*models.DishOrder{}
 	order := obj
-	r.ORM.DB.First(&order, "id = ?", obj.ID)
+	r.ORM.DB.First(&order, "id = ?", order.ID)
 	r.ORM.DB.Model(&order).Related(&notes)
 	return notes, nil
 }

@@ -30,6 +30,9 @@ type DishNote struct {
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
 	AddOns      []string `json:"addOns"`
+	Price       float64  `json:"price"`
+	Count       int      `json:"count"`
+	Subtotal    float64  `json:"subtotal"`
 }
 
 type MenuInput struct {

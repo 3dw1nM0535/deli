@@ -53,6 +53,9 @@ func mapItemsToNotes(items []*models1.DishNote) ([]*models.DishOrder, error) {
 			Title:       items[i].Title,
 			Description: items[i].Description,
 			AddOns:      items[i].AddOns,
+			Price:       items[i].Price,
+			Count:       items[i].Count,
+			Subtotal:    items[i].Subtotal,
 			OrderID:     utils.ParseUUID(models.ID),
 		}
 		dishes = append(dishes, dI)
@@ -71,6 +74,8 @@ func (r *mutationResolver) MakeOrder(ctx context.Context, input models1.OrderInp
 	order := &models.Order{
 		RestaurantNotes: input.RestaurantNotes,
 		RestaurantID:    utils.ParseUUID(input.RestaurantID),
+		OrderStatus:     "In-Kitchen",
+		PaidFor:         false,
 	}
 	r.ORM.DB.Create(&order)
 

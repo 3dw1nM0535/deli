@@ -55,10 +55,15 @@ type DishOrder {
   title: String!
   description: String!
   addOns: [String!]!
+  count: Int!
+  price: Float!
+  subtotal: Float!
 }
 
 type Order {
   id: ID!
   notes: [DishOrder!]!
   restaurantNotes: String!
+  orderStatus: String!
+  paidFor: Boolean!
 }
