@@ -11,6 +11,7 @@ require (
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
+	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jinzhu/gorm v1.9.12
@@ -35,6 +36,7 @@ require (
 	google.golang.org/api v0.20.0
 	google.golang.org/appengine v1.6.5
 	google.golang.org/genproto v0.0.0-20200330113809-af700f360a68 // indirect
+	googlemaps.github.io/maps v0.0.0-20200130222743-aef6b08443c7
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 	gopkg.in/gormigrate.v1 v1.6.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
