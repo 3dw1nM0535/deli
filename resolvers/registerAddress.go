@@ -8,6 +8,7 @@ import (
 
 	models1 "github.com/3dw1nM0535/deli/db/models"
 	"github.com/3dw1nM0535/deli/models"
+	"github.com/3dw1nM0535/deli/utils"
 )
 
 func (r *mutationResolver) RegisterAddress(ctx context.Context, input models.AddressInput) (*models1.Address, error) {
@@ -30,8 +31,12 @@ func (r *mutationResolver) RegisterAddress(ctx context.Context, input models.Add
 			Lat:          input.Lat,
 			Restaurants:  restaurants,
 		}
+		geoCode, err := utils.GeoCodeAddr(context.Background(), address, geocodingKey)
+		if err != nil {
+			return &models1.Address{}, err
+		}
+		log.Println(&geoCode)
 		r.ORM.DB.Save(&address)
-		log.Println(address)
 		return address, nil
 	}
 	err := fmt.Errorf("postal town '%s' doesn't exist", input.PostalTown)
