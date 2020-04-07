@@ -9,14 +9,14 @@ import (
 )
 
 // GeoCodeAddr : return geocoded restaurant address
-func GeoCodeAddr(ctx context.Context, address *models.Address, apiKey string) ([]maps.GeocodingResult, error) {
+func GeoCodeAddr(ctx context.Context, address *models.Address, biz, apiKey string) ([]maps.GeocodingResult, error) {
 	c, err := maps.NewClient(maps.WithAPIKey(apiKey))
 	if err != nil {
 		return nil, err
 	}
 	addr := &maps.GeocodingRequest{
-		Address:    fmt.Sprintf("%s %s", address.StreetName, address.PostalTown),
-		Components: map[maps.Component]string{"locality": address.PostalTown},
+		Address:    fmt.Sprintf("%s %s %s", biz, address.StreetName, address.City),
+		Components: map[maps.Component]string{"country": "KE"},
 		Region:     "KE",
 	}
 	res, err := c.Geocode(ctx, addr)

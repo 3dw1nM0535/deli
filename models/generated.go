@@ -7,13 +7,10 @@ import (
 )
 
 type AddressInput struct {
-	PostalCode   string  `json:"postalCode"`
-	PostalTown   string  `json:"postalTown"`
-	BuildingName string  `json:"buildingName"`
-	StreetName   string  `json:"streetName"`
-	Lon          float64 `json:"lon"`
-	Lat          float64 `json:"lat"`
-	RestaurantID string  `json:"restaurantID"`
+	PostalCode   string `json:"postalCode"`
+	StreetName   string `json:"streetName"`
+	City         string `json:"city"`
+	RestaurantID string `json:"restaurantID"`
 }
 
 type DishInput struct {

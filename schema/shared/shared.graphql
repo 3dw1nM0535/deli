@@ -17,10 +17,11 @@ type Restaurant {
 type Address {
   postalCode: String!
   postalTown: String!
-  buildingName: String!
   streetName: String!
+  city: String!
   lon: Float!
   lat: Float!
+  addressString: String!
   createdAt: Time
   updatedAt: Time
   restaurants: [Restaurant!]!

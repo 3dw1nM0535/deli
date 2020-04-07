@@ -17,11 +17,8 @@ input RestaurantInput {
 
 input AddressInput {
   postalCode: String!
-  postalTown: String!
-  buildingName: String!
   streetName: String!
-  lon: Float!
-  lat: Float!
+  city: String!
   restaurantID: ID!
 }
 
