@@ -19,6 +19,7 @@ func init() {
 	licenseBucketName = utils.MustGetEnv("LICENSE_BUCKET_NAME")
 	dishesBucketName = utils.MustGetEnv("DISHES_BUCKET_NAME")
 	geocodingKey = utils.MustGetEnv("GOOGLE_GEOCODING_KEY")
+	orderCreatedChannel = map[string]map[string]chan *models.Order{}
 }
 
 func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models.License, error) {

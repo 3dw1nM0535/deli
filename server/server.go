@@ -2,6 +2,7 @@ package server
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/3dw1nM0535/deli/db"
 	handler "github.com/3dw1nM0535/deli/handlers"
@@ -31,5 +32,11 @@ func SetupRouter(orm *db.ORM) *gin.Engine {
 func Run(orm *db.ORM) {
 	r := SetupRouter(orm)
 
-	log.Fatal(r.Run(host + ":" + port))
+	s := &http.Server{
+		Handler: r,
+		Addr:    host + ":" + port,
+	}
+
+	s.SetKeepAlivesEnabled(true)
+	log.Fatal(s.ListenAndServe())
 }

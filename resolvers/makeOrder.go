@@ -87,5 +87,10 @@ func (r *mutationResolver) MakeOrder(ctx context.Context, input models1.OrderInp
 	for i := range dishes {
 		r.ORM.DB.Save(dishes[i])
 	}
+
+	for _, c := range orderCreatedChannel[input.RestaurantID] {
+		c <- order
+	}
+
 	return order, nil
 }
