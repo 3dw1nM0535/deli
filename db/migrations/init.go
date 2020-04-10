@@ -44,6 +44,9 @@ func migrate() error {
 	orm.DB.Model(&models.DishOrder{}).AddForeignKey("dish_id", "dishes(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.Order{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
 
+	// Add geolocation column of type geography
+	orm.DB.Exec("ALTER TABLE addresses ADD COLUMN geolocation geography(point);")
+
 	return nil
 }
 

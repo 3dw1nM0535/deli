@@ -1,5 +1,10 @@
 type Query {
 	hello: String!
 	findRestaurant(id: ID!): Restaurant!
-	findRestaurants: [Restaurant!]!
+	findNearByRestaurants(input: Cords!): [Restaurant!]!
+}
+
+input Cords {
+	lon: Float!
+	lat: Float!
 }

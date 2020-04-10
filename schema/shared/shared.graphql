@@ -6,6 +6,7 @@ type Restaurant {
   about: String!
   telephone: String!
   verified: Boolean!
+  distance: Float
   createdAt: Time
   updatedAt: Time
   addresses: [Address!]

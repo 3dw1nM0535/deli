@@ -119,15 +119,16 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		FindRestaurant  func(childComplexity int, id string) int
-		FindRestaurants func(childComplexity int) int
-		Hello           func(childComplexity int) int
+		FindNearByRestaurants func(childComplexity int, input models.Cords) int
+		FindRestaurant        func(childComplexity int, id string) int
+		Hello                 func(childComplexity int) int
 	}
 
 	Restaurant struct {
 		About          func(childComplexity int) int
 		Addresses      func(childComplexity int) int
 		CreatedAt      func(childComplexity int) int
+		Distance       func(childComplexity int) int
 		ID             func(childComplexity int) int
 		License        func(childComplexity int) int
 		Menu           func(childComplexity int) int
@@ -179,7 +180,7 @@ type OrderResolver interface {
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
 	FindRestaurant(ctx context.Context, id string) (*models1.Restaurant, error)
-	FindRestaurants(ctx context.Context) ([]*models1.Restaurant, error)
+	FindNearByRestaurants(ctx context.Context, input models.Cords) ([]*models1.Restaurant, error)
 }
 type RestaurantResolver interface {
 	ID(ctx context.Context, obj *models1.Restaurant) (string, error)
@@ -539,6 +540,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Order.RestaurantNotes(childComplexity), true
 
+	case "Query.findNearByRestaurants":
+		if e.complexity.Query.FindNearByRestaurants == nil {
+			break
+		}
+
+		args, err := ec.field_Query_findNearByRestaurants_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FindNearByRestaurants(childComplexity, args["input"].(models.Cords)), true
+
 	case "Query.findRestaurant":
 		if e.complexity.Query.FindRestaurant == nil {
 			break
@@ -550,13 +563,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.FindRestaurant(childComplexity, args["id"].(string)), true
-
-	case "Query.findRestaurants":
-		if e.complexity.Query.FindRestaurants == nil {
-			break
-		}
-
-		return e.complexity.Query.FindRestaurants(childComplexity), true
 
 	case "Query.hello":
 		if e.complexity.Query.Hello == nil {
@@ -585,6 +591,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Restaurant.CreatedAt(childComplexity), true
+
+	case "Restaurant.distance":
+		if e.complexity.Restaurant.Distance == nil {
+			break
+		}
+
+		return e.complexity.Restaurant.Distance(childComplexity), true
 
 	case "Restaurant.id":
 		if e.complexity.Restaurant.ID == nil {
@@ -797,7 +810,12 @@ input OrderInput {
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	hello: String!
 	findRestaurant(id: ID!): Restaurant!
-	findRestaurants: [Restaurant!]!
+	findNearByRestaurants(input: Cords!): [Restaurant!]!
+}
+
+input Cords {
+	lon: Float!
+	lat: Float!
 }`, BuiltIn: false},
 	&ast.Source{Name: "schema/shared/shared.graphql", Input: `scalar Time
 
@@ -807,6 +825,7 @@ type Restaurant {
   about: String!
   telephone: String!
   verified: Boolean!
+  distance: Float
   createdAt: Time
   updatedAt: Time
   addresses: [Address!]
@@ -975,6 +994,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_findNearByRestaurants_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.Cords
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNCords2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐCords(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -2606,7 +2639,7 @@ func (ec *executionContext) _Query_findRestaurant(ctx context.Context, field gra
 	return ec.marshalNRestaurant2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurant(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_findRestaurants(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_findNearByRestaurants(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2621,9 +2654,16 @@ func (ec *executionContext) _Query_findRestaurants(ctx context.Context, field gr
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_findNearByRestaurants_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().FindRestaurants(rctx)
+		return ec.resolvers.Query().FindNearByRestaurants(rctx, args["input"].(models.Cords))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2877,6 +2917,37 @@ func (ec *executionContext) _Restaurant_verified(ctx context.Context, field grap
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Restaurant_distance(ctx context.Context, field graphql.CollectedField, obj *models1.Restaurant) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Restaurant",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Distance, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalOFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Restaurant_createdAt(ctx context.Context, field graphql.CollectedField, obj *models1.Restaurant) (ret graphql.Marshaler) {
@@ -4216,6 +4287,30 @@ func (ec *executionContext) unmarshalInputAddressInput(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCords(ctx context.Context, obj interface{}) (models.Cords, error) {
+	var it models.Cords
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "lon":
+			var err error
+			it.Lon, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lat":
+			var err error
+			it.Lat, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDishInput(ctx context.Context, obj interface{}) (models.DishInput, error) {
 	var it models.DishInput
 	var asMap = obj.(map[string]interface{})
@@ -4925,7 +5020,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "findRestaurants":
+		case "findNearByRestaurants":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -4933,7 +5028,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_findRestaurants(ctx, field)
+				res = ec._Query_findNearByRestaurants(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -4999,6 +5094,8 @@ func (ec *executionContext) _Restaurant(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "distance":
+			out.Values[i] = ec._Restaurant_distance(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._Restaurant_createdAt(ctx, field, obj)
 		case "updatedAt":
@@ -5362,6 +5459,10 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNCords2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐCords(ctx context.Context, v interface{}) (models.Cords, error) {
+	return ec.unmarshalInputCords(ctx, v)
 }
 
 func (ec *executionContext) marshalNDish2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDish(ctx context.Context, sel ast.SelectionSet, v models1.Dish) graphql.Marshaler {
@@ -6113,6 +6214,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	return graphql.UnmarshalFloat(v)
+}
+
+func (ec *executionContext) marshalOFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	return graphql.MarshalFloat(v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

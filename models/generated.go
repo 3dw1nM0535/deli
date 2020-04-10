@@ -13,6 +13,11 @@ type AddressInput struct {
 	RestaurantID string `json:"restaurantID"`
 }
 
+type Cords struct {
+	Lon float64 `json:"lon"`
+	Lat float64 `json:"lat"`
+}
+
 type DishInput struct {
 	Title       string         `json:"title"`
 	Description string         `json:"description"`

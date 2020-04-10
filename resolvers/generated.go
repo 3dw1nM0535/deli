@@ -83,7 +83,7 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
-// func (r *queryResolver) FindRestaurants(ctx context.Context) ([]*models.Restaurant, error) {
+// func (r *queryResolver) FindNearByRestaurants(ctx context.Context, input models1.Cords) ([]*models.Restaurant, error) {
 // 	panic("not implemented")
 // }
 

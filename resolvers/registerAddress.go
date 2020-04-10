@@ -22,7 +22,8 @@ func (r *mutationResolver) RegisterAddress(ctx context.Context, input models.Add
 	if input.City == "" {
 		return &models1.Address{}, errors.New("provide your business primary city/town location")
 	}
-	r.ORM.DB.Raw("SELECT * FROM postals WHERE postal_code = ?", strings.Title(string(input.PostalCode))).Scan(&addr)
+	query := `SELECT * FROM postals WHERE postal_code = ?`
+	r.ORM.DB.Raw(query, strings.Title(string(input.PostalCode))).Scan(&addr)
 	if addr.PostalTown != "" {
 		var restaurant = &models1.Restaurant{}
 		r.ORM.DB.First(&restaurant, "id = ?", input.RestaurantID)
@@ -58,6 +59,7 @@ func (r *mutationResolver) RegisterAddress(ctx context.Context, input models.Add
 					geoAddr.StreetName = geoCode[i].PlusCode.CompoundCode
 				}
 				r.ORM.DB.Save(&geoAddr)
+				r.ORM.DB.Exec("UPDATE addresses SET geolocation = ST_SetSRID(ST_MakePoint(?, ?), 4326) WHERE id = ?;", geoAddr.Lon, geoAddr.Lat, geoAddr.ID)
 				return geoAddr, nil
 			}
 		}
@@ -68,6 +70,7 @@ func (r *mutationResolver) RegisterAddress(ctx context.Context, input models.Add
 		address.Lat = geoCode[0].Geometry.Location.Lat
 		address.AddressString = geoCode[0].FormattedAddress
 		r.ORM.DB.Save(&address)
+		r.ORM.DB.Exec("UPDATE addresses SET geolocation = ST_SetSRID(ST_MakePoint(?, ?), 4326) WHERE id = ?;", address.Lon, address.Lat, address.ID)
 		return address, nil
 	}
 	err := fmt.Errorf("postal code '%s' doesn't exist", input.PostalCode)

@@ -1,6 +1,8 @@
 package models
 
-import "github.com/gofrs/uuid"
+import (
+	"github.com/gofrs/uuid"
+)
 
 type Address struct {
 	BaseModel
