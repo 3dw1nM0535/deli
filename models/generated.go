@@ -45,6 +45,8 @@ type MenuInput struct {
 type OrderInput struct {
 	OrderNotes      []*DishNote `json:"orderNotes"`
 	RestaurantNotes string      `json:"restaurantNotes"`
+	PhoneNumber     string      `json:"phoneNumber"`
+	TotalSum        float64     `json:"totalSum"`
 	RestaurantID    string      `json:"restaurantId"`
 }
 

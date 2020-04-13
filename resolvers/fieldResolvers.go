@@ -106,3 +106,26 @@ func (r *restaurantResolver) Orders(ctx context.Context, obj *models.Restaurant)
 	r.ORM.DB.Model(&restaurant).Related(&orders)
 	return orders, nil
 }
+
+// Payment : find payment belonging to an order
+func (r *orderResolver) Payment(ctx context.Context, obj *models.Order) (*models.Payment, error) {
+	payment := &models.Payment{}
+	order := obj
+	r.ORM.DB.First(&order, "id = ?", obj.ID)
+	r.ORM.DB.Model(&order).Related(&payment)
+	return payment, nil
+}
+
+func (r *paymentResolver) ID(ctx context.Context, obj *models.Payment) (string, error) {
+	id := obj.ID.String()
+	return id, nil
+}
+
+// Payments : find payments belonging to a restaurant
+func (r *restaurantResolver) Payments(ctx context.Context, obj *models.Restaurant) ([]*models.Payment, error) {
+	payments := []*models.Payment{}
+	restaurant := obj
+	r.ORM.DB.First(&restaurant, "id = ?", obj.ID)
+	r.ORM.DB.Model(&restaurant).Related(&payments)
+	return payments, nil
+}

@@ -45,6 +45,7 @@ type ResolverRoot interface {
 	Menu() MenuResolver
 	Mutation() MutationResolver
 	Order() OrderResolver
+	Payment() PaymentResolver
 	Query() QueryResolver
 	Restaurant() RestaurantResolver
 	Subscription() SubscriptionResolver
@@ -114,8 +115,20 @@ type ComplexityRoot struct {
 		ID              func(childComplexity int) int
 		Notes           func(childComplexity int) int
 		OrderStatus     func(childComplexity int) int
-		PaidFor         func(childComplexity int) int
+		Payment         func(childComplexity int) int
+		PhoneNumber     func(childComplexity int) int
 		RestaurantNotes func(childComplexity int) int
+		TotalSum        func(childComplexity int) int
+	}
+
+	Payment struct {
+		CheckoutRequestID func(childComplexity int) int
+		Confirmed         func(childComplexity int) int
+		ID                func(childComplexity int) int
+		MerchantRequestID func(childComplexity int) int
+		MpesaDescription  func(childComplexity int) int
+		PaidAmount        func(childComplexity int) int
+		PhoneNumber       func(childComplexity int) int
 	}
 
 	Query struct {
@@ -133,6 +146,7 @@ type ComplexityRoot struct {
 		License        func(childComplexity int) int
 		Menu           func(childComplexity int) int
 		Orders         func(childComplexity int) int
+		Payments       func(childComplexity int) int
 		RestaurantName func(childComplexity int) int
 		Telephone      func(childComplexity int) int
 		UpdatedAt      func(childComplexity int) int
@@ -176,6 +190,11 @@ type MutationResolver interface {
 type OrderResolver interface {
 	ID(ctx context.Context, obj *models1.Order) (string, error)
 	Notes(ctx context.Context, obj *models1.Order) ([]*models1.DishOrder, error)
+
+	Payment(ctx context.Context, obj *models1.Order) (*models1.Payment, error)
+}
+type PaymentResolver interface {
+	ID(ctx context.Context, obj *models1.Payment) (string, error)
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
@@ -189,6 +208,7 @@ type RestaurantResolver interface {
 	License(ctx context.Context, obj *models1.Restaurant) (*models1.License, error)
 	Menu(ctx context.Context, obj *models1.Restaurant) ([]*models1.Menu, error)
 	Orders(ctx context.Context, obj *models1.Restaurant) ([]*models1.Order, error)
+	Payments(ctx context.Context, obj *models1.Restaurant) ([]*models1.Payment, error)
 }
 type SubscriptionResolver interface {
 	OrderCreated(ctx context.Context, id string) (<-chan *models1.Order, error)
@@ -526,12 +546,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Order.OrderStatus(childComplexity), true
 
-	case "Order.paidFor":
-		if e.complexity.Order.PaidFor == nil {
+	case "Order.payment":
+		if e.complexity.Order.Payment == nil {
 			break
 		}
 
-		return e.complexity.Order.PaidFor(childComplexity), true
+		return e.complexity.Order.Payment(childComplexity), true
+
+	case "Order.phoneNumber":
+		if e.complexity.Order.PhoneNumber == nil {
+			break
+		}
+
+		return e.complexity.Order.PhoneNumber(childComplexity), true
 
 	case "Order.restaurantNotes":
 		if e.complexity.Order.RestaurantNotes == nil {
@@ -539,6 +566,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Order.RestaurantNotes(childComplexity), true
+
+	case "Order.totalSum":
+		if e.complexity.Order.TotalSum == nil {
+			break
+		}
+
+		return e.complexity.Order.TotalSum(childComplexity), true
+
+	case "Payment.checkoutRequestId":
+		if e.complexity.Payment.CheckoutRequestID == nil {
+			break
+		}
+
+		return e.complexity.Payment.CheckoutRequestID(childComplexity), true
+
+	case "Payment.confirmed":
+		if e.complexity.Payment.Confirmed == nil {
+			break
+		}
+
+		return e.complexity.Payment.Confirmed(childComplexity), true
+
+	case "Payment.id":
+		if e.complexity.Payment.ID == nil {
+			break
+		}
+
+		return e.complexity.Payment.ID(childComplexity), true
+
+	case "Payment.merchantRequestId":
+		if e.complexity.Payment.MerchantRequestID == nil {
+			break
+		}
+
+		return e.complexity.Payment.MerchantRequestID(childComplexity), true
+
+	case "Payment.mpesaDescription":
+		if e.complexity.Payment.MpesaDescription == nil {
+			break
+		}
+
+		return e.complexity.Payment.MpesaDescription(childComplexity), true
+
+	case "Payment.paidAmount":
+		if e.complexity.Payment.PaidAmount == nil {
+			break
+		}
+
+		return e.complexity.Payment.PaidAmount(childComplexity), true
+
+	case "Payment.phoneNumber":
+		if e.complexity.Payment.PhoneNumber == nil {
+			break
+		}
+
+		return e.complexity.Payment.PhoneNumber(childComplexity), true
 
 	case "Query.findNearByRestaurants":
 		if e.complexity.Query.FindNearByRestaurants == nil {
@@ -626,6 +709,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Restaurant.Orders(childComplexity), true
+
+	case "Restaurant.payments":
+		if e.complexity.Restaurant.Payments == nil {
+			break
+		}
+
+		return e.complexity.Restaurant.Payments(childComplexity), true
 
 	case "Restaurant.restaurantName":
 		if e.complexity.Restaurant.RestaurantName == nil {
@@ -804,6 +894,8 @@ input DishNote {
 input OrderInput {
   orderNotes: [DishNote!]!
   restaurantNotes: String!
+  phoneNumber: String!
+  totalSum: Float!
   restaurantId: ID!
 }
 `, BuiltIn: false},
@@ -832,6 +924,7 @@ type Restaurant {
   license: License!
   menu: [Menu!]!
   orders: [Order!]!
+  payments: [Payment!]!
 }
 
 type Address {
@@ -885,8 +978,20 @@ type Order {
   id: ID!
   notes: [DishOrder!]!
   restaurantNotes: String!
+  totalSum: Float!
+  phoneNumber: String!
   orderStatus: String!
-  paidFor: Boolean!
+  payment: Payment!
+}
+
+type Payment {
+  id: ID!
+  merchantRequestId: String!
+  checkoutRequestId: String!
+  mpesaDescription: String!
+  paidAmount: Float!
+  phoneNumber: String!
+  confirmed: Boolean!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/subscription/makeOrder.graphql", Input: `type Subscription {
@@ -2496,6 +2601,74 @@ func (ec *executionContext) _Order_restaurantNotes(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Order_totalSum(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalSum, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Order_phoneNumber(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PhoneNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Order_orderStatus(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2530,7 +2703,7 @@ func (ec *executionContext) _Order_orderStatus(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Order_paidFor(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
+func (ec *executionContext) _Order_payment(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2541,13 +2714,251 @@ func (ec *executionContext) _Order_paidFor(ctx context.Context, field graphql.Co
 		Object:   "Order",
 		Field:    field,
 		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Order().Payment(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.Payment)
+	fc.Result = res
+	return ec.marshalNPayment2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐPayment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Payment_id(ctx context.Context, field graphql.CollectedField, obj *models1.Payment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Payment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Payment().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Payment_merchantRequestId(ctx context.Context, field graphql.CollectedField, obj *models1.Payment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Payment",
+		Field:    field,
+		Args:     nil,
 		IsMethod: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.PaidFor, nil
+		return obj.MerchantRequestID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Payment_checkoutRequestId(ctx context.Context, field graphql.CollectedField, obj *models1.Payment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Payment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CheckoutRequestID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Payment_mpesaDescription(ctx context.Context, field graphql.CollectedField, obj *models1.Payment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Payment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MpesaDescription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Payment_paidAmount(ctx context.Context, field graphql.CollectedField, obj *models1.Payment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Payment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PaidAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Payment_phoneNumber(ctx context.Context, field graphql.CollectedField, obj *models1.Payment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Payment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PhoneNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Payment_confirmed(ctx context.Context, field graphql.CollectedField, obj *models1.Payment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Payment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Confirmed, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3143,6 +3554,40 @@ func (ec *executionContext) _Restaurant_orders(ctx context.Context, field graphq
 	res := resTmp.([]*models1.Order)
 	fc.Result = res
 	return ec.marshalNOrder2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐOrderᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Restaurant_payments(ctx context.Context, field graphql.CollectedField, obj *models1.Restaurant) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Restaurant",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Restaurant().Payments(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Payment)
+	fc.Result = res
+	return ec.marshalNPayment2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐPaymentᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Subscription_orderCreated(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
@@ -4455,6 +4900,18 @@ func (ec *executionContext) unmarshalInputOrderInput(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "phoneNumber":
+			var err error
+			it.PhoneNumber, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "totalSum":
+			var err error
+			it.TotalSum, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "restaurantId":
 			var err error
 			it.RestaurantID, err = ec.unmarshalNID2string(ctx, v)
@@ -4956,13 +5413,98 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "totalSum":
+			out.Values[i] = ec._Order_totalSum(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "phoneNumber":
+			out.Values[i] = ec._Order_phoneNumber(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "orderStatus":
 			out.Values[i] = ec._Order_orderStatus(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "paidFor":
-			out.Values[i] = ec._Order_paidFor(ctx, field, obj)
+		case "payment":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Order_payment(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var paymentImplementors = []string{"Payment"}
+
+func (ec *executionContext) _Payment(ctx context.Context, sel ast.SelectionSet, obj *models1.Payment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, paymentImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Payment")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Payment_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "merchantRequestId":
+			out.Values[i] = ec._Payment_merchantRequestId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "checkoutRequestId":
+			out.Values[i] = ec._Payment_checkoutRequestId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "mpesaDescription":
+			out.Values[i] = ec._Payment_mpesaDescription(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "paidAmount":
+			out.Values[i] = ec._Payment_paidAmount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "phoneNumber":
+			out.Values[i] = ec._Payment_phoneNumber(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "confirmed":
+			out.Values[i] = ec._Payment_confirmed(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -5148,6 +5690,20 @@ func (ec *executionContext) _Restaurant(ctx context.Context, sel ast.SelectionSe
 					}
 				}()
 				res = ec._Restaurant_orders(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "payments":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Restaurant_payments(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5809,6 +6365,57 @@ func (ec *executionContext) marshalNOrder2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋ
 
 func (ec *executionContext) unmarshalNOrderInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐOrderInput(ctx context.Context, v interface{}) (models.OrderInput, error) {
 	return ec.unmarshalInputOrderInput(ctx, v)
+}
+
+func (ec *executionContext) marshalNPayment2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐPayment(ctx context.Context, sel ast.SelectionSet, v models1.Payment) graphql.Marshaler {
+	return ec._Payment(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPayment2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐPaymentᚄ(ctx context.Context, sel ast.SelectionSet, v []*models1.Payment) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPayment2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐPayment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNPayment2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐPayment(ctx context.Context, sel ast.SelectionSet, v *models1.Payment) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Payment(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNRestaurant2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurant(ctx context.Context, sel ast.SelectionSet, v models1.Restaurant) graphql.Marshaler {

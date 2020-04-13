@@ -75,6 +75,14 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
+// func (r *orderResolver) Payment(ctx context.Context, obj *models.Order) (*models.Payment, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *paymentResolver) ID(ctx context.Context, obj *models.Payment) (string, error) {
+// 	panic("not implemented")
+// }
+
 // func (r *queryResolver) Hello(ctx context.Context) (string, error) {
 // 	panic("not implemented")
 // }
@@ -107,6 +115,10 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
+// func (r *restaurantResolver) Payments(ctx context.Context, obj *models.Restaurant) ([]*models.Payment, error) {
+// 	panic("not implemented")
+// }
+
 // func (r *subscriptionResolver) OrderCreated(ctx context.Context, id string) (<-chan *models.Order, error) {
 // 	panic("not implemented")
 // }
@@ -132,6 +144,9 @@ func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{
 // Order returns graph.OrderResolver implementation.
 func (r *Resolver) Order() graph.OrderResolver { return &orderResolver{r} }
 
+// Payment returns graph.PaymentResolver implementation.
+func (r *Resolver) Payment() graph.PaymentResolver { return &paymentResolver{r} }
+
 // Query returns graph.QueryResolver implementation.
 func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 
@@ -148,6 +163,7 @@ type licenseResolver struct{ *Resolver }
 type menuResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type orderResolver struct{ *Resolver }
+type paymentResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type restaurantResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }

@@ -54,5 +54,7 @@ input DishNote {
 input OrderInput {
   orderNotes: [DishNote!]!
   restaurantNotes: String!
+  phoneNumber: String!
+  totalSum: Float!
   restaurantId: ID!
 }

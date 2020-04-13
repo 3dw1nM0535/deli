@@ -46,6 +46,9 @@ func SetupRouter(orm *db.ORM) *gin.Engine {
 	r.GET("/graphql", handler.Playground())
 	r.GET("/", handler.Ping())
 	r.GET("/ws", handler.GraphQL(orm, options))
+	r.POST("/hook", handler.Hook())
+	r.POST("/hook/validation", handler.Hook())
+	r.POST("/hook/confirmation", handler.Hook())
 	return r
 }
 

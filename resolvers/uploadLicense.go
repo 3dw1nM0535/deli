@@ -10,7 +10,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var credPath, projectID, licenseBucketName, dishesBucketName, geocodingKey string
+var credPath, projectID, licenseBucketName, dishesBucketName, geocodingKey, token string
 
 func init() {
 	godotenv.Load()
@@ -20,6 +20,7 @@ func init() {
 	dishesBucketName = utils.MustGetEnv("DISHES_BUCKET_NAME")
 	geocodingKey = utils.MustGetEnv("GOOGLE_GEOCODING_KEY")
 	orderCreatedChannel = map[string]map[string]chan *models.Order{}
+	token = utils.GetToken()
 }
 
 func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models.License, error) {

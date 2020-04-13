@@ -10,17 +10,6 @@ func migrate() error {
 
 	defer orm.DB.Close()
 
-	orm.DB.DropTableIfExists(
-		&models.License{},
-		&models.RestaurantAddresses{},
-		&models.Address{},
-		&models.Menu{},
-		&models.Restaurant{},
-		&models.Dish{},
-		&models.Order{},
-		&models.DishOrder{},
-	)
-
 	err = orm.DB.AutoMigrate(
 		&models.Restaurant{},
 		&models.Address{},
@@ -29,6 +18,7 @@ func migrate() error {
 		&models.Dish{},
 		&models.DishOrder{},
 		&models.Order{},
+		&models.Payment{},
 	).Error
 	if err != nil {
 		return err
@@ -43,6 +33,8 @@ func migrate() error {
 	orm.DB.Model(&models.DishOrder{}).AddForeignKey("order_id", "orders(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.DishOrder{}).AddForeignKey("dish_id", "dishes(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.Order{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.Payment{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.Payment{}).AddForeignKey("order_id", "orders(id)", "CASCADE", "CASCADE")
 
 	// Add geolocation column of type geography
 	orm.DB.Exec("ALTER TABLE addresses ADD COLUMN geolocation geography(point);")

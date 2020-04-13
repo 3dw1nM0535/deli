@@ -13,6 +13,7 @@ type Restaurant {
   license: License!
   menu: [Menu!]!
   orders: [Order!]!
+  payments: [Payment!]!
 }
 
 type Address {
@@ -66,6 +67,18 @@ type Order {
   id: ID!
   notes: [DishOrder!]!
   restaurantNotes: String!
+  totalSum: Float!
+  phoneNumber: String!
   orderStatus: String!
-  paidFor: Boolean!
+  payment: Payment!
+}
+
+type Payment {
+  id: ID!
+  merchantRequestId: String!
+  checkoutRequestId: String!
+  mpesaDescription: String!
+  paidAmount: Float!
+  phoneNumber: String!
+  confirmed: Boolean!
 }
