@@ -19,7 +19,7 @@ require (
 	github.com/go-siris/middleware-recover v0.0.0-20170729134034-2867fcea40e2 // indirect
 	github.com/go-siris/siris v7.4.0+incompatible // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
-	github.com/google/uuid v1.1.1
+	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jinzhu/gorm v1.9.12
@@ -30,16 +30,16 @@ require (
 	github.com/monoculum/formam v0.0.0-20200316225015-49f0baed3a1b // indirect
 	github.com/pasztorpisti/qs v0.0.0-20171216220353-8d6c33ee906c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rs/cors v1.7.0
+	github.com/rs/cors v1.7.0 // indirect
 	github.com/russross/blackfriday v2.0.0+incompatible // indirect
-	github.com/satori/go.uuid v1.2.0
+	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/satori/uuid v1.2.0 // indirect
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
 	github.com/theckman/httpforwarded v0.4.0 // indirect
 	github.com/urfave/cli v1.22.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/vektah/dataloaden v0.3.0 // indirect
-	github.com/vektah/gqlparser v1.3.1
+	github.com/vektah/gqlparser v1.3.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.0.1
 	go.uber.org/zap v1.14.1 // indirect
 	golang.org/x/exp v0.0.0-20200320212757-167ffe94c325 // indirect
@@ -47,7 +47,6 @@ require (
 	golang.org/x/sys v0.0.0-20200406155108-e3b113bbe6a4 // indirect
 	golang.org/x/tools v0.0.0-20200330191527-657a652153b5 // indirect
 	google.golang.org/api v0.20.0
-	google.golang.org/appengine v1.6.5
 	google.golang.org/genproto v0.0.0-20200330113809-af700f360a68 // indirect
 	googlemaps.github.io/maps v0.0.0-20200130222743-aef6b08443c7
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
