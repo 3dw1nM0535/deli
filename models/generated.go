@@ -3,6 +3,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/99designs/gqlgen/graphql"
 )
 
@@ -37,6 +39,15 @@ type DishNote struct {
 	Subtotal    float64  `json:"subtotal"`
 }
 
+type File struct {
+	ID        string     `json:"id"`
+	Media     string     `json:"media"`
+	Content   string     `json:"content"`
+	Size      int        `json:"size"`
+	CreatedAt *time.Time `json:"createdAt"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+}
+
 type MenuInput struct {
 	MenuHeadline string `json:"menuHeadline"`
 	RestaurantID string `json:"restaurantId"`
@@ -56,7 +67,19 @@ type RestaurantInput struct {
 	Telephone      string `json:"telephone"`
 }
 
+type UploadGcc struct {
+	File graphql.Upload `json:"file"`
+}
+
+type UploadID struct {
+	File graphql.Upload `json:"file"`
+}
+
 type UploadLicense struct {
 	RestaurantID string         `json:"restaurantID"`
 	File         graphql.Upload `json:"file"`
+}
+
+type UploadMc struct {
+	File graphql.Upload `json:"file"`
 }

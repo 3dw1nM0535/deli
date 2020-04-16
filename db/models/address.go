@@ -4,6 +4,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// Address : restaurant address data model
 type Address struct {
 	BaseModel
 	PostalCode    string        `gorm:"not_null;type:varchar(50);"`

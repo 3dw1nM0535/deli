@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/3dw1nM0535/deli/db/models"
+	models1 "github.com/3dw1nM0535/deli/models"
 )
 
 func (r *orderResolver) ID(ctx context.Context, obj *models.Order) (string, error) {
@@ -21,10 +22,10 @@ func (r *dishResolver) ID(ctx context.Context, obj *models.Dish) (string, error)
 	return id, nil
 }
 
-func (r *licenseResolver) ID(ctx context.Context, obj *models.License) (string, error) {
-	id := obj.ID.String()
-	return id, nil
-}
+// func (r *fileResolver) ID(ctx context.Context, obj *models.File) (string, error) {
+// 	id := obj.ID.String()
+// 	return id, nil
+// }
 
 func (r *dishResolver) AddOns(ctx context.Context, obj *models.Dish) ([]string, error) {
 	var addOns []string
@@ -65,10 +66,19 @@ func (r *addressResolver) Restaurants(ctx context.Context, obj *models.Address) 
 }
 
 // License : find license belonging to a restaurant
-func (r *restaurantResolver) License(ctx context.Context, obj *models.Restaurant) (*models.License, error) {
+func (r *restaurantResolver) License(ctx context.Context, obj *models.Restaurant) (*models1.File, error) {
 	license := &models.License{}
-	r.ORM.DB.Model(&obj).Related(&license)
-	return license, nil
+	restaurant := obj
+	r.ORM.DB.First(&restaurant, "id = ?", obj.ID)
+	r.ORM.DB.Model(&obj).Related(&license, "License")
+	return &models1.File{
+		ID:        license.ID.String(),
+		Media:     license.Media,
+		Content:   license.Content,
+		Size:      int(license.Size),
+		CreatedAt: &license.CreatedAt,
+		UpdatedAt: &license.UpdatedAt,
+	}, nil
 }
 
 // Menu : find menu belonging to a restaurant

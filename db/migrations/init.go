@@ -19,6 +19,9 @@ func migrate() error {
 		&models.DishOrder{},
 		&models.Order{},
 		&models.Payment{},
+		&models.IDD{},
+		&models.MDC{},
+		&models.GCC{},
 	).Error
 	if err != nil {
 		return err

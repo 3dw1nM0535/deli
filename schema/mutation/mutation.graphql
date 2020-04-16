@@ -3,10 +3,13 @@ scalar Upload
 type Mutation {
   addRestaurant(input: RestaurantInput!): Restaurant!
   registerAddress(input: AddressInput!): Address!
-  uploadLicense(input: UploadLicense!): License!
+  uploadLicense(input: UploadLicense!): File!
   addMenu(input: MenuInput!): Menu!
   addDish(input: [DishInput!]!): [Dish!]!
   makeOrder(input: OrderInput!): Order!
+  uploadGCC(input: UploadGCC!): File!
+  uploadID(input: UploadID!): File!
+  uploadMC(input: UploadMC!): File!
 }
 
 input RestaurantInput {
@@ -57,4 +60,16 @@ input OrderInput {
   phoneNumber: String!
   totalSum: Float!
   restaurantId: ID!
+}
+
+input UploadGCC {
+  file: Upload!
+}
+
+input UploadID {
+  file: Upload!
+}
+
+input UploadMC {
+  file: Upload!
 }

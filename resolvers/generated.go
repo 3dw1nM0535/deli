@@ -31,10 +31,6 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
-// func (r *licenseResolver) ID(ctx context.Context, obj *models.License) (string, error) {
-// 	panic("not implemented")
-// }
-
 // func (r *menuResolver) ID(ctx context.Context, obj *models.Menu) (string, error) {
 // 	panic("not implemented")
 // }
@@ -51,7 +47,7 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
-// func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models.License, error) {
+// func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models1.File, error) {
 // 	panic("not implemented")
 // }
 
@@ -64,6 +60,18 @@ type Resolver struct {
 // }
 
 // func (r *mutationResolver) MakeOrder(ctx context.Context, input models1.OrderInput) (*models.Order, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *mutationResolver) UploadGcc(ctx context.Context, input models1.UploadGcc) (*models1.File, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *mutationResolver) UploadID(ctx context.Context, input models1.UploadID) (*models1.File, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *mutationResolver) UploadMc(ctx context.Context, input models1.UploadMc) (*models1.File, error) {
 // 	panic("not implemented")
 // }
 
@@ -103,7 +111,7 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
-// func (r *restaurantResolver) License(ctx context.Context, obj *models.Restaurant) (*models.License, error) {
+// func (r *restaurantResolver) License(ctx context.Context, obj *models.Restaurant) (*models1.File, error) {
 // 	panic("not implemented")
 // }
 
@@ -132,9 +140,6 @@ func (r *Resolver) Dish() graph.DishResolver { return &dishResolver{r} }
 // DishOrder returns graph.DishOrderResolver implementation.
 func (r *Resolver) DishOrder() graph.DishOrderResolver { return &dishOrderResolver{r} }
 
-// License returns graph.LicenseResolver implementation.
-func (r *Resolver) License() graph.LicenseResolver { return &licenseResolver{r} }
-
 // Menu returns graph.MenuResolver implementation.
 func (r *Resolver) Menu() graph.MenuResolver { return &menuResolver{r} }
 
@@ -159,7 +164,6 @@ func (r *Resolver) Subscription() graph.SubscriptionResolver { return &subscript
 type addressResolver struct{ *Resolver }
 type dishResolver struct{ *Resolver }
 type dishOrderResolver struct{ *Resolver }
-type licenseResolver struct{ *Resolver }
 type menuResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type orderResolver struct{ *Resolver }

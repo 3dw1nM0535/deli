@@ -10,23 +10,35 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var credPath, projectID, licenseBucketName, dishesBucketName, geocodingKey, token string
+var credPath,
+	projectID,
+	licenseBucketName,
+	dishesBucketName,
+	geocodingKey,
+	token,
+	riderIDBucketName,
+	riderGCCBucketName,
+	riderMDCBucketName string
 
 func init() {
 	godotenv.Load()
 	credPath = utils.MustGetEnv("GOOGLE_APPLICATION_CREDENTIALS")
 	projectID = utils.MustGetEnv("GOOGLE_PROJECT_ID")
-	licenseBucketName = utils.MustGetEnv("LICENSE_BUCKET_NAME")
-	dishesBucketName = utils.MustGetEnv("DISHES_BUCKET_NAME")
+	licenseBucketName = utils.MustGetEnv("LICENSE_BUCKET")
+	dishesBucketName = utils.MustGetEnv("DISHES_BUCKET")
 	geocodingKey = utils.MustGetEnv("GOOGLE_GEOCODING_KEY")
+	riderGCCBucketName = utils.MustGetEnv("RIDER_GCC_BUCKET")
+	riderIDBucketName = utils.MustGetEnv("RIDER_IDD_BUCKET")
+	riderMDCBucketName = utils.MustGetEnv("RIDER_MDC_BUCKET")
+
 	orderCreatedChannel = map[string]map[string]chan *models.Order{}
 	token = utils.GetToken()
 }
 
-func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models.License, error) {
+func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models1.File, error) {
 	// validate id
 	if input.RestaurantID == "" {
-		return &models.License{}, errors.New("restaurant id cannot be empty")
+		return &models1.File{}, errors.New("restaurant id cannot be empty")
 	}
 
 	var id = utils.ParseUUID(input.RestaurantID)
@@ -37,21 +49,21 @@ func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.Uplo
 	r.ORM.DB.First(&restaurant, "id = ?", id)
 
 	if restaurant.ID.String() == "00000000-0000-0000-0000-000000000000" {
-		return &models.License{}, errors.New("no such restaurant to add its license")
+		return &models1.File{}, errors.New("no such restaurant to add its license")
 	}
 
 	// check if restaurant already has license attached to it
-	var lice = &models.License{}
-	r.ORM.DB.First(&lice, "restaurant_id = ?", id)
-	if lice.RestaurantID == id {
-		return &models.License{}, errors.New("single business permit cannot have multiple licenses")
+	var file = &models.License{}
+	r.ORM.DB.First(&file, "restaurant_id = ?", id)
+	if file.RestaurantID == id {
+		return &models1.File{}, errors.New("single business permit cannot have multiple licenses")
 	}
 
 	// upload to google cloud storage and return object attributes
 	ctx = context.Background()
 	_, attr, err := utils.Upload(ctx, input.File.File, licenseBucketName, credPath, projectID, input.File.Filename)
 	if err != nil {
-		return &models.License{}, err
+		return &models1.File{}, err
 	}
 
 	var license = &models.License{
@@ -61,7 +73,16 @@ func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.Uplo
 		CreatedAt:    attr.Created,
 		UpdatedAt:    attr.Updated,
 		RestaurantID: id,
+		Restaurant:   restaurant,
 	}
 	r.ORM.DB.Save(&license)
-	return license, nil
+
+	return &models1.File{
+		ID:        license.ID.String(),
+		Media:     license.Media,
+		Content:   license.Content,
+		Size:      int(license.Size),
+		CreatedAt: &license.CreatedAt,
+		UpdatedAt: &license.UpdatedAt,
+	}, nil
 }

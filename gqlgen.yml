@@ -69,6 +69,15 @@ models:
   Payment:
     model:
       github.com/3dw1nM0535/deli/db/models.Payment
+  IDD:
+    model:
+      github.com/3dw1nM0535/deli/db/models.IDD
+  GCC:
+    model:
+      github.com/3dw1nM0535/deli/db/models.GCC
+  MDC:
+    model:
+      github.com/3dw1nM0535/deli/db/models.MDC
 
 # Automatically bind any models matching types
 autobind: []

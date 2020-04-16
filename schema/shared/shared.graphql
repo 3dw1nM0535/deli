@@ -10,7 +10,7 @@ type Restaurant {
   createdAt: Time
   updatedAt: Time
   addresses: [Address!]
-  license: License!
+  license: File!
   menu: [Menu!]!
   orders: [Order!]!
   payments: [Payment!]!
@@ -29,7 +29,7 @@ type Address {
   restaurants: [Restaurant!]!
 }
 
-type License {
+type File {
   id: ID!
   media: String!
   content: String!
