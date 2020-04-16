@@ -34,7 +34,7 @@ func init() {
 	riderDPBucket = utils.MustGetEnv("RIDER_DP_BUCKET")
 
 	orderCreatedChannel = map[string]map[string]chan *models.Order{}
-	token = utils.GetToken()
+	// token = utils.GetToken()
 }
 
 func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models1.File, error) {

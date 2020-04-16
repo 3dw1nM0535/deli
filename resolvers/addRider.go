@@ -25,6 +25,9 @@ func (r *mutationResolver) AddRider(ctx context.Context, input models1.RiderInpu
 	if input.PhoneNumber == "" {
 		return &models.Rider{}, errors.New("rider phone number cannot be empty")
 	}
+	if len(input.PhoneNumber) < 12 || len(input.PhoneNumber) > 12 {
+		return &models.Rider{}, errors.New("invalid phone number format")
+	}
 
 	// check if email is unique
 	r.ORM.DB.First(&rider, "email_address = ?", input.EmailAddress)
