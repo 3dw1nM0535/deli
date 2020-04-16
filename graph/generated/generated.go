@@ -109,6 +109,7 @@ type ComplexityRoot struct {
 		AddRider        func(childComplexity int, input models.RiderInput) int
 		MakeOrder       func(childComplexity int, input models.OrderInput) int
 		RegisterAddress func(childComplexity int, input models.AddressInput) int
+		UploadDp        func(childComplexity int, input models.UploadDp) int
 		UploadGcc       func(childComplexity int, input models.UploadGcc) int
 		UploadID        func(childComplexity int, input models.UploadID) int
 		UploadLicense   func(childComplexity int, input models.UploadLicense) int
@@ -159,6 +160,7 @@ type ComplexityRoot struct {
 	}
 
 	Rider struct {
+		DisplayPic             func(childComplexity int) int
 		EmailAddress           func(childComplexity int) int
 		FirstName              func(childComplexity int) int
 		GoodConductCertificate func(childComplexity int) int
@@ -167,6 +169,7 @@ type ComplexityRoot struct {
 		LastName               func(childComplexity int) int
 		MedicalCertificate     func(childComplexity int) int
 		PhoneNumber            func(childComplexity int) int
+		Verified               func(childComplexity int) int
 	}
 
 	Subscription struct {
@@ -203,6 +206,7 @@ type MutationResolver interface {
 	UploadID(ctx context.Context, input models.UploadID) (*models.File, error)
 	UploadMc(ctx context.Context, input models.UploadMc) (*models.File, error)
 	AddRider(ctx context.Context, input models.RiderInput) (*models1.Rider, error)
+	UploadDp(ctx context.Context, input models.UploadDp) (*models.File, error)
 }
 type OrderResolver interface {
 	ID(ctx context.Context, obj *models1.Order) (string, error)
@@ -230,6 +234,8 @@ type RestaurantResolver interface {
 }
 type RiderResolver interface {
 	ID(ctx context.Context, obj *models1.Rider) (string, error)
+
+	DisplayPic(ctx context.Context, obj *models1.Rider) (*models.File, error)
 
 	IdentificationDocument(ctx context.Context, obj *models1.Rider) (*models.File, error)
 	MedicalCertificate(ctx context.Context, obj *models1.Rider) (*models.File, error)
@@ -550,6 +556,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RegisterAddress(childComplexity, args["input"].(models.AddressInput)), true
 
+	case "Mutation.uploadDP":
+		if e.complexity.Mutation.UploadDp == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_uploadDP_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UploadDp(childComplexity, args["input"].(models.UploadDp)), true
+
 	case "Mutation.uploadGCC":
 		if e.complexity.Mutation.UploadGcc == nil {
 			break
@@ -830,6 +848,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Restaurant.Verified(childComplexity), true
 
+	case "Rider.displayPic":
+		if e.complexity.Rider.DisplayPic == nil {
+			break
+		}
+
+		return e.complexity.Rider.DisplayPic(childComplexity), true
+
 	case "Rider.email_address":
 		if e.complexity.Rider.EmailAddress == nil {
 			break
@@ -885,6 +910,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Rider.PhoneNumber(childComplexity), true
+
+	case "Rider.verified":
+		if e.complexity.Rider.Verified == nil {
+			break
+		}
+
+		return e.complexity.Rider.Verified(childComplexity), true
 
 	case "Subscription.orderCreated":
 		if e.complexity.Subscription.OrderCreated == nil {
@@ -992,6 +1024,7 @@ type Mutation {
   uploadID(input: UploadID!): File!
   uploadMC(input: UploadMC!): File!
   addRider(input: RiderInput!): Rider!
+  uploadDP(input: UploadDP!): File!
 }
 
 input RestaurantInput {
@@ -1064,6 +1097,11 @@ input RiderInput {
   lastname: String!
   email_address: String!
   phone_number: String!
+}
+
+input UploadDP {
+  riderID: ID!
+  file: Upload!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
@@ -1167,6 +1205,8 @@ type Rider {
   firstname: String!
   lastname: String!
   email_address: String!
+  verified: Boolean!
+  displayPic: File!
   phoneNumber: String!
   IdentificationDocument: File!
   MedicalCertificate: File!
@@ -1259,6 +1299,20 @@ func (ec *executionContext) field_Mutation_registerAddress_args(ctx context.Cont
 	var arg0 models.AddressInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNAddressInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐAddressInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadDP_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.UploadDp
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNUploadDP2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐUploadDp(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2912,6 +2966,47 @@ func (ec *executionContext) _Mutation_addRider(ctx context.Context, field graphq
 	return ec.marshalNRider2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRider(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_uploadDP(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_uploadDP_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UploadDp(rctx, args["input"].(models.UploadDp))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.File)
+	fc.Result = res
+	return ec.marshalNFile2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐFile(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Order_id(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4178,6 +4273,74 @@ func (ec *executionContext) _Rider_email_address(ctx context.Context, field grap
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rider_verified(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Verified, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rider_displayPic(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Rider().DisplayPic(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.File)
+	fc.Result = res
+	return ec.marshalNFile2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐFile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Rider_phoneNumber(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
@@ -5716,6 +5879,30 @@ func (ec *executionContext) unmarshalInputRiderInput(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUploadDP(ctx context.Context, obj interface{}) (models.UploadDp, error) {
+	var it models.UploadDp
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "riderID":
+			var err error
+			it.RiderID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "file":
+			var err error
+			it.File, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUploadGCC(ctx context.Context, obj interface{}) (models.UploadGcc, error) {
 	var it models.UploadGcc
 	var asMap = obj.(map[string]interface{})
@@ -6203,6 +6390,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "uploadDP":
+			out.Values[i] = ec._Mutation_uploadDP(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6619,6 +6811,25 @@ func (ec *executionContext) _Rider(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "verified":
+			out.Values[i] = ec._Rider_verified(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "displayPic":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Rider_displayPic(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "phoneNumber":
 			out.Values[i] = ec._Rider_phoneNumber(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7489,6 +7700,10 @@ func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋg
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUploadDP2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐUploadDp(ctx context.Context, v interface{}) (models.UploadDp, error) {
+	return ec.unmarshalInputUploadDP(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNUploadGCC2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐUploadGcc(ctx context.Context, v interface{}) (models.UploadGcc, error) {

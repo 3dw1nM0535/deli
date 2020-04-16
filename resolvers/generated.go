@@ -79,6 +79,10 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
+// func (r *mutationResolver) UploadDp(ctx context.Context, input models1.UploadDp) (*models1.File, error) {
+// 	panic("not implemented")
+// }
+
 // func (r *orderResolver) ID(ctx context.Context, obj *models.Order) (string, error) {
 // 	panic("not implemented")
 // }
@@ -136,6 +140,10 @@ type Resolver struct {
 // }
 
 // func (r *riderResolver) ID(ctx context.Context, obj *models.Rider) (string, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *riderResolver) DisplayPic(ctx context.Context, obj *models.Rider) (*models1.File, error) {
 // 	panic("not implemented")
 // }
 

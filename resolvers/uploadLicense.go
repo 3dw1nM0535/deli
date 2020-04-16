@@ -18,7 +18,8 @@ var credPath,
 	token,
 	riderIDBucketName,
 	riderGCCBucketName,
-	riderMDCBucketName string
+	riderMDCBucketName,
+	riderDPBucket string
 
 func init() {
 	godotenv.Load()
@@ -30,6 +31,7 @@ func init() {
 	riderGCCBucketName = utils.MustGetEnv("RIDER_GCC_BUCKET")
 	riderIDBucketName = utils.MustGetEnv("RIDER_IDD_BUCKET")
 	riderMDCBucketName = utils.MustGetEnv("RIDER_MDC_BUCKET")
+	riderDPBucket = utils.MustGetEnv("RIDER_DP_BUCKET")
 
 	orderCreatedChannel = map[string]map[string]chan *models.Order{}
 	token = utils.GetToken()

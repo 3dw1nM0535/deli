@@ -80,6 +80,8 @@ models:
       github.com/3dw1nM0535/deli/db/models.MDC
   Rider:
     fields:
+      displayPic:
+        resolver: true # force rider dp resolver to be generated
       IdentificationDocument:
         resolver: true # force rider id document resolver to be generated
       MedicalCertificate:

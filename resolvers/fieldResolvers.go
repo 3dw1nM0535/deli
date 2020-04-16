@@ -155,6 +155,7 @@ func (r *riderResolver) IdentificationDocument(ctx context.Context, obj *models.
 		ID:        idd.ID.String(),
 		Media:     idd.Media,
 		Content:   idd.Content,
+		Size:      idd.Size,
 		CreatedAt: &idd.CreatedAt,
 		UpdatedAt: &idd.UpdatedAt,
 	}, nil
@@ -170,6 +171,7 @@ func (r *riderResolver) MedicalCertificate(ctx context.Context, obj *models.Ride
 		ID:        mdc.ID.String(),
 		Media:     mdc.Media,
 		Content:   mdc.Content,
+		Size:      mdc.Size,
 		CreatedAt: &mdc.CreatedAt,
 		UpdatedAt: &mdc.UpdatedAt,
 	}, nil
@@ -185,7 +187,24 @@ func (r *riderResolver) GoodConductCertificate(ctx context.Context, obj *models.
 		ID:        gcc.ID.String(),
 		Media:     gcc.Media,
 		Content:   gcc.Content,
+		Size:      gcc.Size,
 		CreatedAt: &gcc.CreatedAt,
 		UpdatedAt: &gcc.UpdatedAt,
+	}, nil
+}
+
+// DisplayPic : find display picture belonging to a rider
+func (r *riderResolver) DisplayPic(ctx context.Context, obj *models.Rider) (*models1.File, error) {
+	rider := obj
+	dp := &models.DisplayPicture{}
+	r.ORM.DB.First(&rider, "id = ?", obj.ID)
+	r.ORM.DB.Model(&rider).Related(&dp)
+	return &models1.File{
+		ID:        dp.ID.String(),
+		Media:     dp.Media,
+		Content:   dp.Content,
+		Size:      dp.Size,
+		CreatedAt: &dp.CreatedAt,
+		UpdatedAt: &dp.UpdatedAt,
 	}, nil
 }

@@ -23,6 +23,7 @@ func migrate() error {
 		&models.MDC{},
 		&models.GCC{},
 		&models.Rider{},
+		&models.DisplayPicture{},
 	).Error
 	if err != nil {
 		return err
@@ -44,6 +45,7 @@ func migrate() error {
 	orm.DB.Model(&models.IDD{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.MDC{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.GCC{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.DisplayPicture{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
 
 	// Add geolocation column of type geography
 	orm.DB.Exec("ALTER TABLE addresses ADD COLUMN geolocation geography(point);")

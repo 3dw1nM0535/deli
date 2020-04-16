@@ -74,6 +74,11 @@ type RiderInput struct {
 	PhoneNumber  string `json:"phone_number"`
 }
 
+type UploadDp struct {
+	RiderID string         `json:"riderID"`
+	File    graphql.Upload `json:"file"`
+}
+
 type UploadGcc struct {
 	RiderID string         `json:"riderID"`
 	File    graphql.Upload `json:"file"`

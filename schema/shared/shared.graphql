@@ -88,6 +88,8 @@ type Rider {
   firstname: String!
   lastname: String!
   email_address: String!
+  verified: Boolean!
+  displayPic: File!
   phoneNumber: String!
   IdentificationDocument: File!
   MedicalCertificate: File!

@@ -11,6 +11,7 @@ type Mutation {
   uploadID(input: UploadID!): File!
   uploadMC(input: UploadMC!): File!
   addRider(input: RiderInput!): Rider!
+  uploadDP(input: UploadDP!): File!
 }
 
 input RestaurantInput {
@@ -83,4 +84,9 @@ input RiderInput {
   lastname: String!
   email_address: String!
   phone_number: String!
+}
+
+input UploadDP {
+  riderID: ID!
+  file: Upload!
 }
