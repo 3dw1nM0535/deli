@@ -10,6 +10,7 @@ type Mutation {
   uploadGCC(input: UploadGCC!): File!
   uploadID(input: UploadID!): File!
   uploadMC(input: UploadMC!): File!
+  addRider(input: RiderInput!): Rider!
 }
 
 input RestaurantInput {
@@ -63,13 +64,23 @@ input OrderInput {
 }
 
 input UploadGCC {
+  riderID: ID!
   file: Upload!
 }
 
 input UploadID {
+  riderID: ID!
   file: Upload!
 }
 
 input UploadMC {
+  riderID: ID!
   file: Upload!
+}
+
+input RiderInput {
+  firstname: String!
+  lastname: String!
+  email_address: String!
+  phone_number: String!
 }

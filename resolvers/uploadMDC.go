@@ -19,16 +19,17 @@ func (r *mutationResolver) UploadMc(ctx context.Context, input models1.UploadMc)
 	medicalCert := &models.MDC{
 		Media:     attr.MediaLink,
 		Content:   attr.ContentType,
-		Size:      attr.Size,
+		Size:      int(attr.Size),
 		CreatedAt: attr.Created,
 		UpdatedAt: attr.Updated,
+		RiderID:   utils.ParseUUID(input.RiderID),
 	}
 	r.ORM.DB.Save(&medicalCert)
 	return &models1.File{
 		ID:        medicalCert.ID.String(),
 		Media:     medicalCert.Media,
 		Content:   medicalCert.Content,
-		Size:      int(medicalCert.Size),
+		Size:      medicalCert.Size,
 		CreatedAt: &medicalCert.CreatedAt,
 		UpdatedAt: &medicalCert.UpdatedAt,
 	}, nil

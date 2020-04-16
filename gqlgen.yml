@@ -78,6 +78,16 @@ models:
   MDC:
     model:
       github.com/3dw1nM0535/deli/db/models.MDC
+  Rider:
+    fields:
+      IdentificationDocument:
+        resolver: true # force rider id document resolver to be generated
+      MedicalCertificate:
+        resolver: true # force rider medical certificate resolver to be generated
+      GoodConductCertificate:
+        resolver: true # force rider good conduct certificate resolver to be generated
+    model:
+      github.com/3dw1nM0535/deli/db/models.Rider
 
 # Automatically bind any models matching types
 autobind: []

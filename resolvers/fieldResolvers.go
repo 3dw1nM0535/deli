@@ -139,3 +139,53 @@ func (r *restaurantResolver) Payments(ctx context.Context, obj *models.Restauran
 	r.ORM.DB.Model(&restaurant).Related(&payments)
 	return payments, nil
 }
+
+func (r *riderResolver) ID(ctx context.Context, obj *models.Rider) (string, error) {
+	id := obj.ID.String()
+	return id, nil
+}
+
+// IdentificationDocument : find id belonging to a rider
+func (r *riderResolver) IdentificationDocument(ctx context.Context, obj *models.Rider) (*models1.File, error) {
+	idd := &models.IDD{}
+	rider := obj
+	r.ORM.DB.First(&rider, "id = ?", obj.ID)
+	r.ORM.DB.Model(&rider).Related(&idd)
+	return &models1.File{
+		ID:        idd.ID.String(),
+		Media:     idd.Media,
+		Content:   idd.Content,
+		CreatedAt: &idd.CreatedAt,
+		UpdatedAt: &idd.UpdatedAt,
+	}, nil
+}
+
+// MedicalCertificate : find medical certificate belonging to a rider
+func (r *riderResolver) MedicalCertificate(ctx context.Context, obj *models.Rider) (*models1.File, error) {
+	rider := obj
+	mdc := &models.MDC{}
+	r.ORM.DB.First(&rider, "id = ?", obj.ID)
+	r.ORM.DB.Model(&rider).Related(&mdc)
+	return &models1.File{
+		ID:        mdc.ID.String(),
+		Media:     mdc.Media,
+		Content:   mdc.Content,
+		CreatedAt: &mdc.CreatedAt,
+		UpdatedAt: &mdc.UpdatedAt,
+	}, nil
+}
+
+// GoodConductCertificate : find good conduct certificate belonging to a rider
+func (r *riderResolver) GoodConductCertificate(ctx context.Context, obj *models.Rider) (*models1.File, error) {
+	rider := obj
+	gcc := &models.GCC{}
+	r.ORM.DB.First(&rider, "id = ?", obj.ID)
+	r.ORM.DB.Model(&rider).Related(&gcc)
+	return &models1.File{
+		ID:        gcc.ID.String(),
+		Media:     gcc.Media,
+		Content:   gcc.Content,
+		CreatedAt: &gcc.CreatedAt,
+		UpdatedAt: &gcc.UpdatedAt,
+	}, nil
+}

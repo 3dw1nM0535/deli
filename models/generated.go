@@ -67,12 +67,21 @@ type RestaurantInput struct {
 	Telephone      string `json:"telephone"`
 }
 
+type RiderInput struct {
+	Firstname    string `json:"firstname"`
+	Lastname     string `json:"lastname"`
+	EmailAddress string `json:"email_address"`
+	PhoneNumber  string `json:"phone_number"`
+}
+
 type UploadGcc struct {
-	File graphql.Upload `json:"file"`
+	RiderID string         `json:"riderID"`
+	File    graphql.Upload `json:"file"`
 }
 
 type UploadID struct {
-	File graphql.Upload `json:"file"`
+	RiderID string         `json:"riderID"`
+	File    graphql.Upload `json:"file"`
 }
 
 type UploadLicense struct {
@@ -81,5 +90,6 @@ type UploadLicense struct {
 }
 
 type UploadMc struct {
-	File graphql.Upload `json:"file"`
+	RiderID string         `json:"riderID"`
+	File    graphql.Upload `json:"file"`
 }

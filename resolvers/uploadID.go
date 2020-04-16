@@ -19,16 +19,17 @@ func (r *mutationResolver) UploadID(ctx context.Context, input models1.UploadID)
 	identificationDoc := &models.IDD{
 		Media:     attr.MediaLink,
 		Content:   attr.ContentType,
-		Size:      attr.Size,
+		Size:      int(attr.Size),
 		CreatedAt: attr.Created,
 		UpdatedAt: attr.Updated,
+		RiderID:   utils.ParseUUID(input.RiderID),
 	}
 	r.ORM.DB.Save(&identificationDoc)
 	return &models1.File{
 		ID:        identificationDoc.ID.String(),
 		Media:     identificationDoc.Media,
 		Content:   identificationDoc.Content,
-		Size:      int(identificationDoc.Size),
+		Size:      identificationDoc.Size,
 		CreatedAt: &identificationDoc.CreatedAt,
 		UpdatedAt: &identificationDoc.UpdatedAt,
 	}, nil

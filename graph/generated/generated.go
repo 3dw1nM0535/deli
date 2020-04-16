@@ -47,6 +47,7 @@ type ResolverRoot interface {
 	Payment() PaymentResolver
 	Query() QueryResolver
 	Restaurant() RestaurantResolver
+	Rider() RiderResolver
 	Subscription() SubscriptionResolver
 }
 
@@ -105,6 +106,7 @@ type ComplexityRoot struct {
 		AddDish         func(childComplexity int, input []*models.DishInput) int
 		AddMenu         func(childComplexity int, input models.MenuInput) int
 		AddRestaurant   func(childComplexity int, input models.RestaurantInput) int
+		AddRider        func(childComplexity int, input models.RiderInput) int
 		MakeOrder       func(childComplexity int, input models.OrderInput) int
 		RegisterAddress func(childComplexity int, input models.AddressInput) int
 		UploadGcc       func(childComplexity int, input models.UploadGcc) int
@@ -136,6 +138,7 @@ type ComplexityRoot struct {
 	Query struct {
 		FindNearByRestaurants func(childComplexity int, input models.Cords) int
 		FindRestaurant        func(childComplexity int, id string) int
+		FindRider             func(childComplexity int, id string) int
 		Hello                 func(childComplexity int) int
 	}
 
@@ -153,6 +156,17 @@ type ComplexityRoot struct {
 		Telephone      func(childComplexity int) int
 		UpdatedAt      func(childComplexity int) int
 		Verified       func(childComplexity int) int
+	}
+
+	Rider struct {
+		EmailAddress           func(childComplexity int) int
+		FirstName              func(childComplexity int) int
+		GoodConductCertificate func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		IdentificationDocument func(childComplexity int) int
+		LastName               func(childComplexity int) int
+		MedicalCertificate     func(childComplexity int) int
+		PhoneNumber            func(childComplexity int) int
 	}
 
 	Subscription struct {
@@ -188,6 +202,7 @@ type MutationResolver interface {
 	UploadGcc(ctx context.Context, input models.UploadGcc) (*models.File, error)
 	UploadID(ctx context.Context, input models.UploadID) (*models.File, error)
 	UploadMc(ctx context.Context, input models.UploadMc) (*models.File, error)
+	AddRider(ctx context.Context, input models.RiderInput) (*models1.Rider, error)
 }
 type OrderResolver interface {
 	ID(ctx context.Context, obj *models1.Order) (string, error)
@@ -202,6 +217,7 @@ type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
 	FindRestaurant(ctx context.Context, id string) (*models1.Restaurant, error)
 	FindNearByRestaurants(ctx context.Context, input models.Cords) ([]*models1.Restaurant, error)
+	FindRider(ctx context.Context, id string) (*models1.Rider, error)
 }
 type RestaurantResolver interface {
 	ID(ctx context.Context, obj *models1.Restaurant) (string, error)
@@ -211,6 +227,13 @@ type RestaurantResolver interface {
 	Menu(ctx context.Context, obj *models1.Restaurant) ([]*models1.Menu, error)
 	Orders(ctx context.Context, obj *models1.Restaurant) ([]*models1.Order, error)
 	Payments(ctx context.Context, obj *models1.Restaurant) ([]*models1.Payment, error)
+}
+type RiderResolver interface {
+	ID(ctx context.Context, obj *models1.Rider) (string, error)
+
+	IdentificationDocument(ctx context.Context, obj *models1.Rider) (*models.File, error)
+	MedicalCertificate(ctx context.Context, obj *models1.Rider) (*models.File, error)
+	GoodConductCertificate(ctx context.Context, obj *models1.Rider) (*models.File, error)
 }
 type SubscriptionResolver interface {
 	OrderCreated(ctx context.Context, id string) (<-chan *models1.Order, error)
@@ -491,6 +514,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddRestaurant(childComplexity, args["input"].(models.RestaurantInput)), true
 
+	case "Mutation.addRider":
+		if e.complexity.Mutation.AddRider == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addRider_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddRider(childComplexity, args["input"].(models.RiderInput)), true
+
 	case "Mutation.makeOrder":
 		if e.complexity.Mutation.MakeOrder == nil {
 			break
@@ -685,6 +720,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.FindRestaurant(childComplexity, args["id"].(string)), true
 
+	case "Query.findRider":
+		if e.complexity.Query.FindRider == nil {
+			break
+		}
+
+		args, err := ec.field_Query_findRider_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FindRider(childComplexity, args["id"].(string)), true
+
 	case "Query.hello":
 		if e.complexity.Query.Hello == nil {
 			break
@@ -782,6 +829,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Restaurant.Verified(childComplexity), true
+
+	case "Rider.email_address":
+		if e.complexity.Rider.EmailAddress == nil {
+			break
+		}
+
+		return e.complexity.Rider.EmailAddress(childComplexity), true
+
+	case "Rider.firstname":
+		if e.complexity.Rider.FirstName == nil {
+			break
+		}
+
+		return e.complexity.Rider.FirstName(childComplexity), true
+
+	case "Rider.GoodConductCertificate":
+		if e.complexity.Rider.GoodConductCertificate == nil {
+			break
+		}
+
+		return e.complexity.Rider.GoodConductCertificate(childComplexity), true
+
+	case "Rider.id":
+		if e.complexity.Rider.ID == nil {
+			break
+		}
+
+		return e.complexity.Rider.ID(childComplexity), true
+
+	case "Rider.IdentificationDocument":
+		if e.complexity.Rider.IdentificationDocument == nil {
+			break
+		}
+
+		return e.complexity.Rider.IdentificationDocument(childComplexity), true
+
+	case "Rider.lastname":
+		if e.complexity.Rider.LastName == nil {
+			break
+		}
+
+		return e.complexity.Rider.LastName(childComplexity), true
+
+	case "Rider.MedicalCertificate":
+		if e.complexity.Rider.MedicalCertificate == nil {
+			break
+		}
+
+		return e.complexity.Rider.MedicalCertificate(childComplexity), true
+
+	case "Rider.phoneNumber":
+		if e.complexity.Rider.PhoneNumber == nil {
+			break
+		}
+
+		return e.complexity.Rider.PhoneNumber(childComplexity), true
 
 	case "Subscription.orderCreated":
 		if e.complexity.Subscription.OrderCreated == nil {
@@ -888,6 +991,7 @@ type Mutation {
   uploadGCC(input: UploadGCC!): File!
   uploadID(input: UploadID!): File!
   uploadMC(input: UploadMC!): File!
+  addRider(input: RiderInput!): Rider!
 }
 
 input RestaurantInput {
@@ -941,21 +1045,32 @@ input OrderInput {
 }
 
 input UploadGCC {
+  riderID: ID!
   file: Upload!
 }
 
 input UploadID {
+  riderID: ID!
   file: Upload!
 }
 
 input UploadMC {
+  riderID: ID!
   file: Upload!
+}
+
+input RiderInput {
+  firstname: String!
+  lastname: String!
+  email_address: String!
+  phone_number: String!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	hello: String!
 	findRestaurant(id: ID!): Restaurant!
 	findNearByRestaurants(input: Cords!): [Restaurant!]!
+	findRider(id: ID!): Rider!
 }
 
 input Cords {
@@ -1046,6 +1161,17 @@ type Payment {
   phoneNumber: String!
   confirmed: Boolean!
 }
+
+type Rider {
+  id: ID!
+  firstname: String!
+  lastname: String!
+  email_address: String!
+  phoneNumber: String!
+  IdentificationDocument: File!
+  MedicalCertificate: File!
+  GoodConductCertificate: File!
+}
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/subscription/makeOrder.graphql", Input: `type Subscription {
   orderCreated(id: ID!): Order!
@@ -1091,6 +1217,20 @@ func (ec *executionContext) field_Mutation_addRestaurant_args(ctx context.Contex
 	var arg0 models.RestaurantInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNRestaurantInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐRestaurantInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addRider_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.RiderInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNRiderInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐRiderInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1212,6 +1352,20 @@ func (ec *executionContext) field_Query_findNearByRestaurants_args(ctx context.C
 }
 
 func (ec *executionContext) field_Query_findRestaurant_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_findRider_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -2717,6 +2871,47 @@ func (ec *executionContext) _Mutation_uploadMC(ctx context.Context, field graphq
 	return ec.marshalNFile2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐFile(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addRider(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addRider_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddRider(rctx, args["input"].(models.RiderInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.Rider)
+	fc.Result = res
+	return ec.marshalNRider2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRider(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Order_id(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3309,6 +3504,47 @@ func (ec *executionContext) _Query_findNearByRestaurants(ctx context.Context, fi
 	return ec.marshalNRestaurant2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurantᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_findRider(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_findRider_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FindRider(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.Rider)
+	fc.Result = res
+	return ec.marshalNRider2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRider(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3806,6 +4042,278 @@ func (ec *executionContext) _Restaurant_payments(ctx context.Context, field grap
 	res := resTmp.([]*models1.Payment)
 	fc.Result = res
 	return ec.marshalNPayment2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐPaymentᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rider_id(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Rider().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rider_firstname(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FirstName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rider_lastname(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rider_email_address(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EmailAddress, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rider_phoneNumber(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PhoneNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rider_IdentificationDocument(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Rider().IdentificationDocument(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.File)
+	fc.Result = res
+	return ec.marshalNFile2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rider_MedicalCertificate(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Rider().MedicalCertificate(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.File)
+	fc.Result = res
+	return ec.marshalNFile2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rider_GoodConductCertificate(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Rider().GoodConductCertificate(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.File)
+	fc.Result = res
+	return ec.marshalNFile2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐFile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Subscription_orderCreated(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
@@ -5172,12 +5680,54 @@ func (ec *executionContext) unmarshalInputRestaurantInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputRiderInput(ctx context.Context, obj interface{}) (models.RiderInput, error) {
+	var it models.RiderInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "firstname":
+			var err error
+			it.Firstname, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lastname":
+			var err error
+			it.Lastname, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "email_address":
+			var err error
+			it.EmailAddress, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "phone_number":
+			var err error
+			it.PhoneNumber, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUploadGCC(ctx context.Context, obj interface{}) (models.UploadGcc, error) {
 	var it models.UploadGcc
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
 		switch k {
+		case "riderID":
+			var err error
+			it.RiderID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "file":
 			var err error
 			it.File, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
@@ -5196,6 +5746,12 @@ func (ec *executionContext) unmarshalInputUploadID(ctx context.Context, obj inte
 
 	for k, v := range asMap {
 		switch k {
+		case "riderID":
+			var err error
+			it.RiderID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "file":
 			var err error
 			it.File, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
@@ -5238,6 +5794,12 @@ func (ec *executionContext) unmarshalInputUploadMC(ctx context.Context, obj inte
 
 	for k, v := range asMap {
 		switch k {
+		case "riderID":
+			var err error
+			it.RiderID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "file":
 			var err error
 			it.File, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
@@ -5636,6 +6198,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "addRider":
+			out.Values[i] = ec._Mutation_addRider(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5854,6 +6421,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "findRider":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_findRider(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -5982,6 +6563,104 @@ func (ec *executionContext) _Restaurant(ctx context.Context, sel ast.SelectionSe
 					}
 				}()
 				res = ec._Restaurant_payments(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var riderImplementors = []string{"Rider"}
+
+func (ec *executionContext) _Rider(ctx context.Context, sel ast.SelectionSet, obj *models1.Rider) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, riderImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Rider")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Rider_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "firstname":
+			out.Values[i] = ec._Rider_firstname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "lastname":
+			out.Values[i] = ec._Rider_lastname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "email_address":
+			out.Values[i] = ec._Rider_email_address(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "phoneNumber":
+			out.Values[i] = ec._Rider_phoneNumber(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "IdentificationDocument":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Rider_IdentificationDocument(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "MedicalCertificate":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Rider_MedicalCertificate(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "GoodConductCertificate":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Rider_GoodConductCertificate(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -6735,6 +7414,24 @@ func (ec *executionContext) marshalNRestaurant2ᚖgithubᚗcomᚋ3dw1nM0535ᚋde
 
 func (ec *executionContext) unmarshalNRestaurantInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐRestaurantInput(ctx context.Context, v interface{}) (models.RestaurantInput, error) {
 	return ec.unmarshalInputRestaurantInput(ctx, v)
+}
+
+func (ec *executionContext) marshalNRider2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRider(ctx context.Context, sel ast.SelectionSet, v models1.Rider) graphql.Marshaler {
+	return ec._Rider(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNRider2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRider(ctx context.Context, sel ast.SelectionSet, v *models1.Rider) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Rider(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNRiderInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐRiderInput(ctx context.Context, v interface{}) (models.RiderInput, error) {
+	return ec.unmarshalInputRiderInput(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

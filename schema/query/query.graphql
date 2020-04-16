@@ -2,6 +2,7 @@ type Query {
 	hello: String!
 	findRestaurant(id: ID!): Restaurant!
 	findNearByRestaurants(input: Cords!): [Restaurant!]!
+	findRider(id: ID!): Rider!
 }
 
 input Cords {

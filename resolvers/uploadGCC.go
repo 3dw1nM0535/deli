@@ -19,16 +19,17 @@ func (r *mutationResolver) UploadGcc(ctx context.Context, input models1.UploadGc
 	goodConductCert := &models.GCC{
 		Media:     attr.MediaLink,
 		Content:   attr.ContentType,
-		Size:      attr.Size,
+		Size:      int(attr.Size),
 		CreatedAt: attr.Created,
 		UpdatedAt: attr.Updated,
+		RiderID:   utils.ParseUUID(input.RiderID),
 	}
 	r.ORM.DB.Save(&goodConductCert)
 	return &models1.File{
 		ID:        goodConductCert.ID.String(),
 		Media:     goodConductCert.Media,
 		Content:   goodConductCert.Content,
-		Size:      int(goodConductCert.Size),
+		Size:      goodConductCert.Size,
 		CreatedAt: &goodConductCert.CreatedAt,
 		UpdatedAt: &goodConductCert.UpdatedAt,
 	}, nil

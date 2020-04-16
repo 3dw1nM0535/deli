@@ -22,6 +22,7 @@ func migrate() error {
 		&models.IDD{},
 		&models.MDC{},
 		&models.GCC{},
+		&models.Rider{},
 	).Error
 	if err != nil {
 		return err
@@ -38,6 +39,11 @@ func migrate() error {
 	orm.DB.Model(&models.Order{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.Payment{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.Payment{}).AddForeignKey("order_id", "orders(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.Rider{}).AddUniqueIndex("idx_rider_email", "email_address")
+	orm.DB.Model(&models.Rider{}).AddUniqueIndex("idx_rider_phone_no", "phone_number")
+	orm.DB.Model(&models.IDD{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.MDC{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.GCC{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
 
 	// Add geolocation column of type geography
 	orm.DB.Exec("ALTER TABLE addresses ADD COLUMN geolocation geography(point);")

@@ -16,7 +16,7 @@ type License struct {
 	FileModel
 	Media        string `gorm:"not_null;text;"`
 	Content      string `gorm:"type:varchar(255);not_null;"`
-	Size         int64  `gorm:"type:integer;not_null;"`
+	Size         int    `gorm:"type:integer;not_null;"`
 	RestaurantID uuid.UUID
 	Restaurant   *Restaurant
 	CreatedAt    time.Time

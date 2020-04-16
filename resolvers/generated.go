@@ -75,6 +75,10 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
+// func (r *mutationResolver) AddRider(ctx context.Context, input models1.RiderInput) (*models.Rider, error) {
+// 	panic("not implemented")
+// }
+
 // func (r *orderResolver) ID(ctx context.Context, obj *models.Order) (string, error) {
 // 	panic("not implemented")
 // }
@@ -103,6 +107,10 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
+// func (r *queryResolver) FindRider(ctx context.Context, id string) (*models.Rider, error) {
+// 	panic("not implemented")
+// }
+
 // func (r *restaurantResolver) ID(ctx context.Context, obj *models.Restaurant) (string, error) {
 // 	panic("not implemented")
 // }
@@ -124,6 +132,22 @@ type Resolver struct {
 // }
 
 // func (r *restaurantResolver) Payments(ctx context.Context, obj *models.Restaurant) ([]*models.Payment, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *riderResolver) ID(ctx context.Context, obj *models.Rider) (string, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *riderResolver) IdentificationDocument(ctx context.Context, obj *models.Rider) (*models1.File, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *riderResolver) MedicalCertificate(ctx context.Context, obj *models.Rider) (*models1.File, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *riderResolver) GoodConductCertificate(ctx context.Context, obj *models.Rider) (*models1.File, error) {
 // 	panic("not implemented")
 // }
 
@@ -158,6 +182,9 @@ func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 // Restaurant returns graph.RestaurantResolver implementation.
 func (r *Resolver) Restaurant() graph.RestaurantResolver { return &restaurantResolver{r} }
 
+// Rider returns graph.RiderResolver implementation.
+func (r *Resolver) Rider() graph.RiderResolver { return &riderResolver{r} }
+
 // Subscription returns graph.SubscriptionResolver implementation.
 func (r *Resolver) Subscription() graph.SubscriptionResolver { return &subscriptionResolver{r} }
 
@@ -170,4 +197,5 @@ type orderResolver struct{ *Resolver }
 type paymentResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type restaurantResolver struct{ *Resolver }
+type riderResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }

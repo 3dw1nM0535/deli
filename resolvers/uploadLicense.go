@@ -69,7 +69,7 @@ func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.Uplo
 	var license = &models.License{
 		Media:        attr.MediaLink,
 		Content:      attr.ContentType,
-		Size:         attr.Size,
+		Size:         int(attr.Size),
 		CreatedAt:    attr.Created,
 		UpdatedAt:    attr.Updated,
 		RestaurantID: id,
@@ -81,7 +81,7 @@ func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.Uplo
 		ID:        license.ID.String(),
 		Media:     license.Media,
 		Content:   license.Content,
-		Size:      int(license.Size),
+		Size:      license.Size,
 		CreatedAt: &license.CreatedAt,
 		UpdatedAt: &license.UpdatedAt,
 	}, nil

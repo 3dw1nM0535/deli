@@ -82,3 +82,14 @@ type Payment {
   phoneNumber: String!
   confirmed: Boolean!
 }
+
+type Rider {
+  id: ID!
+  firstname: String!
+  lastname: String!
+  email_address: String!
+  phoneNumber: String!
+  IdentificationDocument: File!
+  MedicalCertificate: File!
+  GoodConductCertificate: File!
+}
