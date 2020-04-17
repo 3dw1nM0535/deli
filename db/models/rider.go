@@ -12,4 +12,5 @@ type Rider struct {
 	MedicalCertificate     *MDC
 	GoodConductCertificate *GCC
 	DisplayPic             *DisplayPicture
+	DeliveryMeans          *DeliveryMeans
 }

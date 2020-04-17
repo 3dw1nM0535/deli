@@ -83,6 +83,10 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
+// func (r *mutationResolver) AddDeliveryMeans(ctx context.Context, input models1.DeliveryMeansInput) (*models1.DeliveryMeans, error) {
+// 	panic("not implemented")
+// }
+
 // func (r *orderResolver) ID(ctx context.Context, obj *models.Order) (string, error) {
 // 	panic("not implemented")
 // }
@@ -148,6 +152,10 @@ type Resolver struct {
 // }
 
 // func (r *riderResolver) DisplayPic(ctx context.Context, obj *models.Rider) (*models1.File, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *riderResolver) DeliveryMeans(ctx context.Context, obj *models.Rider) (*models1.DeliveryMeans, error) {
 // 	panic("not implemented")
 // }
 

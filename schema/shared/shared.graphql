@@ -91,7 +91,12 @@ type Rider {
   verified: Boolean!
   displayPic: File!
   phoneNumber: String!
+  deliveryMeans: DeliveryMeans!
   IdentificationDocument: File!
   MedicalCertificate: File!
   GoodConductCertificate: File!
+}
+
+type DeliveryMeans {
+  means: String!
 }

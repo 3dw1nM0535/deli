@@ -24,6 +24,15 @@ type Cords struct {
 	Lat float64 `json:"lat"`
 }
 
+type DeliveryMeans struct {
+	Means string `json:"means"`
+}
+
+type DeliveryMeansInput struct {
+	RiderID string `json:"riderID"`
+	Means   string `json:"means"`
+}
+
 type DishInput struct {
 	Title       string         `json:"title"`
 	Description string         `json:"description"`

@@ -12,6 +12,7 @@ type Mutation {
   uploadMC(input: UploadMC!): File!
   addRider(input: RiderInput!): Rider!
   uploadDP(input: UploadDP!): File!
+  addDeliveryMeans(input: DeliveryMeansInput!): DeliveryMeans!
 }
 
 input RestaurantInput {
@@ -89,4 +90,9 @@ input RiderInput {
 input UploadDP {
   riderID: ID!
   file: Upload!
+}
+
+input DeliveryMeansInput {
+  riderID: ID!
+  means: String!
 }

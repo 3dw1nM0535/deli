@@ -72,6 +72,10 @@ type ComplexityRoot struct {
 		City func(childComplexity int) int
 	}
 
+	DeliveryMeans struct {
+		Means func(childComplexity int) int
+	}
+
 	Dish struct {
 		AddOns      func(childComplexity int) int
 		Description func(childComplexity int) int
@@ -107,17 +111,18 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddDish         func(childComplexity int, input []*models.DishInput) int
-		AddMenu         func(childComplexity int, input models.MenuInput) int
-		AddRestaurant   func(childComplexity int, input models.RestaurantInput) int
-		AddRider        func(childComplexity int, input models.RiderInput) int
-		MakeOrder       func(childComplexity int, input models.OrderInput) int
-		RegisterAddress func(childComplexity int, input models.AddressInput) int
-		UploadDp        func(childComplexity int, input models.UploadDp) int
-		UploadGcc       func(childComplexity int, input models.UploadGcc) int
-		UploadID        func(childComplexity int, input models.UploadID) int
-		UploadLicense   func(childComplexity int, input models.UploadLicense) int
-		UploadMc        func(childComplexity int, input models.UploadMc) int
+		AddDeliveryMeans func(childComplexity int, input models.DeliveryMeansInput) int
+		AddDish          func(childComplexity int, input []*models.DishInput) int
+		AddMenu          func(childComplexity int, input models.MenuInput) int
+		AddRestaurant    func(childComplexity int, input models.RestaurantInput) int
+		AddRider         func(childComplexity int, input models.RiderInput) int
+		MakeOrder        func(childComplexity int, input models.OrderInput) int
+		RegisterAddress  func(childComplexity int, input models.AddressInput) int
+		UploadDp         func(childComplexity int, input models.UploadDp) int
+		UploadGcc        func(childComplexity int, input models.UploadGcc) int
+		UploadID         func(childComplexity int, input models.UploadID) int
+		UploadLicense    func(childComplexity int, input models.UploadLicense) int
+		UploadMc         func(childComplexity int, input models.UploadMc) int
 	}
 
 	Order struct {
@@ -165,6 +170,7 @@ type ComplexityRoot struct {
 	}
 
 	Rider struct {
+		DeliveryMeans          func(childComplexity int) int
 		DisplayPic             func(childComplexity int) int
 		EmailAddress           func(childComplexity int) int
 		FirstName              func(childComplexity int) int
@@ -212,6 +218,7 @@ type MutationResolver interface {
 	UploadMc(ctx context.Context, input models.UploadMc) (*models.File, error)
 	AddRider(ctx context.Context, input models.RiderInput) (*models1.Rider, error)
 	UploadDp(ctx context.Context, input models.UploadDp) (*models.File, error)
+	AddDeliveryMeans(ctx context.Context, input models.DeliveryMeansInput) (*models.DeliveryMeans, error)
 }
 type OrderResolver interface {
 	ID(ctx context.Context, obj *models1.Order) (string, error)
@@ -243,6 +250,7 @@ type RiderResolver interface {
 
 	DisplayPic(ctx context.Context, obj *models1.Rider) (*models.File, error)
 
+	DeliveryMeans(ctx context.Context, obj *models1.Rider) (*models.DeliveryMeans, error)
 	IdentificationDocument(ctx context.Context, obj *models1.Rider) (*models.File, error)
 	MedicalCertificate(ctx context.Context, obj *models1.Rider) (*models.File, error)
 	GoodConductCertificate(ctx context.Context, obj *models1.Rider) (*models.File, error)
@@ -342,6 +350,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.City.City(childComplexity), true
+
+	case "DeliveryMeans.means":
+		if e.complexity.DeliveryMeans.Means == nil {
+			break
+		}
+
+		return e.complexity.DeliveryMeans.Means(childComplexity), true
 
 	case "Dish.addOns":
 		if e.complexity.Dish.AddOns == nil {
@@ -496,6 +511,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Menu.ID(childComplexity), true
+
+	case "Mutation.addDeliveryMeans":
+		if e.complexity.Mutation.AddDeliveryMeans == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addDeliveryMeans_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddDeliveryMeans(childComplexity, args["input"].(models.DeliveryMeansInput)), true
 
 	case "Mutation.addDish":
 		if e.complexity.Mutation.AddDish == nil {
@@ -868,6 +895,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Restaurant.Verified(childComplexity), true
 
+	case "Rider.deliveryMeans":
+		if e.complexity.Rider.DeliveryMeans == nil {
+			break
+		}
+
+		return e.complexity.Rider.DeliveryMeans(childComplexity), true
+
 	case "Rider.displayPic":
 		if e.complexity.Rider.DisplayPic == nil {
 			break
@@ -1045,6 +1079,7 @@ type Mutation {
   uploadMC(input: UploadMC!): File!
   addRider(input: RiderInput!): Rider!
   uploadDP(input: UploadDP!): File!
+  addDeliveryMeans(input: DeliveryMeansInput!): DeliveryMeans!
 }
 
 input RestaurantInput {
@@ -1122,6 +1157,11 @@ input RiderInput {
 input UploadDP {
   riderID: ID!
   file: Upload!
+}
+
+input DeliveryMeansInput {
+  riderID: ID!
+  means: String!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
@@ -1233,9 +1273,14 @@ type Rider {
   verified: Boolean!
   displayPic: File!
   phoneNumber: String!
+  deliveryMeans: DeliveryMeans!
   IdentificationDocument: File!
   MedicalCertificate: File!
   GoodConductCertificate: File!
+}
+
+type DeliveryMeans {
+  means: String!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/subscription/makeOrder.graphql", Input: `type Subscription {
@@ -1247,6 +1292,20 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_addDeliveryMeans_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.DeliveryMeansInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNDeliveryMeansInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeliveryMeansInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_addDish_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -1860,6 +1919,40 @@ func (ec *executionContext) _City_city(ctx context.Context, field graphql.Collec
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.City, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeliveryMeans_means(ctx context.Context, field graphql.CollectedField, obj *models.DeliveryMeans) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeliveryMeans",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Means, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3064,6 +3157,47 @@ func (ec *executionContext) _Mutation_uploadDP(ctx context.Context, field graphq
 	res := resTmp.(*models.File)
 	fc.Result = res
 	return ec.marshalNFile2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addDeliveryMeans(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addDeliveryMeans_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddDeliveryMeans(rctx, args["input"].(models.DeliveryMeansInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.DeliveryMeans)
+	fc.Result = res
+	return ec.marshalNDeliveryMeans2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeliveryMeans(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Order_id(ctx context.Context, field graphql.CollectedField, obj *models1.Order) (ret graphql.Marshaler) {
@@ -4470,6 +4604,40 @@ func (ec *executionContext) _Rider_phoneNumber(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Rider_deliveryMeans(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rider",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Rider().DeliveryMeans(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.DeliveryMeans)
+	fc.Result = res
+	return ec.marshalNDeliveryMeans2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeliveryMeans(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Rider_IdentificationDocument(ctx context.Context, field graphql.CollectedField, obj *models1.Rider) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -5738,6 +5906,30 @@ func (ec *executionContext) unmarshalInputCords(ctx context.Context, obj interfa
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeliveryMeansInput(ctx context.Context, obj interface{}) (models.DeliveryMeansInput, error) {
+	var it models.DeliveryMeansInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "riderID":
+			var err error
+			it.RiderID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "means":
+			var err error
+			it.Means, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDishInput(ctx context.Context, obj interface{}) (models.DishInput, error) {
 	var it models.DishInput
 	var asMap = obj.(map[string]interface{})
@@ -6202,6 +6394,33 @@ func (ec *executionContext) _City(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var deliveryMeansImplementors = []string{"DeliveryMeans"}
+
+func (ec *executionContext) _DeliveryMeans(ctx context.Context, sel ast.SelectionSet, obj *models.DeliveryMeans) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deliveryMeansImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeliveryMeans")
+		case "means":
+			out.Values[i] = ec._DeliveryMeans_means(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var dishImplementors = []string{"Dish"}
 
 func (ec *executionContext) _Dish(ctx context.Context, sel ast.SelectionSet, obj *models1.Dish) graphql.Marshaler {
@@ -6512,6 +6731,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "uploadDP":
 			out.Values[i] = ec._Mutation_uploadDP(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addDeliveryMeans":
+			out.Values[i] = ec._Mutation_addDeliveryMeans(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6969,6 +7193,20 @@ func (ec *executionContext) _Rider(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "deliveryMeans":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Rider_deliveryMeans(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "IdentificationDocument":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -7372,6 +7610,24 @@ func (ec *executionContext) marshalNCity2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋm
 
 func (ec *executionContext) unmarshalNCords2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐCords(ctx context.Context, v interface{}) (models.Cords, error) {
 	return ec.unmarshalInputCords(ctx, v)
+}
+
+func (ec *executionContext) marshalNDeliveryMeans2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeliveryMeans(ctx context.Context, sel ast.SelectionSet, v models.DeliveryMeans) graphql.Marshaler {
+	return ec._DeliveryMeans(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeliveryMeans2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeliveryMeans(ctx context.Context, sel ast.SelectionSet, v *models.DeliveryMeans) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DeliveryMeans(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeliveryMeansInput2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐDeliveryMeansInput(ctx context.Context, v interface{}) (models.DeliveryMeansInput, error) {
+	return ec.unmarshalInputDeliveryMeansInput(ctx, v)
 }
 
 func (ec *executionContext) marshalNDish2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐDish(ctx context.Context, sel ast.SelectionSet, v models1.Dish) graphql.Marshaler {

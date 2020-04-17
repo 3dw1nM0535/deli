@@ -208,3 +208,14 @@ func (r *riderResolver) DisplayPic(ctx context.Context, obj *models.Rider) (*mod
 		UpdatedAt: &dp.UpdatedAt,
 	}, nil
 }
+
+// DeliveryMeans : find delivery means belonging to a rider
+func (r *riderResolver) DeliveryMeans(ctx context.Context, obj *models.Rider) (*models1.DeliveryMeans, error) {
+	means := &models.DeliveryMeans{}
+	rider := obj
+	r.ORM.DB.First(&rider, "id = ?", obj.ID)
+	r.ORM.DB.Model(&rider).Related(&means)
+	return &models1.DeliveryMeans{
+		Means: means.Means,
+	}, nil
+}
