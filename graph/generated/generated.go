@@ -68,6 +68,10 @@ type ComplexityRoot struct {
 		UpdatedAt     func(childComplexity int) int
 	}
 
+	City struct {
+		City func(childComplexity int) int
+	}
+
 	Dish struct {
 		AddOns      func(childComplexity int) int
 		Description func(childComplexity int) int
@@ -138,6 +142,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		FindNearByRestaurants func(childComplexity int, input models.Cords) int
+		FindRegVerResLoc      func(childComplexity int) int
 		FindRestaurant        func(childComplexity int, id string) int
 		FindRider             func(childComplexity int, id string) int
 		Hello                 func(childComplexity int) int
@@ -222,6 +227,7 @@ type QueryResolver interface {
 	FindRestaurant(ctx context.Context, id string) (*models1.Restaurant, error)
 	FindNearByRestaurants(ctx context.Context, input models.Cords) ([]*models1.Restaurant, error)
 	FindRider(ctx context.Context, id string) (*models1.Rider, error)
+	FindRegVerResLoc(ctx context.Context) ([]*models.City, error)
 }
 type RestaurantResolver interface {
 	ID(ctx context.Context, obj *models1.Restaurant) (string, error)
@@ -329,6 +335,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Address.UpdatedAt(childComplexity), true
+
+	case "City.city":
+		if e.complexity.City.City == nil {
+			break
+		}
+
+		return e.complexity.City.City(childComplexity), true
 
 	case "Dish.addOns":
 		if e.complexity.Dish.AddOns == nil {
@@ -726,6 +739,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.FindNearByRestaurants(childComplexity, args["input"].(models.Cords)), true
 
+	case "Query.findRegVerResLoc":
+		if e.complexity.Query.FindRegVerResLoc == nil {
+			break
+		}
+
+		return e.complexity.Query.FindRegVerResLoc(childComplexity), true
+
 	case "Query.findRestaurant":
 		if e.complexity.Query.FindRestaurant == nil {
 			break
@@ -1109,6 +1129,11 @@ input UploadDP {
 	findRestaurant(id: ID!): Restaurant!
 	findNearByRestaurants(input: Cords!): [Restaurant!]!
 	findRider(id: ID!): Rider!
+	findRegVerResLoc: [City!]!
+}
+
+type City {
+	city: String!
 }
 
 input Cords {
@@ -1815,6 +1840,40 @@ func (ec *executionContext) _Address_restaurants(ctx context.Context, field grap
 	res := resTmp.([]*models1.Restaurant)
 	fc.Result = res
 	return ec.marshalNRestaurant2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRestaurantᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _City_city(ctx context.Context, field graphql.CollectedField, obj *models.City) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "City",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.City, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Dish_id(ctx context.Context, field graphql.CollectedField, obj *models1.Dish) (ret graphql.Marshaler) {
@@ -3638,6 +3697,40 @@ func (ec *executionContext) _Query_findRider(ctx context.Context, field graphql.
 	res := resTmp.(*models1.Rider)
 	fc.Result = res
 	return ec.marshalNRider2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋdbᚋmodelsᚐRider(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_findRegVerResLoc(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FindRegVerResLoc(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models.City)
+	fc.Result = res
+	return ec.marshalNCity2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐCityᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6082,6 +6175,33 @@ func (ec *executionContext) _Address(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var cityImplementors = []string{"City"}
+
+func (ec *executionContext) _City(ctx context.Context, sel ast.SelectionSet, obj *models.City) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cityImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("City")
+		case "city":
+			out.Values[i] = ec._City_city(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var dishImplementors = []string{"Dish"}
 
 func (ec *executionContext) _Dish(ctx context.Context, sel ast.SelectionSet, obj *models1.Dish) graphql.Marshaler {
@@ -6622,6 +6742,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_findRider(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "findRegVerResLoc":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_findRegVerResLoc(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -7183,6 +7317,57 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNCity2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐCity(ctx context.Context, sel ast.SelectionSet, v models.City) graphql.Marshaler {
+	return ec._City(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCity2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐCityᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.City) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCity2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐCity(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNCity2ᚖgithubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐCity(ctx context.Context, sel ast.SelectionSet, v *models.City) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._City(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNCords2githubᚗcomᚋ3dw1nM0535ᚋdeliᚋmodelsᚐCords(ctx context.Context, v interface{}) (models.Cords, error) {

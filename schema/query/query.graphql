@@ -3,6 +3,11 @@ type Query {
 	findRestaurant(id: ID!): Restaurant!
 	findNearByRestaurants(input: Cords!): [Restaurant!]!
 	findRider(id: ID!): Rider!
+	findRegVerResLoc: [City!]!
+}
+
+type City {
+	city: String!
 }
 
 input Cords {

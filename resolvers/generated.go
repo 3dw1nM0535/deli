@@ -115,6 +115,10 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
+// func (r *queryResolver) FindRegVerResLoc(ctx context.Context) ([]*models1.City, error) {
+// 	panic("not implemented")
+// }
+
 // func (r *restaurantResolver) ID(ctx context.Context, obj *models.Restaurant) (string, error) {
 // 	panic("not implemented")
 // }
