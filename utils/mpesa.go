@@ -226,7 +226,7 @@ func ConfirmPayment(checkOutID string) (*ConfirmationResponse, *ErrorResp, int) 
 			panic(err)
 		}
 		if errorMessage.ErrorMessage == MpesaErrorMessage { // check if request is pending
-			// delay 40 second before making a request
+			// delay 20 second before making a request
 			delay(20)
 			// call function again; will double delay time to 40seconds
 			c, _, statusCode := ConfirmPayment(errorMessage.RequestID)
