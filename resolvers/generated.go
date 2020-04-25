@@ -4,7 +4,6 @@ package resolvers
 
 import (
 	"github.com/3dw1nM0535/Byte/db"
-
 	graph "github.com/3dw1nM0535/Byte/graph/generated"
 )
 
@@ -84,7 +83,7 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
-// func (r *mutationResolver) AddDisplayPics(ctx context.Context, input []*models1.UploadDoc) ([]*models1.File, error) {
+// func (r *mutationResolver) AddDisplayPics(ctx context.Context, input models1.UploadDocs) ([]*models1.File, error) {
 // 	panic("not implemented")
 // }
 

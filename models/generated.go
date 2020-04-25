@@ -88,3 +88,8 @@ type UploadDoc struct {
 	ID   string         `json:"id"`
 	File graphql.Upload `json:"file"`
 }
+
+type UploadDocs struct {
+	ID    string            `json:"id"`
+	Files []*graphql.Upload `json:"files"`
+}

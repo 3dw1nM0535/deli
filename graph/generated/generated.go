@@ -108,7 +108,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		AddDish         func(childComplexity int, input []*models.DishInput) int
-		AddDisplayPics  func(childComplexity int, input []*models.UploadDoc) int
+		AddDisplayPics  func(childComplexity int, input models.UploadDocs) int
 		AddMenu         func(childComplexity int, input models.MenuInput) int
 		AddRestaurant   func(childComplexity int, input models.RestaurantInput) int
 		AddRider        func(childComplexity int, input models.RiderInput) int
@@ -215,7 +215,7 @@ type MutationResolver interface {
 	UploadMc(ctx context.Context, input models.UploadDoc) (*models.File, error)
 	UploadDp(ctx context.Context, input models.UploadDoc) (*models.File, error)
 	AddRider(ctx context.Context, input models.RiderInput) (*models1.Rider, error)
-	AddDisplayPics(ctx context.Context, input []*models.UploadDoc) ([]*models.File, error)
+	AddDisplayPics(ctx context.Context, input models.UploadDocs) ([]*models.File, error)
 }
 type OrderResolver interface {
 	ID(ctx context.Context, obj *models1.Order) (string, error)
@@ -524,7 +524,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddDisplayPics(childComplexity, args["input"].([]*models.UploadDoc)), true
+		return e.complexity.Mutation.AddDisplayPics(childComplexity, args["input"].(models.UploadDocs)), true
 
 	case "Mutation.addMenu":
 		if e.complexity.Mutation.AddMenu == nil {
@@ -1076,7 +1076,7 @@ type Mutation {
   uploadMC(input: UploadDoc!): File!
   uploadDP(input: UploadDoc!): File!
   addRider(input: RiderInput!): Rider!
-  addDisplayPics(input: [UploadDoc!]!): [File]!
+  addDisplayPics(input: UploadDocs!): [File]!
 }
 
 input RestaurantInput {
@@ -1095,6 +1095,11 @@ input AddressInput {
 input UploadDoc {
   id: ID!
   file: Upload!
+}
+
+input UploadDocs {
+  id: ID!
+  files: [Upload!]!
 }
 
 input DishInput {
@@ -1285,9 +1290,9 @@ func (ec *executionContext) field_Mutation_addDish_args(ctx context.Context, raw
 func (ec *executionContext) field_Mutation_addDisplayPics_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []*models.UploadDoc
+	var arg0 models.UploadDocs
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNUploadDoc2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐUploadDocᚄ(ctx, tmp)
+		arg0, err = ec.unmarshalNUploadDocs2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐUploadDocs(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3124,7 +3129,7 @@ func (ec *executionContext) _Mutation_addDisplayPics(ctx context.Context, field 
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddDisplayPics(rctx, args["input"].([]*models.UploadDoc))
+		return ec.resolvers.Mutation().AddDisplayPics(rctx, args["input"].(models.UploadDocs))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6169,6 +6174,30 @@ func (ec *executionContext) unmarshalInputUploadDoc(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUploadDocs(ctx context.Context, obj interface{}) (models.UploadDocs, error) {
+	var it models.UploadDocs
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "files":
+			var err error
+			it.Files, err = ec.unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -8062,11 +8091,7 @@ func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋg
 	return res
 }
 
-func (ec *executionContext) unmarshalNUploadDoc2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐUploadDoc(ctx context.Context, v interface{}) (models.UploadDoc, error) {
-	return ec.unmarshalInputUploadDoc(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNUploadDoc2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐUploadDocᚄ(ctx context.Context, v interface{}) ([]*models.UploadDoc, error) {
+func (ec *executionContext) unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx context.Context, v interface{}) ([]*graphql.Upload, error) {
 	var vSlice []interface{}
 	if v != nil {
 		if tmp1, ok := v.([]interface{}); ok {
@@ -8076,9 +8101,9 @@ func (ec *executionContext) unmarshalNUploadDoc2ᚕᚖgithubᚗcomᚋ3dw1nM0535�
 		}
 	}
 	var err error
-	res := make([]*models.UploadDoc, len(vSlice))
+	res := make([]*graphql.Upload, len(vSlice))
 	for i := range vSlice {
-		res[i], err = ec.unmarshalNUploadDoc2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐUploadDoc(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -8086,12 +8111,39 @@ func (ec *executionContext) unmarshalNUploadDoc2ᚕᚖgithubᚗcomᚋ3dw1nM0535�
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalNUploadDoc2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐUploadDoc(ctx context.Context, v interface{}) (*models.UploadDoc, error) {
+func (ec *executionContext) marshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx context.Context, sel ast.SelectionSet, v []*graphql.Upload) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (*graphql.Upload, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalNUploadDoc2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐUploadDoc(ctx, v)
+	res, err := ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
 	return &res, err
+}
+
+func (ec *executionContext) marshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v *graphql.Upload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec.marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalNUploadDoc2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐUploadDoc(ctx context.Context, v interface{}) (models.UploadDoc, error) {
+	return ec.unmarshalInputUploadDoc(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNUploadDocs2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐUploadDocs(ctx context.Context, v interface{}) (models.UploadDocs, error) {
+	return ec.unmarshalInputUploadDocs(ctx, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

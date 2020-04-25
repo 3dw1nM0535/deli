@@ -211,5 +211,21 @@ func (r *riderResolver) DisplayPic(ctx context.Context, obj *models.Rider) (*mod
 
 // DisplayPics : find display pics belonging to a restaurant
 func (r *restaurantResolver) DisplayPics(ctx context.Context, obj *models.Restaurant) ([]*models1.File, error) {
-	panic("not implemented")
+	displayPics := []*models.DisplayPic{}
+	pics := []*models1.File{}
+	restaurant := obj
+	r.ORM.DB.First(&restaurant, "id = ?", obj.ID)
+	r.ORM.DB.Model(&restaurant).Related(&displayPics)
+	for i := range displayPics {
+		pic := &models1.File{
+			ID:        displayPics[i].ID.String(),
+			Media:     displayPics[i].Media,
+			Content:   displayPics[i].Content,
+			Size:      displayPics[i].Size,
+			CreatedAt: &displayPics[i].CreatedAt,
+			UpdatedAt: &displayPics[i].UpdatedAt,
+		}
+		pics = append(pics, pic)
+	}
+	return pics, nil
 }

@@ -12,7 +12,7 @@ type Mutation {
   uploadMC(input: UploadDoc!): File!
   uploadDP(input: UploadDoc!): File!
   addRider(input: RiderInput!): Rider!
-  addDisplayPics(input: [UploadDoc!]!): [File]!
+  addDisplayPics(input: UploadDocs!): [File]!
 }
 
 input RestaurantInput {
@@ -31,6 +31,11 @@ input AddressInput {
 input UploadDoc {
   id: ID!
   file: Upload!
+}
+
+input UploadDocs {
+  id: ID!
+  files: [Upload!]!
 }
 
 input DishInput {
