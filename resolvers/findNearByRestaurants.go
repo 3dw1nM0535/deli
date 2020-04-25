@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/3dw1nM0535/deli/db/models"
-	models1 "github.com/3dw1nM0535/deli/models"
+	"github.com/3dw1nM0535/Byte/db/models"
+	models1 "github.com/3dw1nM0535/Byte/models"
 )
 
 func (r *queryResolver) FindNearByRestaurants(ctx context.Context, input models1.Cords) ([]*models.Restaurant, error) {

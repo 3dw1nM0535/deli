@@ -14,6 +14,7 @@ type Restaurant {
   menu: [Menu!]!
   orders: [Order!]!
   payments: [Payment!]!
+  displayPics: [File!]!
 }
 
 type Address {
@@ -91,12 +92,8 @@ type Rider {
   verified: Boolean!
   displayPic: File!
   phoneNumber: String!
-  deliveryMeans: DeliveryMeans!
+  deliveryMeans: String!
   IdentificationDocument: File!
   MedicalCertificate: File!
   GoodConductCertificate: File!
-}
-
-type DeliveryMeans {
-  means: String!
 }

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/3dw1nM0535/deli/db/models"
-	"github.com/3dw1nM0535/deli/utils"
+	"github.com/3dw1nM0535/Byte/db/models"
+	"github.com/3dw1nM0535/Byte/utils"
 )
 
 func (r *queryResolver) FindRider(ctx context.Context, id string) (*models.Rider, error) {

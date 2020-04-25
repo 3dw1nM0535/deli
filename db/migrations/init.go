@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/3dw1nM0535/deli/db"
-	"github.com/3dw1nM0535/deli/db/models"
+	"github.com/3dw1nM0535/Byte/db"
+	"github.com/3dw1nM0535/Byte/db/models"
 )
 
 func migrate() error {
@@ -24,7 +24,7 @@ func migrate() error {
 		&models.GCC{},
 		&models.Rider{},
 		&models.DisplayPicture{},
-		&models.DeliveryMeans{},
+		&models.DisplayPic{},
 	).Error
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func migrate() error {
 	orm.DB.Model(&models.MDC{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.GCC{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
 	orm.DB.Model(&models.DisplayPicture{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
-	orm.DB.Model(&models.DeliveryMeans{}).AddForeignKey("rider_id", "riders(id)", "CASCADE", "CASCADE")
+	orm.DB.Model(&models.DisplayPic{}).AddForeignKey("restaurant_id", "restaurants(id)", "CASCADE", "CASCADE")
 
 	// Add geolocation column of type geography
 	orm.DB.Exec("ALTER TABLE addresses ADD COLUMN geolocation geography(point);")

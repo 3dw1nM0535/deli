@@ -3,8 +3,9 @@ package resolvers
 // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
 
 import (
-	"github.com/3dw1nM0535/deli/db"
-	graph "github.com/3dw1nM0535/deli/graph/generated"
+	"github.com/3dw1nM0535/Byte/db"
+
+	graph "github.com/3dw1nM0535/Byte/graph/generated"
 )
 
 type Resolver struct {
@@ -47,7 +48,7 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
-// func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models1.File, error) {
+// func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
 // 	panic("not implemented")
 // }
 
@@ -63,15 +64,19 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
-// func (r *mutationResolver) UploadGcc(ctx context.Context, input models1.UploadGcc) (*models1.File, error) {
+// func (r *mutationResolver) UploadGcc(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
 // 	panic("not implemented")
 // }
 
-// func (r *mutationResolver) UploadID(ctx context.Context, input models1.UploadID) (*models1.File, error) {
+// func (r *mutationResolver) UploadID(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
 // 	panic("not implemented")
 // }
 
-// func (r *mutationResolver) UploadMc(ctx context.Context, input models1.UploadMc) (*models1.File, error) {
+// func (r *mutationResolver) UploadMc(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *mutationResolver) UploadDp(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
 // 	panic("not implemented")
 // }
 
@@ -79,11 +84,7 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
-// func (r *mutationResolver) UploadDp(ctx context.Context, input models1.UploadDp) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) AddDeliveryMeans(ctx context.Context, input models1.DeliveryMeansInput) (*models1.DeliveryMeans, error) {
+// func (r *mutationResolver) AddDisplayPics(ctx context.Context, input []*models1.UploadDoc) ([]*models1.File, error) {
 // 	panic("not implemented")
 // }
 
@@ -147,15 +148,15 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
+// func (r *restaurantResolver) DisplayPics(ctx context.Context, obj *models.Restaurant) ([]*models1.File, error) {
+// 	panic("not implemented")
+// }
+
 // func (r *riderResolver) ID(ctx context.Context, obj *models.Rider) (string, error) {
 // 	panic("not implemented")
 // }
 
 // func (r *riderResolver) DisplayPic(ctx context.Context, obj *models.Rider) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *riderResolver) DeliveryMeans(ctx context.Context, obj *models.Rider) (*models1.DeliveryMeans, error) {
 // 	panic("not implemented")
 // }
 

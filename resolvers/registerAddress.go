@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	models1 "github.com/3dw1nM0535/deli/db/models"
-	"github.com/3dw1nM0535/deli/models"
-	"github.com/3dw1nM0535/deli/utils"
+	models1 "github.com/3dw1nM0535/Byte/db/models"
+	"github.com/3dw1nM0535/Byte/models"
+	"github.com/3dw1nM0535/Byte/utils"
 )
 
 func (r *mutationResolver) RegisterAddress(ctx context.Context, input models.AddressInput) (*models1.Address, error) {

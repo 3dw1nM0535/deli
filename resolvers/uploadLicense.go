@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/3dw1nM0535/deli/db/models"
-	models1 "github.com/3dw1nM0535/deli/models"
-	"github.com/3dw1nM0535/deli/utils"
+	"github.com/3dw1nM0535/Byte/db/models"
+	models1 "github.com/3dw1nM0535/Byte/models"
+	"github.com/3dw1nM0535/Byte/utils"
 	"github.com/joho/godotenv"
 )
 
@@ -37,13 +37,13 @@ func init() {
 	// token = utils.GetToken()
 }
 
-func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadLicense) (*models1.File, error) {
+func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
 	// validate id
-	if input.RestaurantID == "" {
+	if input.ID == "" {
 		return &models1.File{}, errors.New("restaurant id cannot be empty")
 	}
 
-	var id = utils.ParseUUID(input.RestaurantID)
+	var id = utils.ParseUUID(input.ID)
 
 	// check that restaurant is already in our database
 	// before attaching its license
@@ -57,7 +57,7 @@ func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.Uplo
 	// check if restaurant already has license attached to it
 	var file = &models.License{}
 	r.ORM.DB.First(&file, "restaurant_id = ?", id)
-	if file.RestaurantID == id {
+	if file.ID == id {
 		return &models1.File{}, errors.New("single business permit cannot have multiple licenses")
 	}
 

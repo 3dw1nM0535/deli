@@ -14,5 +14,6 @@ type DisplayPicture struct {
 	Content   string `gorm:"type:varchar(50);not_null;"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Rider     *Rider
 	RiderID   uuid.UUID
 }

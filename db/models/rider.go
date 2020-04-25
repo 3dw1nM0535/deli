@@ -8,9 +8,9 @@ type Rider struct {
 	PhoneNumber            string `gorm:"type:varchar(50);not_null;"`
 	EmailAddress           string `gorm:"type:varchar(100);not_null;"`
 	Verified               bool   `gorm:"type:boolean;not_null;default:false;"`
+	DeliveryMeans          string `gorm:"type:varchar(100);not_null;"`
 	IdentificationDocument *IDD
 	MedicalCertificate     *MDC
 	GoodConductCertificate *GCC
 	DisplayPic             *DisplayPicture
-	DeliveryMeans          *DeliveryMeans
 }

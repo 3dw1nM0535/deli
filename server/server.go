@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/3dw1nM0535/deli/db"
-	handler "github.com/3dw1nM0535/deli/handlers"
-	"github.com/3dw1nM0535/deli/utils"
+	"github.com/3dw1nM0535/Byte/db"
+	handler "github.com/3dw1nM0535/Byte/handlers"
+	"github.com/3dw1nM0535/Byte/utils"
 	option "github.com/99designs/gqlgen/handler"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

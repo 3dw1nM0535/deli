@@ -3,16 +3,16 @@ scalar Upload
 type Mutation {
   addRestaurant(input: RestaurantInput!): Restaurant!
   registerAddress(input: AddressInput!): Address!
-  uploadLicense(input: UploadLicense!): File!
+  uploadLicense(input: UploadDoc!): File!
   addMenu(input: MenuInput!): Menu!
   addDish(input: [DishInput!]!): [Dish!]!
   makeOrder(input: OrderInput!): Order!
-  uploadGCC(input: UploadGCC!): File!
-  uploadID(input: UploadID!): File!
-  uploadMC(input: UploadMC!): File!
+  uploadGCC(input: UploadDoc!): File!
+  uploadID(input: UploadDoc!): File!
+  uploadMC(input: UploadDoc!): File!
+  uploadDP(input: UploadDoc!): File!
   addRider(input: RiderInput!): Rider!
-  uploadDP(input: UploadDP!): File!
-  addDeliveryMeans(input: DeliveryMeansInput!): DeliveryMeans!
+  addDisplayPics(input: [UploadDoc!]!): [File]!
 }
 
 input RestaurantInput {
@@ -28,8 +28,8 @@ input AddressInput {
   restaurantID: ID!
 }
 
-input UploadLicense {
-  restaurantID: ID!
+input UploadDoc {
+  id: ID!
   file: Upload!
 }
 
@@ -65,31 +65,12 @@ input OrderInput {
   restaurantId: ID!
 }
 
-input UploadGCC {
-  riderID: ID!
-  file: Upload!
-}
-
-input UploadID {
-  riderID: ID!
-  file: Upload!
-}
-
-input UploadMC {
-  riderID: ID!
-  file: Upload!
-}
-
 input RiderInput {
   firstname: String!
   lastname: String!
   email_address: String!
   phone_number: String!
-}
-
-input UploadDP {
-  riderID: ID!
-  file: Upload!
+  deliveryMeans: String!
 }
 
 input DeliveryMeansInput {

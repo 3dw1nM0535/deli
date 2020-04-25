@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"github.com/3dw1nM0535/deli/db"
-	graph "github.com/3dw1nM0535/deli/graph/generated"
-	resolver "github.com/3dw1nM0535/deli/resolvers"
+	"github.com/3dw1nM0535/Byte/db"
+	graph "github.com/3dw1nM0535/Byte/graph/generated"
+	resolver "github.com/3dw1nM0535/Byte/resolvers"
 	"github.com/99designs/gqlgen/handler"
 	option "github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"

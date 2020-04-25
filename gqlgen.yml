@@ -40,24 +40,26 @@ models:
         resolver: true # force restaurant orders resolver to be generated
       payments:
         resolver: true # force restaurant payments resolver to be generated
-    model: github.com/3dw1nM0535/deli/db/models.Restaurant
+      displayPics:
+        resolver: true # force restaurant display pics to be generated
+    model: github.com/3dw1nM0535/Byte/db/models.Restaurant
   Address:
     fields:
       restaurants:
         resolver: true # force restaurants resolver to be generated
-    model: github.com/3dw1nM0535/deli/db/models.Address
+    model: github.com/3dw1nM0535/Byte/db/models.Address
   License:
-    model: github.com/3dw1nM0535/deli/db/models.License
+    model: github.com/3dw1nM0535/Byte/db/models.License
   Menu:
-    model: github.com/3dw1nM0535/deli/db/models.Menu
+    model: github.com/3dw1nM0535/Byte/db/models.Menu
     fields:
       dishes:
         resolver: true # force dishes resolver to be generated
   Dish:
-    model: github.com/3dw1nM0535/deli/db/models.Dish
+    model: github.com/3dw1nM0535/Byte/db/models.Dish
   DishOrder:
     model:
-      github.com/3dw1nM0535/deli/db/models.DishOrder
+      github.com/3dw1nM0535/Byte/db/models.DishOrder
   Order:
     fields:
       notes:
@@ -65,19 +67,19 @@ models:
       payment:
         resolver: true # force resolver payment for an order to be generated
     model:
-      github.com/3dw1nM0535/deli/db/models.Order
+      github.com/3dw1nM0535/Byte/db/models.Order
   Payment:
     model:
-      github.com/3dw1nM0535/deli/db/models.Payment
+      github.com/3dw1nM0535/Byte/db/models.Payment
   IDD:
     model:
-      github.com/3dw1nM0535/deli/db/models.IDD
+      github.com/3dw1nM0535/Byte/db/models.IDD
   GCC:
     model:
-      github.com/3dw1nM0535/deli/db/models.GCC
+      github.com/3dw1nM0535/Byte/db/models.GCC
   MDC:
     model:
-      github.com/3dw1nM0535/deli/db/models.MDC
+      github.com/3dw1nM0535/Byte/db/models.MDC
   Rider:
     fields:
       displayPic:
@@ -88,13 +90,8 @@ models:
         resolver: true # force rider medical certificate resolver to be generated
       GoodConductCertificate:
         resolver: true # force rider good conduct certificate resolver to be generated
-      deliveryMeans:
-        resolver: true # force rider delivery means resolver to be generated
     model:
-      github.com/3dw1nM0535/deli/db/models.Rider
-  Delivery:
-    model:
-      github.com/3dw1nM0535/deli/db/models.DeliveryMeans
+      github.com/3dw1nM0535/Byte/db/models.Rider
 
 # Automatically bind any models matching types
 autobind: []

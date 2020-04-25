@@ -3,8 +3,8 @@ package resolvers
 import (
 	"context"
 
-	"github.com/3dw1nM0535/deli/db/models"
-	models1 "github.com/3dw1nM0535/deli/models"
+	"github.com/3dw1nM0535/Byte/db/models"
+	models1 "github.com/3dw1nM0535/Byte/models"
 )
 
 func (r *orderResolver) ID(ctx context.Context, obj *models.Order) (string, error) {
@@ -209,13 +209,7 @@ func (r *riderResolver) DisplayPic(ctx context.Context, obj *models.Rider) (*mod
 	}, nil
 }
 
-// DeliveryMeans : find delivery means belonging to a rider
-func (r *riderResolver) DeliveryMeans(ctx context.Context, obj *models.Rider) (*models1.DeliveryMeans, error) {
-	means := &models.DeliveryMeans{}
-	rider := obj
-	r.ORM.DB.First(&rider, "id = ?", obj.ID)
-	r.ORM.DB.Model(&rider).Related(&means)
-	return &models1.DeliveryMeans{
-		Means: means.Means,
-	}, nil
+// DisplayPics : find display pics belonging to a restaurant
+func (r *restaurantResolver) DisplayPics(ctx context.Context, obj *models.Restaurant) ([]*models1.File, error) {
+	panic("not implemented")
 }

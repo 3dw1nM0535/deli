@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/3dw1nM0535/deli/db/models"
-	models1 "github.com/3dw1nM0535/deli/models"
+	"github.com/3dw1nM0535/Byte/db/models"
+	models1 "github.com/3dw1nM0535/Byte/models"
 )
 
 func (r *mutationResolver) AddRider(ctx context.Context, input models1.RiderInput) (*models.Rider, error) {
@@ -28,6 +28,9 @@ func (r *mutationResolver) AddRider(ctx context.Context, input models1.RiderInpu
 	if len(input.PhoneNumber) < 12 || len(input.PhoneNumber) > 12 {
 		return &models.Rider{}, errors.New("invalid phone number format")
 	}
+	if input.DeliveryMeans == "" {
+		return &models.Rider{}, errors.New("You must have delivery means")
+	}
 
 	// check if email is unique
 	r.ORM.DB.First(&rider, "email_address = ?", input.EmailAddress)
@@ -44,10 +47,11 @@ func (r *mutationResolver) AddRider(ctx context.Context, input models1.RiderInpu
 	}
 
 	newRider := &models.Rider{
-		FirstName:    input.Firstname,
-		LastName:     input.Lastname,
-		EmailAddress: input.EmailAddress,
-		PhoneNumber:  input.PhoneNumber,
+		FirstName:     input.Firstname,
+		LastName:      input.Lastname,
+		EmailAddress:  input.EmailAddress,
+		PhoneNumber:   input.PhoneNumber,
+		DeliveryMeans: input.DeliveryMeans,
 	}
 	r.ORM.DB.Save(&newRider)
 	return newRider, nil

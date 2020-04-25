@@ -13,6 +13,7 @@ type GCC struct {
 	Content   string `gorm:"type:varchar(255);not_null;"`
 	Size      int    `gorm:"type:integer;not_null;"`
 	RiderID   uuid.UUID
+	Rider     *Rider
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	models1 "github.com/3dw1nM0535/deli/db/models"
-	"github.com/3dw1nM0535/deli/models"
+	models1 "github.com/3dw1nM0535/Byte/db/models"
+	"github.com/3dw1nM0535/Byte/models"
 )
 
 // AddRestaurant : create and save restaurant to the database

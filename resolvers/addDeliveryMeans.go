@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/3dw1nM0535/deli/db/models"
-	models1 "github.com/3dw1nM0535/deli/models"
-	"github.com/3dw1nM0535/deli/utils"
+	"github.com/3dw1nM0535/Byte/db/models"
+	models1 "github.com/3dw1nM0535/Byte/models"
+	"github.com/3dw1nM0535/Byte/utils"
 )
 
 func (r *mutationResolver) AddDeliveryMeans(ctx context.Context, input models1.DeliveryMeansInput) (*models1.DeliveryMeans, error) {

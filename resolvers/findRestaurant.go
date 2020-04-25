@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	models1 "github.com/3dw1nM0535/deli/db/models"
+	models1 "github.com/3dw1nM0535/Byte/db/models"
 )
 
 // FindRestaurant : find restaurant partner using its id
@@ -22,7 +22,3 @@ func (r *queryResolver) FindRestaurant(ctx context.Context, id string) (*models1
 	}
 	return restaurant, nil
 }
-
-// func (r *queryResolver) FindRestaurant(ctx context.Context, id string) (*models1.Restaurant, error) {
-
-// }

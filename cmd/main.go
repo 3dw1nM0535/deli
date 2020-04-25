@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/3dw1nM0535/deli/db"
-	"github.com/3dw1nM0535/deli/server"
+	"github.com/3dw1nM0535/Byte/db"
+	"github.com/3dw1nM0535/Byte/server"
 )
 
 func main() {

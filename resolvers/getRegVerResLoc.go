@@ -3,7 +3,7 @@ package resolvers
 import (
 	"context"
 
-	models1 "github.com/3dw1nM0535/deli/models"
+	models1 "github.com/3dw1nM0535/Byte/models"
 )
 
 func (r *queryResolver) FindRegVerResLoc(ctx context.Context) ([]*models1.City, error) {

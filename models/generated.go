@@ -24,10 +24,6 @@ type Cords struct {
 	Lat float64 `json:"lat"`
 }
 
-type DeliveryMeans struct {
-	Means string `json:"means"`
-}
-
 type DeliveryMeansInput struct {
 	RiderID string `json:"riderID"`
 	Means   string `json:"means"`
@@ -81,33 +77,14 @@ type RestaurantInput struct {
 }
 
 type RiderInput struct {
-	Firstname    string `json:"firstname"`
-	Lastname     string `json:"lastname"`
-	EmailAddress string `json:"email_address"`
-	PhoneNumber  string `json:"phone_number"`
+	Firstname     string `json:"firstname"`
+	Lastname      string `json:"lastname"`
+	EmailAddress  string `json:"email_address"`
+	PhoneNumber   string `json:"phone_number"`
+	DeliveryMeans string `json:"deliveryMeans"`
 }
 
-type UploadDp struct {
-	RiderID string         `json:"riderID"`
-	File    graphql.Upload `json:"file"`
-}
-
-type UploadGcc struct {
-	RiderID string         `json:"riderID"`
-	File    graphql.Upload `json:"file"`
-}
-
-type UploadID struct {
-	RiderID string         `json:"riderID"`
-	File    graphql.Upload `json:"file"`
-}
-
-type UploadLicense struct {
-	RestaurantID string         `json:"restaurantID"`
-	File         graphql.Upload `json:"file"`
-}
-
-type UploadMc struct {
-	RiderID string         `json:"riderID"`
-	File    graphql.Upload `json:"file"`
+type UploadDoc struct {
+	ID   string         `json:"id"`
+	File graphql.Upload `json:"file"`
 }
