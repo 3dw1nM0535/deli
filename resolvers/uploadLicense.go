@@ -70,8 +70,10 @@ func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.Uplo
 		return &models1.File{}, err
 	}
 
+	// Parse object URL
+	objURL := utils.ObjectURL(attr)
 	var license = &models.License{
-		Media:        attr.MediaLink,
+		Media:        objURL,
 		Content:      attr.ContentType,
 		Size:         int(attr.Size),
 		CreatedAt:    attr.Created,

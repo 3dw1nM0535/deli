@@ -25,8 +25,10 @@ func (r *mutationResolver) UploadMc(ctx context.Context, input models1.UploadDoc
 		return &models1.File{}, err
 	}
 
+	// Parse object URL
+	objURL := utils.ObjectURL(attr)
 	medicalCert := &models.MDC{
-		Media:     attr.MediaLink,
+		Media:     objURL,
 		Content:   attr.ContentType,
 		Size:      int(attr.Size),
 		CreatedAt: attr.Created,

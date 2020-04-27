@@ -24,8 +24,10 @@ func (r *mutationResolver) UploadID(ctx context.Context, input models1.UploadDoc
 		return &models1.File{}, err
 	}
 
+	// Parse object URL
+	objURL := utils.ObjectURL(attr)
 	identificationDoc := &models.IDD{
-		Media:     attr.MediaLink,
+		Media:     objURL,
 		Content:   attr.ContentType,
 		Size:      int(attr.Size),
 		CreatedAt: attr.Created,

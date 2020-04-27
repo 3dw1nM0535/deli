@@ -25,8 +25,10 @@ func (r *mutationResolver) UploadDp(ctx context.Context, input models1.UploadDoc
 		return &models1.File{}, err
 	}
 
+	// Parse object URL
+	objURL := utils.ObjectURL(attr)
 	dp := &models.DisplayPicture{
-		Media:     attr.MediaLink,
+		Media:     objURL,
 		Size:      int(attr.Size),
 		Content:   attr.ContentType,
 		CreatedAt: attr.Created,

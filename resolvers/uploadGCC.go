@@ -25,8 +25,10 @@ func (r *mutationResolver) UploadGcc(ctx context.Context, input models1.UploadDo
 		return &models1.File{}, err
 	}
 
+	// Parse object URL
+	objURL := utils.ObjectURL(attr)
 	goodConductCert := &models.GCC{
-		Media:     attr.MediaLink,
+		Media:     objURL,
 		Content:   attr.ContentType,
 		Size:      int(attr.Size),
 		CreatedAt: attr.Created,

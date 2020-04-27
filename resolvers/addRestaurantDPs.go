@@ -31,6 +31,7 @@ func (r *mutationResolver) AddDisplayPics(ctx context.Context, input models1.Upl
 		if err != nil {
 			return []*models1.File{}, err
 		}
+		// Parse object URL
 		objURL := utils.ObjectURL(attr)
 		file := &models.DisplayPic{
 			Media:        objURL,
