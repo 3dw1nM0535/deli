@@ -2,11 +2,14 @@ package utils
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/option"
 )
+
+// GetGCS : authenticate
 
 // GetGCS : authenticate
 func GetGCS(ctx context.Context, credPath string) (*storage.Client, error) {
@@ -43,6 +46,16 @@ func Upload(ctx context.Context, r io.Reader, bucketName, credPath, projectID, f
 		return nil, nil, err
 	}
 
+	// Set object access to public
+	if err := obj.ACL().Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
+		return nil, nil, err
+	}
+
 	attr, err := obj.Attrs(ctx)
 	return obj, attr, err
+}
+
+// Get object URL
+func ObjectURL(attr *storage.ObjectAttrs) string {
+	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", attr.Bucket, attr.Name)
 }
