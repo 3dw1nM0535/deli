@@ -5,7 +5,8 @@ type Mutation {
   registerAddress(input: AddressInput!): Address!
   uploadLicense(input: UploadDoc!): File!
   addMenu(input: MenuInput!): Menu!
-  addDish(input: [DishInput!]!): [Dish!]!
+  addDish(input: DishInput!): Dish!
+  addDishAddOn(input: DishAddOnInput!): DishAddOn!
   makeOrder(input: OrderInput!): Order!
   uploadGCC(input: UploadDoc!): File!
   uploadID(input: UploadDoc!): File!
@@ -13,72 +14,4 @@ type Mutation {
   uploadDP(input: UploadDoc!): File!
   addRider(input: RiderInput!): Rider!
   addDisplayPics(input: UploadDocs!): [File]!
-}
-
-input RestaurantInput {
-  restaurantName: String!
-  about: String!
-  telephone: String!
-}
-
-input AddressInput {
-  postalCode: String!
-  streetName: String!
-  city: String!
-  restaurantID: ID!
-}
-
-input UploadDoc {
-  id: ID!
-  file: Upload!
-}
-
-input UploadDocs {
-  id: ID!
-  files: [Upload!]!
-}
-
-input DishInput {
-  title: String!
-  description: String!
-  price: Float!
-  image: Upload!
-  addOns: [String!]!
-  menuId: ID!
-}
-
-input MenuInput {
-  menuHeadline: String!
-  restaurantId: ID!
-}
-
-input DishNote {
-  dishId: ID!
-  title: String!
-  description: String!
-  addOns: [String!]!
-  price: Float!
-  count: Int!
-  subtotal: Float!
-}
-
-input OrderInput {
-  orderNotes: [DishNote!]!
-  restaurantNotes: String!
-  phoneNumber: String!
-  totalSum: Float!
-  restaurantId: ID!
-}
-
-input RiderInput {
-  firstname: String!
-  lastname: String!
-  email_address: String!
-  phone_number: String!
-  deliveryMeans: String!
-}
-
-input DeliveryMeansInput {
-  riderID: ID!
-  means: String!
 }

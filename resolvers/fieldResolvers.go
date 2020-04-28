@@ -7,6 +7,20 @@ import (
 	models1 "github.com/3dw1nM0535/Byte/models"
 )
 
+func (r *dishAddOnResolver) ID(ctx context.Context, obj *models.DishAddOn) (string, error) {
+	id := obj.ID.String()
+	return id, nil
+}
+
+// Find dish addons belonging to a dish
+func (r *dishResolver) DishAddOn(ctx context.Context, obj *models.Dish) ([]*models.DishAddOn, error) {
+	addOns := []*models.DishAddOn{}
+	dish := obj
+	r.ORM.DB.First(&dish, "id = ?", obj.ID)
+	r.ORM.DB.Model(&dish).Related(&addOns)
+	return addOns, nil
+}
+
 func (r *orderResolver) ID(ctx context.Context, obj *models.Order) (string, error) {
 	id := obj.ID.String()
 	return id, nil
@@ -20,17 +34,6 @@ func (r *restaurantResolver) ID(ctx context.Context, obj *models.Restaurant) (st
 func (r *dishResolver) ID(ctx context.Context, obj *models.Dish) (string, error) {
 	id := obj.ID.String()
 	return id, nil
-}
-
-// func (r *fileResolver) ID(ctx context.Context, obj *models.File) (string, error) {
-// 	id := obj.ID.String()
-// 	return id, nil
-// }
-
-func (r *dishResolver) AddOns(ctx context.Context, obj *models.Dish) ([]string, error) {
-	var addOns []string
-	addOns = obj.AddOns
-	return addOns, nil
 }
 
 func (r *menuResolver) ID(ctx context.Context, obj *models.Menu) (string, error) {
@@ -93,10 +96,6 @@ func (r *restaurantResolver) Menu(ctx context.Context, obj *models.Restaurant) (
 func (r *dishOrderResolver) ID(ctx context.Context, obj *models.DishOrder) (string, error) {
 	id := obj.ID.String()
 	return id, nil
-}
-func (r *dishOrderResolver) AddOns(ctx context.Context, obj *models.DishOrder) ([]string, error) {
-	addons := obj.AddOns
-	return addons, nil
 }
 
 // Notes : find notes belonging to an order

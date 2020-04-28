@@ -24,9 +24,10 @@ type Cords struct {
 	Lat float64 `json:"lat"`
 }
 
-type DeliveryMeansInput struct {
-	RiderID string `json:"riderID"`
-	Means   string `json:"means"`
+type DishAddOnInput struct {
+	Name   string  `json:"name"`
+	Price  float64 `json:"price"`
+	DishID string  `json:"dishId"`
 }
 
 type DishInput struct {
@@ -34,18 +35,17 @@ type DishInput struct {
 	Description string         `json:"description"`
 	Price       float64        `json:"price"`
 	Image       graphql.Upload `json:"image"`
-	AddOns      []string       `json:"addOns"`
 	MenuID      string         `json:"menuId"`
 }
 
 type DishNote struct {
-	DishID      string   `json:"dishId"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	AddOns      []string `json:"addOns"`
-	Price       float64  `json:"price"`
-	Count       int      `json:"count"`
-	Subtotal    float64  `json:"subtotal"`
+	DishID      string            `json:"dishId"`
+	Title       string            `json:"title"`
+	Description string            `json:"description"`
+	AddOn       []*DishAddOnInput `json:"addOn"`
+	Price       float64           `json:"price"`
+	Count       int               `json:"count"`
+	Subtotal    float64           `json:"subtotal"`
 }
 
 type File struct {

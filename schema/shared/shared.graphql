@@ -39,13 +39,21 @@ type File {
   updatedAt: Time
 }
 
+# DishAddOn
+type DishAddOn {
+  id: ID!
+  name: String!
+  price: Float!
+}
+
+# Dish Type
 type Dish {
   id: ID!
   title: String!
   description: String!
   price: Float!
   image: String
-  addOns: [String!]!
+  dishAddOn: [DishAddOn!]!
 }
 
 type Menu {
@@ -58,7 +66,6 @@ type DishOrder {
   id: ID!
   title: String!
   description: String!
-  addOns: [String!]!
   count: Int!
   price: Float!
   subtotal: Float!

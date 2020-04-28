@@ -4,6 +4,7 @@ package resolvers
 
 import (
 	"github.com/3dw1nM0535/Byte/db"
+
 	graph "github.com/3dw1nM0535/Byte/graph/generated"
 )
 
@@ -19,15 +20,15 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
-// func (r *dishResolver) AddOns(ctx context.Context, obj *models.Dish) ([]string, error) {
+// func (r *dishResolver) DishAddOn(ctx context.Context, obj *models.Dish) ([]*models.DishAddOn, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *dishAddOnResolver) ID(ctx context.Context, obj *models.DishAddOn) (string, error) {
 // 	panic("not implemented")
 // }
 
 // func (r *dishOrderResolver) ID(ctx context.Context, obj *models.DishOrder) (string, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *dishOrderResolver) AddOns(ctx context.Context, obj *models.DishOrder) ([]string, error) {
 // 	panic("not implemented")
 // }
 
@@ -55,7 +56,11 @@ type Resolver struct {
 // 	panic("not implemented")
 // }
 
-// func (r *mutationResolver) AddDish(ctx context.Context, input []*models1.DishInput) ([]*models.Dish, error) {
+// func (r *mutationResolver) AddDish(ctx context.Context, input models1.DishInput) (*models.Dish, error) {
+// 	panic("not implemented")
+// }
+
+// func (r *mutationResolver) AddDishAddOn(ctx context.Context, input models1.DishAddOnInput) (*models.DishAddOn, error) {
 // 	panic("not implemented")
 // }
 
@@ -181,6 +186,9 @@ func (r *Resolver) Address() graph.AddressResolver { return &addressResolver{r} 
 // Dish returns graph.DishResolver implementation.
 func (r *Resolver) Dish() graph.DishResolver { return &dishResolver{r} }
 
+// DishAddOn returns graph.DishAddOnResolver implementation.
+func (r *Resolver) DishAddOn() graph.DishAddOnResolver { return &dishAddOnResolver{r} }
+
 // DishOrder returns graph.DishOrderResolver implementation.
 func (r *Resolver) DishOrder() graph.DishOrderResolver { return &dishOrderResolver{r} }
 
@@ -210,6 +218,7 @@ func (r *Resolver) Subscription() graph.SubscriptionResolver { return &subscript
 
 type addressResolver struct{ *Resolver }
 type dishResolver struct{ *Resolver }
+type dishAddOnResolver struct{ *Resolver }
 type dishOrderResolver struct{ *Resolver }
 type menuResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }

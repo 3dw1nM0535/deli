@@ -53,7 +53,6 @@ func mapItemsToNotes(items []*models1.DishNote) ([]*models.DishOrder, error) {
 			DishID:      utils.ParseUUID(items[i].DishID),
 			Title:       items[i].Title,
 			Description: items[i].Description,
-			AddOns:      items[i].AddOns,
 			Price:       items[i].Price,
 			Count:       items[i].Count,
 			Subtotal:    items[i].Subtotal,

@@ -40,6 +40,7 @@ type Config struct {
 type ResolverRoot interface {
 	Address() AddressResolver
 	Dish() DishResolver
+	DishAddOn() DishAddOnResolver
 	DishOrder() DishOrderResolver
 	Menu() MenuResolver
 	Mutation() MutationResolver
@@ -73,16 +74,21 @@ type ComplexityRoot struct {
 	}
 
 	Dish struct {
-		AddOns      func(childComplexity int) int
 		Description func(childComplexity int) int
+		DishAddOn   func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Image       func(childComplexity int) int
 		Price       func(childComplexity int) int
 		Title       func(childComplexity int) int
 	}
 
+	DishAddOn struct {
+		ID    func(childComplexity int) int
+		Name  func(childComplexity int) int
+		Price func(childComplexity int) int
+	}
+
 	DishOrder struct {
-		AddOns      func(childComplexity int) int
 		Count       func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -107,7 +113,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddDish         func(childComplexity int, input []*models.DishInput) int
+		AddDish         func(childComplexity int, input models.DishInput) int
+		AddDishAddOn    func(childComplexity int, input models.DishAddOnInput) int
 		AddDisplayPics  func(childComplexity int, input models.UploadDocs) int
 		AddMenu         func(childComplexity int, input models.MenuInput) int
 		AddRestaurant   func(childComplexity int, input models.RestaurantInput) int
@@ -191,12 +198,13 @@ type AddressResolver interface {
 type DishResolver interface {
 	ID(ctx context.Context, obj *models1.Dish) (string, error)
 
-	AddOns(ctx context.Context, obj *models1.Dish) ([]string, error)
+	DishAddOn(ctx context.Context, obj *models1.Dish) ([]*models1.DishAddOn, error)
+}
+type DishAddOnResolver interface {
+	ID(ctx context.Context, obj *models1.DishAddOn) (string, error)
 }
 type DishOrderResolver interface {
 	ID(ctx context.Context, obj *models1.DishOrder) (string, error)
-
-	AddOns(ctx context.Context, obj *models1.DishOrder) ([]string, error)
 }
 type MenuResolver interface {
 	ID(ctx context.Context, obj *models1.Menu) (string, error)
@@ -208,7 +216,8 @@ type MutationResolver interface {
 	RegisterAddress(ctx context.Context, input models.AddressInput) (*models1.Address, error)
 	UploadLicense(ctx context.Context, input models.UploadDoc) (*models.File, error)
 	AddMenu(ctx context.Context, input models.MenuInput) (*models1.Menu, error)
-	AddDish(ctx context.Context, input []*models.DishInput) ([]*models1.Dish, error)
+	AddDish(ctx context.Context, input models.DishInput) (*models1.Dish, error)
+	AddDishAddOn(ctx context.Context, input models.DishAddOnInput) (*models1.DishAddOn, error)
 	MakeOrder(ctx context.Context, input models.OrderInput) (*models1.Order, error)
 	UploadGcc(ctx context.Context, input models.UploadDoc) (*models.File, error)
 	UploadID(ctx context.Context, input models.UploadDoc) (*models.File, error)
@@ -348,19 +357,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.City.City(childComplexity), true
 
-	case "Dish.addOns":
-		if e.complexity.Dish.AddOns == nil {
-			break
-		}
-
-		return e.complexity.Dish.AddOns(childComplexity), true
-
 	case "Dish.description":
 		if e.complexity.Dish.Description == nil {
 			break
 		}
 
 		return e.complexity.Dish.Description(childComplexity), true
+
+	case "Dish.dishAddOn":
+		if e.complexity.Dish.DishAddOn == nil {
+			break
+		}
+
+		return e.complexity.Dish.DishAddOn(childComplexity), true
 
 	case "Dish.id":
 		if e.complexity.Dish.ID == nil {
@@ -390,12 +399,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Dish.Title(childComplexity), true
 
-	case "DishOrder.addOns":
-		if e.complexity.DishOrder.AddOns == nil {
+	case "DishAddOn.id":
+		if e.complexity.DishAddOn.ID == nil {
 			break
 		}
 
-		return e.complexity.DishOrder.AddOns(childComplexity), true
+		return e.complexity.DishAddOn.ID(childComplexity), true
+
+	case "DishAddOn.name":
+		if e.complexity.DishAddOn.Name == nil {
+			break
+		}
+
+		return e.complexity.DishAddOn.Name(childComplexity), true
+
+	case "DishAddOn.price":
+		if e.complexity.DishAddOn.Price == nil {
+			break
+		}
+
+		return e.complexity.DishAddOn.Price(childComplexity), true
 
 	case "DishOrder.count":
 		if e.complexity.DishOrder.Count == nil {
@@ -512,7 +535,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddDish(childComplexity, args["input"].([]*models.DishInput)), true
+		return e.complexity.Mutation.AddDish(childComplexity, args["input"].(models.DishInput)), true
+
+	case "Mutation.addDishAddOn":
+		if e.complexity.Mutation.AddDishAddOn == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addDishAddOn_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddDishAddOn(childComplexity, args["input"].(models.DishAddOnInput)), true
 
 	case "Mutation.addDisplayPics":
 		if e.complexity.Mutation.AddDisplayPics == nil {
@@ -1062,29 +1097,14 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	&ast.Source{Name: "schema/mutation/mutation.graphql", Input: `scalar Upload
-
-type Mutation {
-  addRestaurant(input: RestaurantInput!): Restaurant!
-  registerAddress(input: AddressInput!): Address!
-  uploadLicense(input: UploadDoc!): File!
-  addMenu(input: MenuInput!): Menu!
-  addDish(input: [DishInput!]!): [Dish!]!
-  makeOrder(input: OrderInput!): Order!
-  uploadGCC(input: UploadDoc!): File!
-  uploadID(input: UploadDoc!): File!
-  uploadMC(input: UploadDoc!): File!
-  uploadDP(input: UploadDoc!): File!
-  addRider(input: RiderInput!): Rider!
-  addDisplayPics(input: UploadDocs!): [File]!
-}
-
+	&ast.Source{Name: "schema/mutation/input.graphql", Input: `# Restaurant input data
 input RestaurantInput {
   restaurantName: String!
   about: String!
   telephone: String!
 }
 
+# Address input data
 input AddressInput {
   postalCode: String!
   streetName: String!
@@ -1092,40 +1112,52 @@ input AddressInput {
   restaurantID: ID!
 }
 
+# Document Upload data input
 input UploadDoc {
   id: ID!
   file: Upload!
 }
 
+# Documents Upload data input
 input UploadDocs {
   id: ID!
   files: [Upload!]!
 }
 
-input DishInput {
-  title: String!
-  description: String!
-  price: Float!
-  image: Upload!
-  addOns: [String!]!
-  menuId: ID!
-}
-
+# Restaurant Menu data input
 input MenuInput {
   menuHeadline: String!
   restaurantId: ID!
 }
 
+# Restaurant Dish data input
+input DishInput {
+  title: String!
+  description: String!
+  price: Float!
+  image: Upload!
+  menuId: ID!
+}
+
+# Dish Add On data input
+input DishAddOnInput {
+  name: String!
+  price: Float!
+  dishId: ID!
+}
+
+# Restaurant notes data input
 input DishNote {
   dishId: ID!
   title: String!
   description: String!
-  addOns: [String!]!
+  addOn: [DishAddOnInput!]!
   price: Float!
   count: Int!
   subtotal: Float!
 }
 
+# Order data input
 input OrderInput {
   orderNotes: [DishNote!]!
   restaurantNotes: String!
@@ -1134,6 +1166,7 @@ input OrderInput {
   restaurantId: ID!
 }
 
+# Rider data input
 input RiderInput {
   firstname: String!
   lastname: String!
@@ -1141,10 +1174,23 @@ input RiderInput {
   phone_number: String!
   deliveryMeans: String!
 }
+`, BuiltIn: false},
+	&ast.Source{Name: "schema/mutation/mutation.graphql", Input: `scalar Upload
 
-input DeliveryMeansInput {
-  riderID: ID!
-  means: String!
+type Mutation {
+  addRestaurant(input: RestaurantInput!): Restaurant!
+  registerAddress(input: AddressInput!): Address!
+  uploadLicense(input: UploadDoc!): File!
+  addMenu(input: MenuInput!): Menu!
+  addDish(input: DishInput!): Dish!
+  addDishAddOn(input: DishAddOnInput!): DishAddOn!
+  makeOrder(input: OrderInput!): Order!
+  uploadGCC(input: UploadDoc!): File!
+  uploadID(input: UploadDoc!): File!
+  uploadMC(input: UploadDoc!): File!
+  uploadDP(input: UploadDoc!): File!
+  addRider(input: RiderInput!): Rider!
+  addDisplayPics(input: UploadDocs!): [File]!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
@@ -1204,13 +1250,21 @@ type File {
   updatedAt: Time
 }
 
+# DishAddOn
+type DishAddOn {
+  id: ID!
+  name: String!
+  price: Float!
+}
+
+# Dish Type
 type Dish {
   id: ID!
   title: String!
   description: String!
   price: Float!
   image: String
-  addOns: [String!]!
+  dishAddOn: [DishAddOn!]!
 }
 
 type Menu {
@@ -1223,7 +1277,6 @@ type DishOrder {
   id: ID!
   title: String!
   description: String!
-  addOns: [String!]!
   count: Int!
   price: Float!
   subtotal: Float!
@@ -1273,12 +1326,26 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_addDishAddOn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.DishAddOnInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNDishAddOnInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishAddOnInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addDish_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []*models.DishInput
+	var arg0 models.DishInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNDishInput2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishInputᚄ(ctx, tmp)
+		arg0, err = ec.unmarshalNDishInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2082,7 +2149,7 @@ func (ec *executionContext) _Dish_image(ctx context.Context, field graphql.Colle
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Dish_addOns(ctx context.Context, field graphql.CollectedField, obj *models1.Dish) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dish_dishAddOn(ctx context.Context, field graphql.CollectedField, obj *models1.Dish) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2099,7 +2166,7 @@ func (ec *executionContext) _Dish_addOns(ctx context.Context, field graphql.Coll
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Dish().AddOns(rctx, obj)
+		return ec.resolvers.Dish().DishAddOn(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2111,9 +2178,111 @@ func (ec *executionContext) _Dish_addOns(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]string)
+	res := resTmp.([]*models1.DishAddOn)
 	fc.Result = res
-	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+	return ec.marshalNDishAddOn2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐDishAddOnᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DishAddOn_id(ctx context.Context, field graphql.CollectedField, obj *models1.DishAddOn) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DishAddOn",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DishAddOn().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DishAddOn_name(ctx context.Context, field graphql.CollectedField, obj *models1.DishAddOn) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DishAddOn",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DishAddOn_price(ctx context.Context, field graphql.CollectedField, obj *models1.DishAddOn) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DishAddOn",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Price, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DishOrder_id(ctx context.Context, field graphql.CollectedField, obj *models1.DishOrder) (ret graphql.Marshaler) {
@@ -2216,40 +2385,6 @@ func (ec *executionContext) _DishOrder_description(ctx context.Context, field gr
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _DishOrder_addOns(ctx context.Context, field graphql.CollectedField, obj *models1.DishOrder) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "DishOrder",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.DishOrder().AddOns(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DishOrder_count(ctx context.Context, field graphql.CollectedField, obj *models1.DishOrder) (ret graphql.Marshaler) {
@@ -2842,7 +2977,7 @@ func (ec *executionContext) _Mutation_addDish(ctx context.Context, field graphql
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddDish(rctx, args["input"].([]*models.DishInput))
+		return ec.resolvers.Mutation().AddDish(rctx, args["input"].(models.DishInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2854,9 +2989,50 @@ func (ec *executionContext) _Mutation_addDish(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models1.Dish)
+	res := resTmp.(*models1.Dish)
 	fc.Result = res
-	return ec.marshalNDish2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐDishᚄ(ctx, field.Selections, res)
+	return ec.marshalNDish2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐDish(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addDishAddOn(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addDishAddOn_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddDishAddOn(rctx, args["input"].(models.DishAddOnInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.DishAddOn)
+	fc.Result = res
+	return ec.marshalNDishAddOn2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐDishAddOn(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_makeOrder(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5886,21 +6062,27 @@ func (ec *executionContext) unmarshalInputCords(ctx context.Context, obj interfa
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputDeliveryMeansInput(ctx context.Context, obj interface{}) (models.DeliveryMeansInput, error) {
-	var it models.DeliveryMeansInput
+func (ec *executionContext) unmarshalInputDishAddOnInput(ctx context.Context, obj interface{}) (models.DishAddOnInput, error) {
+	var it models.DishAddOnInput
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
 		switch k {
-		case "riderID":
+		case "name":
 			var err error
-			it.RiderID, err = ec.unmarshalNID2string(ctx, v)
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "means":
+		case "price":
 			var err error
-			it.Means, err = ec.unmarshalNString2string(ctx, v)
+			it.Price, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "dishId":
+			var err error
+			it.DishID, err = ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5940,12 +6122,6 @@ func (ec *executionContext) unmarshalInputDishInput(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
-		case "addOns":
-			var err error
-			it.AddOns, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "menuId":
 			var err error
 			it.MenuID, err = ec.unmarshalNID2string(ctx, v)
@@ -5982,9 +6158,9 @@ func (ec *executionContext) unmarshalInputDishNote(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
-		case "addOns":
+		case "addOn":
 			var err error
-			it.AddOns, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			it.AddOn, err = ec.unmarshalNDishAddOnInput2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishAddOnInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6350,7 +6526,7 @@ func (ec *executionContext) _Dish(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "image":
 			out.Values[i] = ec._Dish_image(ctx, field, obj)
-		case "addOns":
+		case "dishAddOn":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -6358,12 +6534,58 @@ func (ec *executionContext) _Dish(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Dish_addOns(ctx, field, obj)
+				res = ec._Dish_dishAddOn(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var dishAddOnImplementors = []string{"DishAddOn"}
+
+func (ec *executionContext) _DishAddOn(ctx context.Context, sel ast.SelectionSet, obj *models1.DishAddOn) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, dishAddOnImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DishAddOn")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DishAddOn_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "name":
+			out.Values[i] = ec._DishAddOn_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "price":
+			out.Values[i] = ec._DishAddOn_price(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6410,20 +6632,6 @@ func (ec *executionContext) _DishOrder(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "addOns":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._DishOrder_addOns(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
 		case "count":
 			out.Values[i] = ec._DishOrder_count(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6588,6 +6796,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "addDish":
 			out.Values[i] = ec._Mutation_addDish(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addDishAddOn":
+			out.Values[i] = ec._Mutation_addDishAddOn(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -7555,11 +7768,62 @@ func (ec *executionContext) marshalNDish2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋd
 	return ec._Dish(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNDishInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishInput(ctx context.Context, v interface{}) (models.DishInput, error) {
-	return ec.unmarshalInputDishInput(ctx, v)
+func (ec *executionContext) marshalNDishAddOn2githubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐDishAddOn(ctx context.Context, sel ast.SelectionSet, v models1.DishAddOn) graphql.Marshaler {
+	return ec._DishAddOn(ctx, sel, &v)
 }
 
-func (ec *executionContext) unmarshalNDishInput2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishInputᚄ(ctx context.Context, v interface{}) ([]*models.DishInput, error) {
+func (ec *executionContext) marshalNDishAddOn2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐDishAddOnᚄ(ctx context.Context, sel ast.SelectionSet, v []*models1.DishAddOn) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDishAddOn2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐDishAddOn(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNDishAddOn2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐDishAddOn(ctx context.Context, sel ast.SelectionSet, v *models1.DishAddOn) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DishAddOn(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDishAddOnInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishAddOnInput(ctx context.Context, v interface{}) (models.DishAddOnInput, error) {
+	return ec.unmarshalInputDishAddOnInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNDishAddOnInput2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishAddOnInputᚄ(ctx context.Context, v interface{}) ([]*models.DishAddOnInput, error) {
 	var vSlice []interface{}
 	if v != nil {
 		if tmp1, ok := v.([]interface{}); ok {
@@ -7569,9 +7833,9 @@ func (ec *executionContext) unmarshalNDishInput2ᚕᚖgithubᚗcomᚋ3dw1nM0535�
 		}
 	}
 	var err error
-	res := make([]*models.DishInput, len(vSlice))
+	res := make([]*models.DishAddOnInput, len(vSlice))
 	for i := range vSlice {
-		res[i], err = ec.unmarshalNDishInput2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNDishAddOnInput2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishAddOnInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -7579,12 +7843,16 @@ func (ec *executionContext) unmarshalNDishInput2ᚕᚖgithubᚗcomᚋ3dw1nM0535�
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalNDishInput2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishInput(ctx context.Context, v interface{}) (*models.DishInput, error) {
+func (ec *executionContext) unmarshalNDishAddOnInput2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishAddOnInput(ctx context.Context, v interface{}) (*models.DishAddOnInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalNDishInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishInput(ctx, v)
+	res, err := ec.unmarshalNDishAddOnInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishAddOnInput(ctx, v)
 	return &res, err
+}
+
+func (ec *executionContext) unmarshalNDishInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishInput(ctx context.Context, v interface{}) (models.DishInput, error) {
+	return ec.unmarshalInputDishInput(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNDishNote2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐDishNote(ctx context.Context, v interface{}) (models.DishNote, error) {
@@ -8046,35 +8314,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]string, len(vSlice))
-	for i := range vSlice {
-		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
-	}
-
-	return ret
 }
 
 func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {

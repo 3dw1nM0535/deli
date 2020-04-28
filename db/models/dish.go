@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/lib/pq"
+	"github.com/jinzhu/gorm/dialects/postgres"
 
 	"github.com/gofrs/uuid"
 )
@@ -13,6 +13,7 @@ type Dish struct {
 	Description string         `gorm:"not_null;text;"`
 	Price       float64        `gorm:"not_null;type:float;"`
 	Image       string         `gorm:"not_null;text;"`
-	AddOns      pq.StringArray `gorm:"type:varchar(100)[]"`
+	DishAddOn   postgres.Jsonb `gorm:"not_null;"`
 	MenuID      uuid.UUID
+	AddOns      []*DishAddOn
 }
