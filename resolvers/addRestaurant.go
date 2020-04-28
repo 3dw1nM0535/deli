@@ -20,6 +20,9 @@ func (r *mutationResolver) AddRestaurant(ctx context.Context, input models.Resta
 		err := errors.New("restaurant brief description cannot be empty")
 		return &models1.Restaurant{}, err
 	}
+	if input.Cuisine == "" {
+		return &models1.Restaurant{}, errors.New("restaurant's cuisines cannot be empty")
+	}
 	if input.Telephone == "" {
 		err := errors.New("restaurant contact information cannot be empty")
 		return &models1.Restaurant{}, err
@@ -35,6 +38,7 @@ func (r *mutationResolver) AddRestaurant(ctx context.Context, input models.Resta
 	var newRestaurant = &models1.Restaurant{
 		RestaurantName: input.RestaurantName,
 		About:          input.About,
+		Cuisine:        input.Cuisine,
 		Telephone:      input.Telephone,
 	}
 	r.ORM.DB.Create(&newRestaurant)

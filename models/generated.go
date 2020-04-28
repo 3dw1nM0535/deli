@@ -74,6 +74,7 @@ type RestaurantInput struct {
 	RestaurantName string `json:"restaurantName"`
 	About          string `json:"about"`
 	Telephone      string `json:"telephone"`
+	Cuisine        string `json:"cuisine"`
 }
 
 type RiderInput struct {

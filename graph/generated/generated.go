@@ -160,6 +160,7 @@ type ComplexityRoot struct {
 		About          func(childComplexity int) int
 		Addresses      func(childComplexity int) int
 		CreatedAt      func(childComplexity int) int
+		Cuisine        func(childComplexity int) int
 		DisplayPics    func(childComplexity int) int
 		Distance       func(childComplexity int) int
 		ID             func(childComplexity int) int
@@ -850,6 +851,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Restaurant.CreatedAt(childComplexity), true
 
+	case "Restaurant.cuisine":
+		if e.complexity.Restaurant.Cuisine == nil {
+			break
+		}
+
+		return e.complexity.Restaurant.Cuisine(childComplexity), true
+
 	case "Restaurant.displayPics":
 		if e.complexity.Restaurant.DisplayPics == nil {
 			break
@@ -1102,6 +1110,7 @@ input RestaurantInput {
   restaurantName: String!
   about: String!
   telephone: String!
+  cuisine: String!
 }
 
 # Address input data
@@ -1217,6 +1226,7 @@ type Restaurant {
   about: String!
   telephone: String!
   verified: Boolean!
+  cuisine: String!
   distance: Float
   createdAt: Time
   updatedAt: Time
@@ -4228,6 +4238,40 @@ func (ec *executionContext) _Restaurant_verified(ctx context.Context, field grap
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Restaurant_cuisine(ctx context.Context, field graphql.CollectedField, obj *models1.Restaurant) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Restaurant",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cuisine, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Restaurant_distance(ctx context.Context, field graphql.CollectedField, obj *models1.Restaurant) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6278,6 +6322,12 @@ func (ec *executionContext) unmarshalInputRestaurantInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "cuisine":
+			var err error
+			it.Cuisine, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -7142,6 +7192,11 @@ func (ec *executionContext) _Restaurant(ctx context.Context, sel ast.SelectionSe
 			}
 		case "verified":
 			out.Values[i] = ec._Restaurant_verified(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "cuisine":
+			out.Values[i] = ec._Restaurant_cuisine(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}

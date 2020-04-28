@@ -3,6 +3,7 @@ input RestaurantInput {
   restaurantName: String!
   about: String!
   telephone: String!
+  cuisine: String!
 }
 
 # Address input data
