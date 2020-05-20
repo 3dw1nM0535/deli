@@ -10,8 +10,6 @@ import (
 )
 
 // GetGCS : authenticate
-
-// GetGCS : authenticate
 func GetGCS(ctx context.Context, credPath string) (*storage.Client, error) {
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile(credPath))
 	if err != nil {
