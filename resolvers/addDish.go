@@ -18,7 +18,11 @@ func menuExists(id string) bool {
 	if validID.String() == uid {
 		return false
 	}
-	db, _ := db.Factory()
+	db, err := db.Factory()
+	// check for any error
+	if err != nil {
+		return false
+	}
 	db.DB.Where("id = ?", validID).First(&menu)
 	if menu.ID.String() == uid {
 		return false
@@ -26,6 +30,7 @@ func menuExists(id string) bool {
 	return true
 }
 
+// AddDish : add dish controller
 func (r *mutationResolver) AddDish(ctx context.Context, input models1.DishInput) (*models.Dish, error) {
 	// validate data
 	if input.MenuID == "" {

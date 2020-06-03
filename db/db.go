@@ -34,11 +34,12 @@ type ORM struct {
 // Factory : open a database connection
 func Factory() (*ORM, error) {
 	dbURI := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", dbHost, dbPort, dbUser, dbPassword, dbName, sslMode)
+	// pass dialect and db URI to gorm.Open
 	dbm, err := gorm.Open("postgres", dbURI)
 	if err != nil {
 		fmt.Printf("Error connecting to database: " + err.Error())
 	}
-	dbm.LogMode(logMode)
+	dbm.LogMode(logMode) // should the db log every sql commands?(true or false)
 
 	return &ORM{DB: dbm}, nil
 }

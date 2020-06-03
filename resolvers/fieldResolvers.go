@@ -21,6 +21,7 @@ func (r *dishResolver) DishAddOn(ctx context.Context, obj *models.Dish) ([]*mode
 	return addOns, nil
 }
 
+// ID fields resolvers
 func (r *orderResolver) ID(ctx context.Context, obj *models.Order) (string, error) {
 	id := obj.ID.String()
 	return id, nil
