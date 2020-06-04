@@ -22,7 +22,7 @@ func Hook() gin.HandlerFunc {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(string(body))
+		fmt.Println(string(body)) // print body content to stdout
 		c.JSON(http.StatusOK, gin.H{
 			"message": string(body),
 		})

@@ -39,7 +39,7 @@ func (r *mutationResolver) RegisterAddress(ctx context.Context, input models.Add
 			StreetName:  input.StreetName,
 			Restaurants: restaurants,
 		}
-		geoCode, err := utils.GeoCodeAddr(context.Background(), address, restaurant.RestaurantName, geocodingKey)
+		geoCode, err := utils.GeoCodeAddr(ctx, address, restaurant.RestaurantName, geocodingKey)
 		if err != nil {
 			return &models1.Address{}, err
 		}
