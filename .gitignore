@@ -1,1 +1,7 @@
 .env
+*.env~
+*.yml~
+*~
+*.un~
+*.go~
+*.graphql~

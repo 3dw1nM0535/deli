@@ -1,17 +1,3 @@
-scalar Upload
-
 type Mutation {
-  addRestaurant(input: RestaurantInput!): Restaurant!
-  registerAddress(input: AddressInput!): Address!
-  uploadLicense(input: UploadDoc!): File!
-  addMenu(input: MenuInput!): Menu!
-  addDish(input: DishInput!): Dish!
-  addDishAddOn(input: DishAddOnInput!): DishAddOn!
-  makeOrder(input: OrderInput!): Order!
-  uploadGCC(input: UploadDoc!): File!
-  uploadID(input: UploadDoc!): File!
-  uploadMC(input: UploadDoc!): File!
-  uploadDP(input: UploadDoc!): File!
-  addRider(input: RiderInput!): Rider!
-  addDisplayPics(input: UploadDocs!): [File]!
+  addFarm(input: FarmInput!): Farm!
 }

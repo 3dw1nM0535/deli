@@ -28,76 +28,8 @@ struct_tag: json
 
 # Tell graph about any existing models to be reused in graphql
 models:
-  Restaurant:
-    fields:
-      addresses:
-        resolver: true # force addresses resolver to be generated
-      license:
-        resolver: true # force license resolver to be generated
-      menu:
-        resolver: true # force menu resolver to be generated
-      orders:
-        resolver: true # force restaurant orders resolver to be generated
-      payments:
-        resolver: true # force restaurant payments resolver to be generated
-      displayPics:
-        resolver: true # force restaurant display pics to be generated
-    model: github.com/3dw1nM0535/Byte/db/models.Restaurant
-  Address:
-    fields:
-      restaurants:
-        resolver: true # force restaurants resolver to be generated
-    model: github.com/3dw1nM0535/Byte/db/models.Address
-  License:
-    model: github.com/3dw1nM0535/Byte/db/models.License
-  Menu:
-    model: github.com/3dw1nM0535/Byte/db/models.Menu
-    fields:
-      dishes:
-        resolver: true # force dishes resolver to be generated
-  Dish:
-    fields:
-      dishAddOn:
-        resolver: true # force dish add resolver to be generated
-    model: github.com/3dw1nM0535/Byte/db/models.Dish
-  DishAddOn:
-    model:
-      github.com/3dw1nM0535/Byte/db/models.DishAddOn
-  DishOrder:
-    model:
-      github.com/3dw1nM0535/Byte/db/models.DishOrder
-  Order:
-    fields:
-      notes:
-        resolver: true # force resolver order notes for order to be generated
-      payment:
-        resolver: true # force resolver payment for an order to be generated
-    model:
-      github.com/3dw1nM0535/Byte/db/models.Order
-  Payment:
-    model:
-      github.com/3dw1nM0535/Byte/db/models.Payment
-  IDD:
-    model:
-      github.com/3dw1nM0535/Byte/db/models.IDD
-  GCC:
-    model:
-      github.com/3dw1nM0535/Byte/db/models.GCC
-  MDC:
-    model:
-      github.com/3dw1nM0535/Byte/db/models.MDC
-  Rider:
-    fields:
-      displayPic:
-        resolver: true # force rider dp resolver to be generated
-      IdentificationDocument:
-        resolver: true # force rider id document resolver to be generated
-      MedicalCertificate:
-        resolver: true # force rider medical certificate resolver to be generated
-      GoodConductCertificate:
-        resolver: true # force rider good conduct certificate resolver to be generated
-    model:
-      github.com/3dw1nM0535/Byte/db/models.Rider
+  Farm:
+    model: github.com/3dw1nM0535/Byte/db/models.Farm
 
 # Automatically bind any models matching types
 autobind: []

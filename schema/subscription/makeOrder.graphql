@@ -1,3 +1,0 @@
-type Subscription {
-  orderCreated(id: ID!): Order!
-}

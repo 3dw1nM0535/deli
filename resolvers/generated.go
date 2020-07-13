@@ -4,7 +4,6 @@ package resolvers
 
 import (
 	"github.com/3dw1nM0535/Byte/db"
-
 	graph "github.com/3dw1nM0535/Byte/graph/generated"
 )
 
@@ -12,219 +11,21 @@ type Resolver struct {
 	ORM *db.ORM
 }
 
-// func (r *addressResolver) Restaurants(ctx context.Context, obj *models.Address) ([]*models.Restaurant, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *dishResolver) ID(ctx context.Context, obj *models.Dish) (string, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *dishResolver) DishAddOn(ctx context.Context, obj *models.Dish) ([]*models.DishAddOn, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *dishAddOnResolver) ID(ctx context.Context, obj *models.DishAddOn) (string, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *dishOrderResolver) ID(ctx context.Context, obj *models.DishOrder) (string, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *menuResolver) ID(ctx context.Context, obj *models.Menu) (string, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *menuResolver) Dishes(ctx context.Context, obj *models.Menu) ([]*models.Dish, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) AddRestaurant(ctx context.Context, input models1.RestaurantInput) (*models.Restaurant, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) RegisterAddress(ctx context.Context, input models1.AddressInput) (*models.Address, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) UploadLicense(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) AddMenu(ctx context.Context, input models1.MenuInput) (*models.Menu, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) AddDish(ctx context.Context, input models1.DishInput) (*models.Dish, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) AddDishAddOn(ctx context.Context, input models1.DishAddOnInput) (*models.DishAddOn, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) MakeOrder(ctx context.Context, input models1.OrderInput) (*models.Order, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) UploadGcc(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) UploadID(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) UploadMc(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) UploadDp(ctx context.Context, input models1.UploadDoc) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) AddRider(ctx context.Context, input models1.RiderInput) (*models.Rider, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *mutationResolver) AddDisplayPics(ctx context.Context, input models1.UploadDocs) ([]*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *orderResolver) ID(ctx context.Context, obj *models.Order) (string, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *orderResolver) Notes(ctx context.Context, obj *models.Order) ([]*models.DishOrder, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *orderResolver) Payment(ctx context.Context, obj *models.Order) (*models.Payment, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *paymentResolver) ID(ctx context.Context, obj *models.Payment) (string, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *queryResolver) Hello(ctx context.Context) (string, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *queryResolver) FindRestaurant(ctx context.Context, id string) (*models.Restaurant, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *queryResolver) FindNearByRestaurants(ctx context.Context, input models1.Cords) ([]*models.Restaurant, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *queryResolver) FindRider(ctx context.Context, id string) (*models.Rider, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *queryResolver) FindRegVerResLoc(ctx context.Context) ([]*models1.City, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *restaurantResolver) ID(ctx context.Context, obj *models.Restaurant) (string, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *restaurantResolver) Addresses(ctx context.Context, obj *models.Restaurant) ([]*models.Address, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *restaurantResolver) License(ctx context.Context, obj *models.Restaurant) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *restaurantResolver) Menu(ctx context.Context, obj *models.Restaurant) ([]*models.Menu, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *restaurantResolver) Orders(ctx context.Context, obj *models.Restaurant) ([]*models.Order, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *restaurantResolver) Payments(ctx context.Context, obj *models.Restaurant) ([]*models.Payment, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *restaurantResolver) DisplayPics(ctx context.Context, obj *models.Restaurant) ([]*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *riderResolver) ID(ctx context.Context, obj *models.Rider) (string, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *riderResolver) DisplayPic(ctx context.Context, obj *models.Rider) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *riderResolver) IdentificationDocument(ctx context.Context, obj *models.Rider) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *riderResolver) MedicalCertificate(ctx context.Context, obj *models.Rider) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *riderResolver) GoodConductCertificate(ctx context.Context, obj *models.Rider) (*models1.File, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *subscriptionResolver) OrderCreated(ctx context.Context, id string) (<-chan *models.Order, error) {
-// 	panic("not implemented")
-// }
-
-// Address returns graph.AddressResolver implementation.
-func (r *Resolver) Address() graph.AddressResolver { return &addressResolver{r} }
-
-// Dish returns graph.DishResolver implementation.
-func (r *Resolver) Dish() graph.DishResolver { return &dishResolver{r} }
-
-// DishAddOn returns graph.DishAddOnResolver implementation.
-func (r *Resolver) DishAddOn() graph.DishAddOnResolver { return &dishAddOnResolver{r} }
-
-// DishOrder returns graph.DishOrderResolver implementation.
-func (r *Resolver) DishOrder() graph.DishOrderResolver { return &dishOrderResolver{r} }
-
-// Menu returns graph.MenuResolver implementation.
-func (r *Resolver) Menu() graph.MenuResolver { return &menuResolver{r} }
+/*
+ *func (r *mutationResolver) AddFarm(ctx context.Context, input models.FarmInput) (*models1.Farm, error) {
+ *  panic("not implemented")
+ *}
+ *
+ *func (r *queryResolver) Hello(ctx context.Context) (string, error) {
+ *  panic("not implemented")
+ *}
+ */
 
 // Mutation returns graph.MutationResolver implementation.
 func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
 
-// Order returns graph.OrderResolver implementation.
-func (r *Resolver) Order() graph.OrderResolver { return &orderResolver{r} }
-
-// Payment returns graph.PaymentResolver implementation.
-func (r *Resolver) Payment() graph.PaymentResolver { return &paymentResolver{r} }
-
 // Query returns graph.QueryResolver implementation.
 func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 
-// Restaurant returns graph.RestaurantResolver implementation.
-func (r *Resolver) Restaurant() graph.RestaurantResolver { return &restaurantResolver{r} }
-
-// Rider returns graph.RiderResolver implementation.
-func (r *Resolver) Rider() graph.RiderResolver { return &riderResolver{r} }
-
-// Subscription returns graph.SubscriptionResolver implementation.
-func (r *Resolver) Subscription() graph.SubscriptionResolver { return &subscriptionResolver{r} }
-
-type addressResolver struct{ *Resolver }
-type dishResolver struct{ *Resolver }
-type dishAddOnResolver struct{ *Resolver }
-type dishOrderResolver struct{ *Resolver }
-type menuResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
-type orderResolver struct{ *Resolver }
-type paymentResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-type restaurantResolver struct{ *Resolver }
-type riderResolver struct{ *Resolver }
-type subscriptionResolver struct{ *Resolver }

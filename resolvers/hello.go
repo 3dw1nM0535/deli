@@ -1,8 +1,9 @@
 package resolvers
 
-import "context"
+import (
+	"context"
+)
 
-// Hello : return hello world
 func (r *queryResolver) Hello(ctx context.Context) (string, error) {
-	return "Hello, World!", nil
+	return "Hello, Welcome to Octopus!", nil
 }
