@@ -1,7 +1,6 @@
-# Byte
+# Octopus State API
 
-We are pledging to create a peer-to-peer system that will give everyone access to clean, healthy, available, and affordable food. A system modeled on social entrepreneurship that will solve problems in the current regime of youth unemployment, financial crisis, food
-security, and provide social solutions by being part of an awesome community; because a community is a shared responsibility. We should be able to interact with food systems by understanding where our food comes from, the people involved in delivering the food to us, and what we need to do to create delicious and nutritious meals to be experienced by everyone, regardless of economic status or background. We are fighting to create a system that is conscious and respectful of the health of the environment, the quality of the food, the safety of the grower, and the future of consumers; not leaving behind the future generations.
+We are changing 100,000years old agricultural practices and harvest(goods and produce) trading using decentralized protocols.
 
 ## Getting Started
 
