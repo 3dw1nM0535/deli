@@ -12,7 +12,14 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.4.0
+	github.com/machinebox/graphql v0.2.2
+	github.com/matryer/is v1.4.0 // indirect
+	github.com/mitchellh/mapstructure v1.3.2
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/stretchr/testify v1.6.1
 	github.com/vektah/gqlparser/v2 v2.0.1
 	google.golang.org/api v0.22.0
 	googlemaps.github.io/maps v1.1.1
+	gopkg.in/yaml.v2 v2.3.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
