@@ -15,6 +15,6 @@ func (r *mutationResolver) AddFarm(ctx context.Context, input models1.FarmInput)
 		Soil:      input.Soil,
 		ImageHash: input.ImageHash,
 	}
-	r.ORM.DB.Save(&newFarm)
+	r.ORM.DB.Create(&newFarm)
 	return newFarm, nil
 }
