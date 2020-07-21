@@ -4,6 +4,7 @@ package resolvers
 
 import (
 	"github.com/3dw1nM0535/Byte/db"
+
 	graph "github.com/3dw1nM0535/Byte/graph/generated"
 )
 
@@ -16,7 +17,15 @@ type Resolver struct {
  *  panic("not implemented")
  *}
  *
+ */
+/*
  *func (r *queryResolver) Hello(ctx context.Context) (string, error) {
+ *  panic("not implemented")
+ *}
+ */
+
+/*
+ *func (r *queryResolver) GetFarms(ctx context.Context) ([]*models1.Farm, error) {
  *  panic("not implemented")
  *}
  */

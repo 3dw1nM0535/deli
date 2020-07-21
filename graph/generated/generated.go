@@ -56,7 +56,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Hello func(childComplexity int) int
+		GetFarms func(childComplexity int) int
+		Hello    func(childComplexity int) int
 	}
 }
 
@@ -65,6 +66,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
+	GetFarms(ctx context.Context) ([]*models1.Farm, error)
 }
 
 type executableSchema struct {
@@ -121,6 +123,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddFarm(childComplexity, args["input"].(models.FarmInput)), true
+
+	case "Query.getFarms":
+		if e.complexity.Query.GetFarms == nil {
+			break
+		}
+
+		return e.complexity.Query.GetFarms(childComplexity), true
 
 	case "Query.hello":
 		if e.complexity.Query.Hello == nil {
@@ -207,6 +216,7 @@ input FarmInput {
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	hello: String!
+  getFarms: [Farm]!
 }
 
 `, BuiltIn: false},
@@ -500,6 +510,40 @@ func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.Coll
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getFarms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetFarms(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Farm)
+	fc.Result = res
+	return ec.marshalNFarm2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1772,6 +1816,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "getFarms":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getFarms(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -2048,6 +2106,43 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 
 func (ec *executionContext) marshalNFarm2githubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx context.Context, sel ast.SelectionSet, v models1.Farm) graphql.Marshaler {
 	return ec._Farm(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNFarm2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx context.Context, sel ast.SelectionSet, v []*models1.Farm) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOFarm2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalNFarm2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx context.Context, sel ast.SelectionSet, v *models1.Farm) graphql.Marshaler {
@@ -2353,6 +2448,17 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalOFarm2githubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx context.Context, sel ast.SelectionSet, v models1.Farm) graphql.Marshaler {
+	return ec._Farm(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOFarm2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx context.Context, sel ast.SelectionSet, v *models1.Farm) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Farm(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
