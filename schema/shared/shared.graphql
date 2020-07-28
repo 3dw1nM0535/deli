@@ -5,5 +5,7 @@ type Farm {
   size: String!
   soil: String!
   imageHash: String!
+  owner: String!
+  season: String!
 }
 

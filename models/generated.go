@@ -7,4 +7,6 @@ type FarmInput struct {
 	Size      string `json:"size"`
 	Soil      string `json:"soil"`
 	ImageHash string `json:"imageHash"`
+	Season    string `json:"season"`
+	Owner     string `json:"owner"`
 }

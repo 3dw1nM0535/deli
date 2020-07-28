@@ -47,6 +47,8 @@ type ComplexityRoot struct {
 	Farm struct {
 		ID        func(childComplexity int) int
 		ImageHash func(childComplexity int) int
+		Owner     func(childComplexity int) int
+		Season    func(childComplexity int) int
 		Size      func(childComplexity int) int
 		Soil      func(childComplexity int) int
 	}
@@ -97,6 +99,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Farm.ImageHash(childComplexity), true
+
+	case "Farm.owner":
+		if e.complexity.Farm.Owner == nil {
+			break
+		}
+
+		return e.complexity.Farm.Owner(childComplexity), true
+
+	case "Farm.season":
+		if e.complexity.Farm.Season == nil {
+			break
+		}
+
+		return e.complexity.Farm.Season(childComplexity), true
 
 	case "Farm.size":
 		if e.complexity.Farm.Size == nil {
@@ -208,6 +224,8 @@ input FarmInput {
   size: String!
   soil: String!
   imageHash: String!
+  season: String!
+  owner: String!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/mutation/mutation.graphql", Input: `type Mutation {
@@ -227,6 +245,8 @@ type Farm {
   size: String!
   soil: String!
   imageHash: String!
+  owner: String!
+  season: String!
 }
 
 `, BuiltIn: false},
@@ -421,6 +441,74 @@ func (ec *executionContext) _Farm_imageHash(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ImageHash, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Farm_owner(ctx context.Context, field graphql.CollectedField, obj *models1.Farm) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Farm",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Owner, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Farm_season(ctx context.Context, field graphql.CollectedField, obj *models1.Farm) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Farm",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Season, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1700,6 +1788,18 @@ func (ec *executionContext) unmarshalInputFarmInput(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "season":
+			var err error
+			it.Season, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "owner":
+			var err error
+			it.Owner, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -1742,6 +1842,16 @@ func (ec *executionContext) _Farm(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "imageHash":
 			out.Values[i] = ec._Farm_imageHash(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "owner":
+			out.Values[i] = ec._Farm_owner(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "season":
+			out.Values[i] = ec._Farm_season(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

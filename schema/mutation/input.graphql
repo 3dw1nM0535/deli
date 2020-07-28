@@ -4,4 +4,6 @@ input FarmInput {
   size: String!
   soil: String!
   imageHash: String!
+  season: String!
+  owner: String!
 }

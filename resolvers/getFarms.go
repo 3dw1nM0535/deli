@@ -16,6 +16,8 @@ func (r *queryResolver) GetFarms(ctx context.Context) ([]*models1.Farm, error) {
 			Size:      farms[i].Size,
 			Soil:      farms[i].Soil,
 			ImageHash: farms[i].ImageHash,
+			Season:    farms[i].Season,
+			Owner:     farms[i].Owner,
 		}
 		returnFarms = append(returnFarms, f)
 	}
