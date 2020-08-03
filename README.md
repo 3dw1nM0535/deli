@@ -1,4 +1,4 @@
-# Octopus State API
+# taxa state API
 
 We are changing 100,000years old agricultural practices and harvest(goods and produce) trading using decentralized protocols.
 
