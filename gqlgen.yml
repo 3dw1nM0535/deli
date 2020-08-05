@@ -30,6 +30,8 @@ struct_tag: json
 models:
   Farm:
     model: github.com/3dw1nM0535/Byte/db/models.Farm
+  Season:
+    model: github.com/3dw1nM0535/Byte/db/models.Season
 
 # Automatically bind any models matching types
 autobind: []

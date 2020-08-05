@@ -10,3 +10,14 @@ type FarmInput struct {
 	Season    string `json:"season"`
 	Owner     string `json:"owner"`
 }
+
+type SeasonInput struct {
+	Token         int     `json:"token"`
+	Crop          *string `json:"crop"`
+	Fertilizer    *string `json:"fertilizer"`
+	Seed          *string `json:"seed"`
+	ExpectedYield *string `json:"expectedYield"`
+	SeedSupplier  *string `json:"seedSupplier"`
+	HarvestYield  *string `json:"harvestYield"`
+	HarvestPrice  *string `json:"harvestPrice"`
+}

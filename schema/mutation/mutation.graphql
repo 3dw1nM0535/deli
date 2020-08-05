@@ -1,3 +1,4 @@
 type Mutation {
   addFarm(input: FarmInput!): Farm!
+  addSeason(input: SeasonInput!): Season!
 }

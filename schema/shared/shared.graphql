@@ -7,5 +7,21 @@ type Farm {
   imageHash: String!
   owner: String!
   season: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Season {
+  id: ID!
+  token: Int!
+  crop: String!
+  fertilizer: String!
+  seed: String!
+  expectedYield: String!
+  seedSupplier: String!
+  harvestYield: String!
+  harvestPrice: String!
+  createdAt: Time!
+  updatedAt: Time!
 }
 

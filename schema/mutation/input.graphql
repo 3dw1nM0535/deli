@@ -7,3 +7,15 @@ input FarmInput {
   season: String!
   owner: String!
 }
+
+input SeasonInput {
+  token: Int!
+  crop: String
+  fertilizer: String
+  seed: String
+  expectedYield: String
+  seedSupplier: String
+  harvestYield: String
+  harvestPrice: String
+}
+

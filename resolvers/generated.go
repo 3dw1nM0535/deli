@@ -13,15 +13,23 @@ type Resolver struct {
 
 /*
  *func (r *mutationResolver) AddFarm(ctx context.Context, input models.FarmInput) (*models1.Farm, error) {
- *        panic("not implemented")
+ *  panic("not implemented")
+ *}
+ *
+ *func (r *mutationResolver) AddSeason(ctx context.Context, input models.SeasonInput) (*models1.Season, error) {
+ *  panic("not implemented")
  *}
  *
  *func (r *queryResolver) Hello(ctx context.Context) (string, error) {
- *        panic("not implemented")
+ *  panic("not implemented")
  *}
  *
  *func (r *queryResolver) GetFarms(ctx context.Context) ([]*models1.Farm, error) {
- *        panic("not implemented")
+ *  panic("not implemented")
+ *}
+ *
+ *func (r *seasonResolver) ID(ctx context.Context, obj *models1.Season) (string, error) {
+ *  panic("not implemented")
  *}
  */
 
@@ -31,5 +39,9 @@ func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{
 // Query returns graph.QueryResolver implementation.
 func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 
+// Season returns graph.SeasonResolver implementation.
+func (r *Resolver) Season() graph.SeasonResolver { return &seasonResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type seasonResolver struct{ *Resolver }
