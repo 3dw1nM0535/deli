@@ -1,0 +1,12 @@
+package resolvers
+
+import (
+	"context"
+	models1 "github.com/3dw1nM0535/Byte/db/models"
+)
+
+func (r *queryResolver) GetSeasons(ctx context.Context) ([]*models1.Season, error) {
+	seasons := []*models1.Season{}
+	r.ORM.DB.Find(&seasons)
+	return seasons, nil
+}
