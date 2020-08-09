@@ -19,3 +19,27 @@ input SeasonInput {
   harvestPrice: String
 }
 
+input SeasonUpdateInput {
+  token: String!
+  season: String!
+}
+
+input PreparationInput {
+  seasonNumber: Int!
+  crop: String!
+  fertilizer: String!
+}
+
+input PlantingInput {
+  seasonNumber: Int!
+  seedUsed: String!
+  expectedYield: String!
+  seedSupplier: String!
+}
+
+input HarvestInput {
+  seasonNumber: Int!
+  totalSupply: String!
+  price: String!
+}
+
