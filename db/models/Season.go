@@ -13,6 +13,7 @@ type Model struct {
 
 type Season struct {
 	Model
+	SeasonNumber  int    `gorm:"type:integer;"`
 	Token         int    `gorm:"type:integer;"`
 	Crop          string `gorm:"type:varchar(255);"`
 	Fertilizer    string `gorm:"type:varchar(255);"`

@@ -32,6 +32,7 @@ type PreparationInput struct {
 
 type SeasonInput struct {
 	Token         int     `json:"token"`
+	SeasonNumber  int     `json:"seasonNumber"`
 	Crop          *string `json:"crop"`
 	Fertilizer    *string `json:"fertilizer"`
 	Seed          *string `json:"seed"`

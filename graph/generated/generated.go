@@ -80,6 +80,7 @@ type ComplexityRoot struct {
 		HarvestPrice  func(childComplexity int) int
 		HarvestYield  func(childComplexity int) int
 		ID            func(childComplexity int) int
+		SeasonNumber  func(childComplexity int) int
 		Seed          func(childComplexity int) int
 		SeedSupplier  func(childComplexity int) int
 		Token         func(childComplexity int) int
@@ -317,6 +318,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Season.ID(childComplexity), true
 
+	case "Season.seasonNumber":
+		if e.complexity.Season.SeasonNumber == nil {
+			break
+		}
+
+		return e.complexity.Season.SeasonNumber(childComplexity), true
+
 	case "Season.seed":
 		if e.complexity.Season.Seed == nil {
 			break
@@ -421,6 +429,7 @@ input FarmInput {
 
 input SeasonInput {
   token: Int!
+  seasonNumber: Int!
   crop: String
   fertilizer: String
   seed: String
@@ -486,6 +495,7 @@ type Farm {
 
 type Season {
   id: ID!
+  seasonNumber: Int!
   token: Int!
   crop: String!
   fertilizer: String!
@@ -1361,6 +1371,40 @@ func (ec *executionContext) _Season_id(ctx context.Context, field graphql.Collec
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Season_seasonNumber(ctx context.Context, field graphql.CollectedField, obj *models1.Season) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Season",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SeasonNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Season_token(ctx context.Context, field graphql.CollectedField, obj *models1.Season) (ret graphql.Marshaler) {
@@ -2914,6 +2958,12 @@ func (ec *executionContext) unmarshalInputSeasonInput(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
+		case "seasonNumber":
+			var err error
+			it.SeasonNumber, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "crop":
 			var err error
 			it.Crop, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -3209,6 +3259,11 @@ func (ec *executionContext) _Season(ctx context.Context, sel ast.SelectionSet, o
 				}
 				return res
 			})
+		case "seasonNumber":
+			out.Values[i] = ec._Season_seasonNumber(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "token":
 			out.Values[i] = ec._Season_token(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

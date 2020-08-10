@@ -14,6 +14,7 @@ func (r *seasonResolver) ID(ctx context.Context, obj *models1.Season) (string, e
 func (r *mutationResolver) AddSeason(ctx context.Context, input models.SeasonInput) (*models1.Season, error) {
 	seasonData := &models1.Season{
 		Token:         input.Token,
+		SeasonNumber:  input.SeasonNumber,
 		Crop:          *input.Crop,
 		Fertilizer:    *input.Fertilizer,
 		Seed:          *input.Seed,

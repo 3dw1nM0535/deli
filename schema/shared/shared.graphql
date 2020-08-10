@@ -13,6 +13,7 @@ type Farm {
 
 type Season {
   id: ID!
+  seasonNumber: Int!
   token: Int!
   crop: String!
   fertilizer: String!

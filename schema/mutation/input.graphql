@@ -10,6 +10,7 @@ input FarmInput {
 
 input SeasonInput {
   token: Int!
+  seasonNumber: Int!
   crop: String
   fertilizer: String
   seed: String
