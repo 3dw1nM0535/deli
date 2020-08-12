@@ -43,6 +43,6 @@ type SeasonInput struct {
 }
 
 type SeasonUpdateInput struct {
-	Token  string `json:"token"`
+	Token  int    `json:"token"`
 	Season string `json:"season"`
 }

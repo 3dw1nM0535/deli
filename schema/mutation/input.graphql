@@ -21,7 +21,7 @@ input SeasonInput {
 }
 
 input SeasonUpdateInput {
-  token: String!
+  token: Int!
   season: String!
 }
 

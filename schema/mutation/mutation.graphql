@@ -1,7 +1,7 @@
 type Mutation {
   addFarm(input: FarmInput!): Farm!
+  updateFarmSeason(input: SeasonUpdateInput!): Farm!
   addSeason(input: SeasonInput!): Season!
-  updateFarmSeason(input: SeasonUpdateInput!): Season!
   updateFarmPreparations(input: PreparationInput!): Season!
   updateFarmPlantings(input: PlantingInput!): Season!
   updateFarmHarvests(input: HarvestInput): Season!
