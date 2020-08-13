@@ -20,10 +20,6 @@ type Resolver struct {
  *  panic("not implemented")
  *}
  *
- *func (r *mutationResolver) AddSeason(ctx context.Context, input models.SeasonInput) (*models1.Season, error) {
- *  panic("not implemented")
- *}
- *
  *func (r *mutationResolver) UpdateFarmPreparations(ctx context.Context, input models.PreparationInput) (*models1.Season, error) {
  *  panic("not implemented")
  *}

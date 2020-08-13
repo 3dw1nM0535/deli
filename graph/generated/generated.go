@@ -59,7 +59,6 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		AddFarm                func(childComplexity int, input models.FarmInput) int
-		AddSeason              func(childComplexity int, input models.SeasonInput) int
 		UpdateFarmHarvests     func(childComplexity int, input *models.HarvestInput) int
 		UpdateFarmPlantings    func(childComplexity int, input models.PlantingInput) int
 		UpdateFarmPreparations func(childComplexity int, input models.PreparationInput) int
@@ -91,7 +90,6 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	AddFarm(ctx context.Context, input models.FarmInput) (*models1.Farm, error)
 	UpdateFarmSeason(ctx context.Context, input models.SeasonUpdateInput) (*models1.Farm, error)
-	AddSeason(ctx context.Context, input models.SeasonInput) (*models1.Season, error)
 	UpdateFarmPreparations(ctx context.Context, input models.PreparationInput) (*models1.Season, error)
 	UpdateFarmPlantings(ctx context.Context, input models.PlantingInput) (*models1.Season, error)
 	UpdateFarmHarvests(ctx context.Context, input *models.HarvestInput) (*models1.Season, error)
@@ -187,18 +185,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddFarm(childComplexity, args["input"].(models.FarmInput)), true
-
-	case "Mutation.addSeason":
-		if e.complexity.Mutation.AddSeason == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_addSeason_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.AddSeason(childComplexity, args["input"].(models.SeasonInput)), true
 
 	case "Mutation.updateFarmHarvests":
 		if e.complexity.Mutation.UpdateFarmHarvests == nil {
@@ -427,18 +413,6 @@ input FarmInput {
   owner: String!
 }
 
-input SeasonInput {
-  token: Int!
-  seasonNumber: Int!
-  crop: String
-  fertilizer: String
-  seed: String
-  expectedYield: String
-  seedSupplier: String
-  harvestYield: String
-  harvestPrice: String
-}
-
 input SeasonUpdateInput {
   token: Int!
   season: String!
@@ -446,12 +420,14 @@ input SeasonUpdateInput {
 
 input PreparationInput {
   seasonNumber: Int!
+  token: Int!
   crop: String!
   fertilizer: String!
 }
 
 input PlantingInput {
   seasonNumber: Int!
+  token: Int!
   seedUsed: String!
   expectedYield: String!
   seedSupplier: String!
@@ -459,6 +435,7 @@ input PlantingInput {
 
 input HarvestInput {
   seasonNumber: Int!
+  token: Int!
   totalSupply: String!
   price: String!
 }
@@ -467,7 +444,6 @@ input HarvestInput {
 	&ast.Source{Name: "schema/mutation/mutation.graphql", Input: `type Mutation {
   addFarm(input: FarmInput!): Farm!
   updateFarmSeason(input: SeasonUpdateInput!): Farm!
-  addSeason(input: SeasonInput!): Season!
   updateFarmPreparations(input: PreparationInput!): Season!
   updateFarmPlantings(input: PlantingInput!): Season!
   updateFarmHarvests(input: HarvestInput): Season!
@@ -522,20 +498,6 @@ func (ec *executionContext) field_Mutation_addFarm_args(ctx context.Context, raw
 	var arg0 models.FarmInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNFarmInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐFarmInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_addSeason_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 models.SeasonInput
-	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNSeasonInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐSeasonInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1002,47 +964,6 @@ func (ec *executionContext) _Mutation_updateFarmSeason(ctx context.Context, fiel
 	res := resTmp.(*models1.Farm)
 	fc.Result = res
 	return ec.marshalNFarm2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_addSeason(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mutation",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_addSeason_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddSeason(rctx, args["input"].(models.SeasonInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*models1.Season)
-	fc.Result = res
-	return ec.marshalNSeason2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐSeason(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateFarmPreparations(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2862,6 +2783,12 @@ func (ec *executionContext) unmarshalInputHarvestInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "totalSupply":
 			var err error
 			it.TotalSupply, err = ec.unmarshalNString2string(ctx, v)
@@ -2889,6 +2816,12 @@ func (ec *executionContext) unmarshalInputPlantingInput(ctx context.Context, obj
 		case "seasonNumber":
 			var err error
 			it.SeasonNumber, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2928,6 +2861,12 @@ func (ec *executionContext) unmarshalInputPreparationInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "crop":
 			var err error
 			it.Crop, err = ec.unmarshalNString2string(ctx, v)
@@ -2937,72 +2876,6 @@ func (ec *executionContext) unmarshalInputPreparationInput(ctx context.Context, 
 		case "fertilizer":
 			var err error
 			it.Fertilizer, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputSeasonInput(ctx context.Context, obj interface{}) (models.SeasonInput, error) {
-	var it models.SeasonInput
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "token":
-			var err error
-			it.Token, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "seasonNumber":
-			var err error
-			it.SeasonNumber, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "crop":
-			var err error
-			it.Crop, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "fertilizer":
-			var err error
-			it.Fertilizer, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "seed":
-			var err error
-			it.Seed, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "expectedYield":
-			var err error
-			it.ExpectedYield, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "seedSupplier":
-			var err error
-			it.SeedSupplier, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "harvestYield":
-			var err error
-			it.HarvestYield, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "harvestPrice":
-			var err error
-			it.HarvestPrice, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3128,11 +3001,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateFarmSeason":
 			out.Values[i] = ec._Mutation_updateFarmSeason(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "addSeason":
-			out.Values[i] = ec._Mutation_addSeason(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3738,10 +3606,6 @@ func (ec *executionContext) marshalNSeason2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByte�
 		return graphql.Null
 	}
 	return ec._Season(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNSeasonInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐSeasonInput(ctx context.Context, v interface{}) (models.SeasonInput, error) {
-	return ec.unmarshalInputSeasonInput(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNSeasonUpdateInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐSeasonUpdateInput(ctx context.Context, v interface{}) (models.SeasonUpdateInput, error) {

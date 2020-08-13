@@ -13,12 +13,14 @@ type FarmInput struct {
 
 type HarvestInput struct {
 	SeasonNumber int    `json:"seasonNumber"`
+	Token        int    `json:"token"`
 	TotalSupply  string `json:"totalSupply"`
 	Price        string `json:"price"`
 }
 
 type PlantingInput struct {
 	SeasonNumber  int    `json:"seasonNumber"`
+	Token         int    `json:"token"`
 	SeedUsed      string `json:"seedUsed"`
 	ExpectedYield string `json:"expectedYield"`
 	SeedSupplier  string `json:"seedSupplier"`
@@ -26,20 +28,9 @@ type PlantingInput struct {
 
 type PreparationInput struct {
 	SeasonNumber int    `json:"seasonNumber"`
+	Token        int    `json:"token"`
 	Crop         string `json:"crop"`
 	Fertilizer   string `json:"fertilizer"`
-}
-
-type SeasonInput struct {
-	Token         int     `json:"token"`
-	SeasonNumber  int     `json:"seasonNumber"`
-	Crop          *string `json:"crop"`
-	Fertilizer    *string `json:"fertilizer"`
-	Seed          *string `json:"seed"`
-	ExpectedYield *string `json:"expectedYield"`
-	SeedSupplier  *string `json:"seedSupplier"`
-	HarvestYield  *string `json:"harvestYield"`
-	HarvestPrice  *string `json:"harvestPrice"`
 }
 
 type SeasonUpdateInput struct {
