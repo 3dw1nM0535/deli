@@ -1,6 +1,6 @@
 type Query {
 	hello: String!
   getFarms: [Farm]!
-  getSeasons: [Season]!
+  getSeasons(input: SeasonsQueryInput!): [Season]!
 }
 

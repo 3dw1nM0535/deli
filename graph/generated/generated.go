@@ -67,7 +67,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetFarms   func(childComplexity int) int
-		GetSeasons func(childComplexity int) int
+		GetSeasons func(childComplexity int, input models.SeasonsQueryInput) int
 		Hello      func(childComplexity int) int
 	}
 
@@ -97,7 +97,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
 	GetFarms(ctx context.Context) ([]*models1.Farm, error)
-	GetSeasons(ctx context.Context) ([]*models1.Season, error)
+	GetSeasons(ctx context.Context, input models.SeasonsQueryInput) ([]*models1.Season, error)
 }
 type SeasonResolver interface {
 	ID(ctx context.Context, obj *models1.Season) (string, error)
@@ -246,7 +246,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.GetSeasons(childComplexity), true
+		args, err := ec.field_Query_getSeasons_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetSeasons(childComplexity, args["input"].(models.SeasonsQueryInput)), true
 
 	case "Query.hello":
 		if e.complexity.Query.Hello == nil {
@@ -403,7 +408,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	&ast.Source{Name: "schema/mutation/input.graphql", Input: `# Farm input type
+	&ast.Source{Name: "schema/input/input.graphql", Input: `# Farm input type
 input FarmInput {
   id: ID!
   size: String!
@@ -440,6 +445,11 @@ input HarvestInput {
   price: String!
 }
 
+input SeasonsQueryInput {
+  token: Int!
+  seasonNumber: Int!
+}
+
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/mutation/mutation.graphql", Input: `type Mutation {
   addFarm(input: FarmInput!): Farm!
@@ -452,7 +462,7 @@ input HarvestInput {
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	hello: String!
   getFarms: [Farm]!
-  getSeasons: [Season]!
+  getSeasons(input: SeasonsQueryInput!): [Season]!
 }
 
 `, BuiltIn: false},
@@ -573,6 +583,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getSeasons_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.SeasonsQueryInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNSeasonsQueryInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐSeasonsQueryInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1172,9 +1196,16 @@ func (ec *executionContext) _Query_getSeasons(ctx context.Context, field graphql
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getSeasons_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetSeasons(rctx)
+		return ec.resolvers.Query().GetSeasons(rctx, args["input"].(models.SeasonsQueryInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2909,6 +2940,30 @@ func (ec *executionContext) unmarshalInputSeasonUpdateInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSeasonsQueryInput(ctx context.Context, obj interface{}) (models.SeasonsQueryInput, error) {
+	var it models.SeasonsQueryInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "seasonNumber":
+			var err error
+			it.SeasonNumber, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3610,6 +3665,10 @@ func (ec *executionContext) marshalNSeason2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByte�
 
 func (ec *executionContext) unmarshalNSeasonUpdateInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐSeasonUpdateInput(ctx context.Context, v interface{}) (models.SeasonUpdateInput, error) {
 	return ec.unmarshalInputSeasonUpdateInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNSeasonsQueryInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐSeasonsQueryInput(ctx context.Context, v interface{}) (models.SeasonsQueryInput, error) {
+	return ec.unmarshalInputSeasonsQueryInput(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

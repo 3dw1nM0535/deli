@@ -40,7 +40,7 @@ type Resolver struct {
  *  panic("not implemented")
  *}
  *
- *func (r *queryResolver) GetSeasons(ctx context.Context) ([]*models1.Season, error) {
+ *func (r *queryResolver) GetSeasons(ctx context.Context, input models.SeasonsQueryInput) ([]*models1.Season, error) {
  *  panic("not implemented")
  *}
  *
