@@ -13,23 +13,17 @@ const (
 func (r *mutationResolver) UpdateFarmPreparations(ctx context.Context, input models.PreparationInput) (*models1.Season, error) {
 	season := &models1.Season{}
 	r.ORM.DB.Where("season_number = ? AND token = ?", input.SeasonNumber, input.Token).First(&season)
-	if season.ID.String() == specialUUID {
-		newSeason := &models1.Season{
-			SeasonNumber:  input.SeasonNumber,
-			Token:         input.Token,
-			Crop:          input.Crop,
-			Fertilizer:    input.Fertilizer,
-			Seed:          "",
-			ExpectedYield: "",
-			SeedSupplier:  "",
-			HarvestYield:  "",
-			HarvestPrice:  "",
-		}
-		r.ORM.DB.Save(&newSeason)
-		return newSeason, nil
+	if season.ID.String() == specialUUID && r.ORM.DB.NewRecord(season) {
+		season.Crop = input.Crop
+		season.SeasonNumber = input.SeasonNumber
+		season.Token = input.Token
+		season.Fertilizer = input.Fertilizer
+		r.ORM.DB.Create(&season)
+		return season, nil
 	}
-	season.Crop = input.Crop
-	season.Fertilizer = input.Fertilizer
-	r.ORM.DB.Save(&season)
+	r.ORM.DB.Model(&season).Updates(&models1.Season{
+		Crop:       input.Crop,
+		Fertilizer: input.Fertilizer,
+	})
 	return season, nil
 }

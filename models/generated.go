@@ -14,8 +14,9 @@ type FarmInput struct {
 type HarvestInput struct {
 	SeasonNumber int    `json:"seasonNumber"`
 	Token        int    `json:"token"`
-	TotalSupply  string `json:"totalSupply"`
+	TotalSupply  int    `json:"totalSupply"`
 	Price        string `json:"price"`
+	SupplyUnit   string `json:"supplyUnit"`
 }
 
 type PlantingInput struct {

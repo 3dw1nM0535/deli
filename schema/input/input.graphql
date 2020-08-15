@@ -31,8 +31,9 @@ input PlantingInput {
 input HarvestInput {
   seasonNumber: Int!
   token: Int!
-  totalSupply: String!
+  totalSupply: Int!
   price: String!
+  supplyUnit: String!
 }
 
 input SeasonsQueryInput {

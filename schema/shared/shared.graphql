@@ -20,7 +20,8 @@ type Season {
   seed: String!
   expectedYield: String!
   seedSupplier: String!
-  harvestYield: String!
+  harvestYield: Int!
+  harvestUnit: String!
   harvestPrice: String!
   createdAt: Time!
   updatedAt: Time!

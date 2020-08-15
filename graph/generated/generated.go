@@ -77,6 +77,7 @@ type ComplexityRoot struct {
 		ExpectedYield func(childComplexity int) int
 		Fertilizer    func(childComplexity int) int
 		HarvestPrice  func(childComplexity int) int
+		HarvestUnit   func(childComplexity int) int
 		HarvestYield  func(childComplexity int) int
 		ID            func(childComplexity int) int
 		SeasonNumber  func(childComplexity int) int
@@ -295,6 +296,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Season.HarvestPrice(childComplexity), true
 
+	case "Season.harvestUnit":
+		if e.complexity.Season.HarvestUnit == nil {
+			break
+		}
+
+		return e.complexity.Season.HarvestUnit(childComplexity), true
+
 	case "Season.harvestYield":
 		if e.complexity.Season.HarvestYield == nil {
 			break
@@ -441,8 +449,9 @@ input PlantingInput {
 input HarvestInput {
   seasonNumber: Int!
   token: Int!
-  totalSupply: String!
+  totalSupply: Int!
   price: String!
+  supplyUnit: String!
 }
 
 input SeasonsQueryInput {
@@ -488,7 +497,8 @@ type Season {
   seed: String!
   expectedYield: String!
   seedSupplier: String!
-  harvestYield: String!
+  harvestYield: Int!
+  harvestUnit: String!
   harvestPrice: String!
   createdAt: Time!
   updatedAt: Time!
@@ -1581,6 +1591,40 @@ func (ec *executionContext) _Season_harvestYield(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.HarvestYield, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Season_harvestUnit(ctx context.Context, field graphql.CollectedField, obj *models1.Season) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Season",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HarvestUnit, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2822,13 +2866,19 @@ func (ec *executionContext) unmarshalInputHarvestInput(ctx context.Context, obj 
 			}
 		case "totalSupply":
 			var err error
-			it.TotalSupply, err = ec.unmarshalNString2string(ctx, v)
+			it.TotalSupply, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "price":
 			var err error
 			it.Price, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "supplyUnit":
+			var err error
+			it.SupplyUnit, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3219,6 +3269,11 @@ func (ec *executionContext) _Season(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "harvestYield":
 			out.Values[i] = ec._Season_harvestYield(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "harvestUnit":
+			out.Values[i] = ec._Season_harvestUnit(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}

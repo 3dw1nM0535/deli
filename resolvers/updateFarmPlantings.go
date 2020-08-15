@@ -14,9 +14,10 @@ func (r *mutationResolver) UpdateFarmPlantings(ctx context.Context, input models
 		notFound := errors.New("no season found. start from preparations")
 		return nil, notFound
 	}
-	season.Seed = input.SeedUsed
-	season.SeedSupplier = input.SeedSupplier
-	season.ExpectedYield = input.ExpectedYield
-	r.ORM.DB.Save(&season)
+	r.ORM.DB.Model(&season).Updates(&models1.Season{
+		Seed:          input.SeedUsed,
+		SeedSupplier:  input.SeedSupplier,
+		ExpectedYield: input.ExpectedYield,
+	})
 	return season, nil
 }
