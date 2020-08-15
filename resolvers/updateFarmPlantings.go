@@ -10,7 +10,7 @@ import (
 func (r *mutationResolver) UpdateFarmPlantings(ctx context.Context, input models.PlantingInput) (*models1.Season, error) {
 	season := &models1.Season{}
 	r.ORM.DB.Where("season_number = ? AND token = ?", input.SeasonNumber, input.Token).First(&season)
-	if season.ID.String() == specialUUID {
+	if season.ID.String() == specialUUID && r.ORM.DB.NewRecord(season) {
 		notFound := errors.New("no season found. start from preparations")
 		return nil, notFound
 	}
