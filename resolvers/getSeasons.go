@@ -8,6 +8,6 @@ import (
 
 func (r *queryResolver) GetSeasons(ctx context.Context, input models.SeasonsQueryInput) ([]*models1.Season, error) {
 	seasons := []*models1.Season{}
-	r.ORM.DB.Where("token = ? AND season_number = ?", input.Token, input.SeasonNumber).Find(&seasons)
+	r.ORM.DB.Where("token = ?", input.Token).Find(&seasons)
 	return seasons, nil
 }

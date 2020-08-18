@@ -40,6 +40,5 @@ type SeasonUpdateInput struct {
 }
 
 type SeasonsQueryInput struct {
-	Token        int `json:"token"`
-	SeasonNumber int `json:"seasonNumber"`
+	Token int `json:"token"`
 }

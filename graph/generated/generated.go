@@ -456,7 +456,6 @@ input HarvestInput {
 
 input SeasonsQueryInput {
   token: Int!
-  seasonNumber: Int!
 }
 
 `, BuiltIn: false},
@@ -2999,12 +2998,6 @@ func (ec *executionContext) unmarshalInputSeasonsQueryInput(ctx context.Context,
 		case "token":
 			var err error
 			it.Token, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "seasonNumber":
-			var err error
-			it.SeasonNumber, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
