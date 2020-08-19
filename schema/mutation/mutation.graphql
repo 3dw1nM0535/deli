@@ -4,4 +4,5 @@ type Mutation {
   updateFarmPreparations(input: PreparationInput!): Season!
   updateFarmPlantings(input: PlantingInput!): Season!
   updateFarmHarvests(input: HarvestInput): Season!
+  addBooking(input: BookingInput): Booking!
 }

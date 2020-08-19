@@ -40,3 +40,17 @@ input SeasonsQueryInput {
   token: Int!
 }
 
+input BookingInput {
+  token: Int!
+  volume: Int!
+  booker: String!
+  deposit: String!
+  delivered: Boolean!
+  cancelled: Boolean!
+}
+
+input BookingsQueryInput {
+  bookerAddress: String!
+  token: Int!
+}
+

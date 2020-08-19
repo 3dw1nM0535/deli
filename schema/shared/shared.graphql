@@ -27,3 +27,15 @@ type Season {
   updatedAt: Time!
 }
 
+type Booking {
+  id: ID!
+  volume: Int!
+  booker: String!
+  deposit: String!
+  token: Int!
+  delivered: Boolean!
+  cancelled: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+}
+

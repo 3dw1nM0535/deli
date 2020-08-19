@@ -37,6 +37,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Booking() BookingResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Season() SeasonResolver
@@ -46,6 +47,18 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Booking struct {
+		Booker    func(childComplexity int) int
+		Cancelled func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		Delivered func(childComplexity int) int
+		Deposit   func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Token     func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+		Volume    func(childComplexity int) int
+	}
+
 	Farm struct {
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
@@ -58,6 +71,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AddBooking             func(childComplexity int, input *models.BookingInput) int
 		AddFarm                func(childComplexity int, input models.FarmInput) int
 		UpdateFarmHarvests     func(childComplexity int, input *models.HarvestInput) int
 		UpdateFarmPlantings    func(childComplexity int, input models.PlantingInput) int
@@ -66,9 +80,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetFarms   func(childComplexity int) int
-		GetSeasons func(childComplexity int, input models.SeasonsQueryInput) int
-		Hello      func(childComplexity int) int
+		GetBookings func(childComplexity int, input models.BookingsQueryInput) int
+		GetFarms    func(childComplexity int) int
+		GetSeasons  func(childComplexity int, input models.SeasonsQueryInput) int
+		Hello       func(childComplexity int) int
 	}
 
 	Season struct {
@@ -88,17 +103,22 @@ type ComplexityRoot struct {
 	}
 }
 
+type BookingResolver interface {
+	ID(ctx context.Context, obj *models1.Booking) (string, error)
+}
 type MutationResolver interface {
 	AddFarm(ctx context.Context, input models.FarmInput) (*models1.Farm, error)
 	UpdateFarmSeason(ctx context.Context, input models.SeasonUpdateInput) (*models1.Farm, error)
 	UpdateFarmPreparations(ctx context.Context, input models.PreparationInput) (*models1.Season, error)
 	UpdateFarmPlantings(ctx context.Context, input models.PlantingInput) (*models1.Season, error)
 	UpdateFarmHarvests(ctx context.Context, input *models.HarvestInput) (*models1.Season, error)
+	AddBooking(ctx context.Context, input *models.BookingInput) (*models1.Booking, error)
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
 	GetFarms(ctx context.Context) ([]*models1.Farm, error)
 	GetSeasons(ctx context.Context, input models.SeasonsQueryInput) ([]*models1.Season, error)
+	GetBookings(ctx context.Context, input models.BookingsQueryInput) ([]*models1.Booking, error)
 }
 type SeasonResolver interface {
 	ID(ctx context.Context, obj *models1.Season) (string, error)
@@ -118,6 +138,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Booking.booker":
+		if e.complexity.Booking.Booker == nil {
+			break
+		}
+
+		return e.complexity.Booking.Booker(childComplexity), true
+
+	case "Booking.cancelled":
+		if e.complexity.Booking.Cancelled == nil {
+			break
+		}
+
+		return e.complexity.Booking.Cancelled(childComplexity), true
+
+	case "Booking.createdAt":
+		if e.complexity.Booking.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Booking.CreatedAt(childComplexity), true
+
+	case "Booking.delivered":
+		if e.complexity.Booking.Delivered == nil {
+			break
+		}
+
+		return e.complexity.Booking.Delivered(childComplexity), true
+
+	case "Booking.deposit":
+		if e.complexity.Booking.Deposit == nil {
+			break
+		}
+
+		return e.complexity.Booking.Deposit(childComplexity), true
+
+	case "Booking.id":
+		if e.complexity.Booking.ID == nil {
+			break
+		}
+
+		return e.complexity.Booking.ID(childComplexity), true
+
+	case "Booking.token":
+		if e.complexity.Booking.Token == nil {
+			break
+		}
+
+		return e.complexity.Booking.Token(childComplexity), true
+
+	case "Booking.updatedAt":
+		if e.complexity.Booking.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Booking.UpdatedAt(childComplexity), true
+
+	case "Booking.volume":
+		if e.complexity.Booking.Volume == nil {
+			break
+		}
+
+		return e.complexity.Booking.Volume(childComplexity), true
 
 	case "Farm.createdAt":
 		if e.complexity.Farm.CreatedAt == nil {
@@ -174,6 +257,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Farm.UpdatedAt(childComplexity), true
+
+	case "Mutation.addBooking":
+		if e.complexity.Mutation.AddBooking == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addBooking_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddBooking(childComplexity, args["input"].(*models.BookingInput)), true
 
 	case "Mutation.addFarm":
 		if e.complexity.Mutation.AddFarm == nil {
@@ -234,6 +329,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateFarmSeason(childComplexity, args["input"].(models.SeasonUpdateInput)), true
+
+	case "Query.getBookings":
+		if e.complexity.Query.GetBookings == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getBookings_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetBookings(childComplexity, args["input"].(models.BookingsQueryInput)), true
 
 	case "Query.getFarms":
 		if e.complexity.Query.GetFarms == nil {
@@ -458,6 +565,20 @@ input SeasonsQueryInput {
   token: Int!
 }
 
+input BookingInput {
+  token: Int!
+  volume: Int!
+  booker: String!
+  deposit: String!
+  delivered: Boolean!
+  cancelled: Boolean!
+}
+
+input BookingsQueryInput {
+  bookerAddress: String!
+  token: Int!
+}
+
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/mutation/mutation.graphql", Input: `type Mutation {
   addFarm(input: FarmInput!): Farm!
@@ -465,12 +586,14 @@ input SeasonsQueryInput {
   updateFarmPreparations(input: PreparationInput!): Season!
   updateFarmPlantings(input: PlantingInput!): Season!
   updateFarmHarvests(input: HarvestInput): Season!
+  addBooking(input: BookingInput): Booking!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
 	hello: String!
   getFarms: [Farm]!
   getSeasons(input: SeasonsQueryInput!): [Season]!
+  getBookings(input: BookingsQueryInput!): [Booking]!
 }
 
 `, BuiltIn: false},
@@ -503,6 +626,18 @@ type Season {
   updatedAt: Time!
 }
 
+type Booking {
+  id: ID!
+  volume: Int!
+  booker: String!
+  deposit: String!
+  token: Int!
+  delivered: Boolean!
+  cancelled: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -510,6 +645,20 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_addBooking_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *models.BookingInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalOBookingInput2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐBookingInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_addFarm_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -595,6 +744,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_getBookings_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.BookingsQueryInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNBookingsQueryInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐBookingsQueryInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_getSeasons_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -644,6 +807,312 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Booking_id(ctx context.Context, field graphql.CollectedField, obj *models1.Booking) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Booking",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Booking().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Booking_volume(ctx context.Context, field graphql.CollectedField, obj *models1.Booking) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Booking",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Volume, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Booking_booker(ctx context.Context, field graphql.CollectedField, obj *models1.Booking) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Booking",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Booker, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Booking_deposit(ctx context.Context, field graphql.CollectedField, obj *models1.Booking) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Booking",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Deposit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Booking_token(ctx context.Context, field graphql.CollectedField, obj *models1.Booking) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Booking",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Booking_delivered(ctx context.Context, field graphql.CollectedField, obj *models1.Booking) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Booking",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Delivered, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Booking_cancelled(ctx context.Context, field graphql.CollectedField, obj *models1.Booking) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Booking",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cancelled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Booking_createdAt(ctx context.Context, field graphql.CollectedField, obj *models1.Booking) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Booking",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Booking_updatedAt(ctx context.Context, field graphql.CollectedField, obj *models1.Booking) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Booking",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Farm_id(ctx context.Context, field graphql.CollectedField, obj *models1.Farm) (ret graphql.Marshaler) {
 	defer func() {
@@ -1122,6 +1591,47 @@ func (ec *executionContext) _Mutation_updateFarmHarvests(ctx context.Context, fi
 	return ec.marshalNSeason2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐSeason(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addBooking(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addBooking_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddBooking(rctx, args["input"].(*models.BookingInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.Booking)
+	fc.Result = res
+	return ec.marshalNBooking2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐBooking(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1229,6 +1739,47 @@ func (ec *executionContext) _Query_getSeasons(ctx context.Context, field graphql
 	res := resTmp.([]*models1.Season)
 	fc.Result = res
 	return ec.marshalNSeason2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐSeason(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getBookings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getBookings_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetBookings(rctx, args["input"].(models.BookingsQueryInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Booking)
+	fc.Result = res
+	return ec.marshalNBooking2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐBooking(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2797,6 +3348,78 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputBookingInput(ctx context.Context, obj interface{}) (models.BookingInput, error) {
+	var it models.BookingInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "volume":
+			var err error
+			it.Volume, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "booker":
+			var err error
+			it.Booker, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "deposit":
+			var err error
+			it.Deposit, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "delivered":
+			var err error
+			it.Delivered, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "cancelled":
+			var err error
+			it.Cancelled, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputBookingsQueryInput(ctx context.Context, obj interface{}) (models.BookingsQueryInput, error) {
+	var it models.BookingsQueryInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "bookerAddress":
+			var err error
+			it.BookerAddress, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputFarmInput(ctx context.Context, obj interface{}) (models.FarmInput, error) {
 	var it models.FarmInput
 	var asMap = obj.(map[string]interface{})
@@ -3015,6 +3638,82 @@ func (ec *executionContext) unmarshalInputSeasonsQueryInput(ctx context.Context,
 
 // region    **************************** object.gotpl ****************************
 
+var bookingImplementors = []string{"Booking"}
+
+func (ec *executionContext) _Booking(ctx context.Context, sel ast.SelectionSet, obj *models1.Booking) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, bookingImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Booking")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Booking_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "volume":
+			out.Values[i] = ec._Booking_volume(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "booker":
+			out.Values[i] = ec._Booking_booker(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "deposit":
+			out.Values[i] = ec._Booking_deposit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "token":
+			out.Values[i] = ec._Booking_token(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "delivered":
+			out.Values[i] = ec._Booking_delivered(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "cancelled":
+			out.Values[i] = ec._Booking_cancelled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._Booking_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Booking_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var farmImplementors = []string{"Farm"}
 
 func (ec *executionContext) _Farm(ctx context.Context, sel ast.SelectionSet, obj *models1.Farm) graphql.Marshaler {
@@ -3117,6 +3816,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "addBooking":
+			out.Values[i] = ec._Mutation_addBooking(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3180,6 +3884,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getSeasons(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getBookings":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getBookings(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3540,6 +4258,61 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
+
+func (ec *executionContext) marshalNBooking2githubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐBooking(ctx context.Context, sel ast.SelectionSet, v models1.Booking) graphql.Marshaler {
+	return ec._Booking(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNBooking2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐBooking(ctx context.Context, sel ast.SelectionSet, v []*models1.Booking) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOBooking2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐBooking(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNBooking2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐBooking(ctx context.Context, sel ast.SelectionSet, v *models1.Booking) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Booking(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNBookingsQueryInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐBookingsQueryInput(ctx context.Context, v interface{}) (models.BookingsQueryInput, error) {
+	return ec.unmarshalInputBookingsQueryInput(ctx, v)
+}
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
@@ -3971,6 +4744,29 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalOBooking2githubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐBooking(ctx context.Context, sel ast.SelectionSet, v models1.Booking) graphql.Marshaler {
+	return ec._Booking(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOBooking2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐBooking(ctx context.Context, sel ast.SelectionSet, v *models1.Booking) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Booking(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOBookingInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐBookingInput(ctx context.Context, v interface{}) (models.BookingInput, error) {
+	return ec.unmarshalInputBookingInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOBookingInput2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐBookingInput(ctx context.Context, v interface{}) (*models.BookingInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOBookingInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐBookingInput(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

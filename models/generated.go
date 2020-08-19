@@ -2,6 +2,20 @@
 
 package models
 
+type BookingInput struct {
+	Token     int    `json:"token"`
+	Volume    int    `json:"volume"`
+	Booker    string `json:"booker"`
+	Deposit   string `json:"deposit"`
+	Delivered bool   `json:"delivered"`
+	Cancelled bool   `json:"cancelled"`
+}
+
+type BookingsQueryInput struct {
+	BookerAddress string `json:"bookerAddress"`
+	Token         int    `json:"token"`
+}
+
 type FarmInput struct {
 	ID        string `json:"id"`
 	Size      string `json:"size"`

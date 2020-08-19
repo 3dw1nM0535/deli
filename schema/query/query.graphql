@@ -2,5 +2,6 @@ type Query {
 	hello: String!
   getFarms: [Farm]!
   getSeasons(input: SeasonsQueryInput!): [Season]!
+  getBookings(input: BookingsQueryInput!): [Booking]!
 }
 

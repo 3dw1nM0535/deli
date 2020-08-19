@@ -13,6 +13,7 @@ func migrate() error {
 	err = orm.DB.AutoMigrate(
 		&models.Farm{},
 		&models.Season{},
+		&models.Booking{},
 	).Error
 	if err != nil {
 		return err

@@ -32,6 +32,8 @@ models:
     model: github.com/3dw1nM0535/Byte/db/models.Farm
   Season:
     model: github.com/3dw1nM0535/Byte/db/models.Season
+  Booking:
+    model: github.com/3dw1nM0535/Byte/db/models.Booking
 
 # Automatically bind any models matching types
 autobind: []
