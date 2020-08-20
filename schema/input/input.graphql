@@ -36,6 +36,12 @@ input HarvestInput {
   supplyUnit: String!
 }
 
+input HarvestUpdateInput {
+  token: Int!
+  seasonNumber: Int!
+  newSupply: Int!
+}
+
 input SeasonsQueryInput {
   token: Int!
 }
@@ -46,7 +52,6 @@ input BookingInput {
   booker: String!
   deposit: String!
   delivered: Boolean!
-  cancelled: Boolean!
 }
 
 input BookingsQueryInput {

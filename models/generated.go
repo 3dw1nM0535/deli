@@ -8,7 +8,6 @@ type BookingInput struct {
 	Booker    string `json:"booker"`
 	Deposit   string `json:"deposit"`
 	Delivered bool   `json:"delivered"`
-	Cancelled bool   `json:"cancelled"`
 }
 
 type BookingsQueryInput struct {
@@ -31,6 +30,12 @@ type HarvestInput struct {
 	TotalSupply  int    `json:"totalSupply"`
 	Price        string `json:"price"`
 	SupplyUnit   string `json:"supplyUnit"`
+}
+
+type HarvestUpdateInput struct {
+	Token        int `json:"token"`
+	SeasonNumber int `json:"seasonNumber"`
+	NewSupply    int `json:"newSupply"`
 }
 
 type PlantingInput struct {

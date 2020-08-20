@@ -7,5 +7,4 @@ type Booking struct {
 	Deposit   string `gorm:"type:varchar(255);"`
 	Token     int    `gorm:"type:integer;"`
 	Delivered bool   `gorm:"type:boolean;"`
-	Cancelled bool   `gorm:"type:boolean;"`
 }

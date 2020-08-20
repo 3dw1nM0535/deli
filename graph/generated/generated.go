@@ -49,7 +49,6 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Booking struct {
 		Booker    func(childComplexity int) int
-		Cancelled func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
 		Delivered func(childComplexity int) int
 		Deposit   func(childComplexity int) int
@@ -71,12 +70,13 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddBooking             func(childComplexity int, input *models.BookingInput) int
-		AddFarm                func(childComplexity int, input models.FarmInput) int
-		UpdateFarmHarvests     func(childComplexity int, input *models.HarvestInput) int
-		UpdateFarmPlantings    func(childComplexity int, input models.PlantingInput) int
-		UpdateFarmPreparations func(childComplexity int, input models.PreparationInput) int
-		UpdateFarmSeason       func(childComplexity int, input models.SeasonUpdateInput) int
+		AddBooking              func(childComplexity int, input *models.BookingInput) int
+		AddFarm                 func(childComplexity int, input models.FarmInput) int
+		UpdateFarmHarvestSupply func(childComplexity int, input models.HarvestUpdateInput) int
+		UpdateFarmHarvests      func(childComplexity int, input *models.HarvestInput) int
+		UpdateFarmPlantings     func(childComplexity int, input models.PlantingInput) int
+		UpdateFarmPreparations  func(childComplexity int, input models.PreparationInput) int
+		UpdateFarmSeason        func(childComplexity int, input models.SeasonUpdateInput) int
 	}
 
 	Query struct {
@@ -112,6 +112,7 @@ type MutationResolver interface {
 	UpdateFarmPreparations(ctx context.Context, input models.PreparationInput) (*models1.Season, error)
 	UpdateFarmPlantings(ctx context.Context, input models.PlantingInput) (*models1.Season, error)
 	UpdateFarmHarvests(ctx context.Context, input *models.HarvestInput) (*models1.Season, error)
+	UpdateFarmHarvestSupply(ctx context.Context, input models.HarvestUpdateInput) (*models1.Season, error)
 	AddBooking(ctx context.Context, input *models.BookingInput) (*models1.Booking, error)
 }
 type QueryResolver interface {
@@ -145,13 +146,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Booking.Booker(childComplexity), true
-
-	case "Booking.cancelled":
-		if e.complexity.Booking.Cancelled == nil {
-			break
-		}
-
-		return e.complexity.Booking.Cancelled(childComplexity), true
 
 	case "Booking.createdAt":
 		if e.complexity.Booking.CreatedAt == nil {
@@ -281,6 +275,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddFarm(childComplexity, args["input"].(models.FarmInput)), true
+
+	case "Mutation.updateFarmHarvestSupply":
+		if e.complexity.Mutation.UpdateFarmHarvestSupply == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateFarmHarvestSupply_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateFarmHarvestSupply(childComplexity, args["input"].(models.HarvestUpdateInput)), true
 
 	case "Mutation.updateFarmHarvests":
 		if e.complexity.Mutation.UpdateFarmHarvests == nil {
@@ -561,6 +567,12 @@ input HarvestInput {
   supplyUnit: String!
 }
 
+input HarvestUpdateInput {
+  token: Int!
+  seasonNumber: Int!
+  newSupply: Int!
+}
+
 input SeasonsQueryInput {
   token: Int!
 }
@@ -571,7 +583,6 @@ input BookingInput {
   booker: String!
   deposit: String!
   delivered: Boolean!
-  cancelled: Boolean!
 }
 
 input BookingsQueryInput {
@@ -586,6 +597,7 @@ input BookingsQueryInput {
   updateFarmPreparations(input: PreparationInput!): Season!
   updateFarmPlantings(input: PlantingInput!): Season!
   updateFarmHarvests(input: HarvestInput): Season!
+  updateFarmHarvestSupply(input: HarvestUpdateInput!): Season!
   addBooking(input: BookingInput): Booking!
 }
 `, BuiltIn: false},
@@ -633,7 +645,6 @@ type Booking {
   deposit: String!
   token: Int!
   delivered: Boolean!
-  cancelled: Boolean!
   createdAt: Time!
   updatedAt: Time!
 }
@@ -666,6 +677,20 @@ func (ec *executionContext) field_Mutation_addFarm_args(ctx context.Context, raw
 	var arg0 models.FarmInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNFarmInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐFarmInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateFarmHarvestSupply_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.HarvestUpdateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNHarvestUpdateInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐHarvestUpdateInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -996,40 +1021,6 @@ func (ec *executionContext) _Booking_delivered(ctx context.Context, field graphq
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Delivered, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Booking_cancelled(ctx context.Context, field graphql.CollectedField, obj *models1.Booking) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Booking",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Cancelled, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1575,6 +1566,47 @@ func (ec *executionContext) _Mutation_updateFarmHarvests(ctx context.Context, fi
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateFarmHarvests(rctx, args["input"].(*models.HarvestInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.Season)
+	fc.Result = res
+	return ec.marshalNSeason2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐSeason(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateFarmHarvestSupply(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateFarmHarvestSupply_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateFarmHarvestSupply(rctx, args["input"].(models.HarvestUpdateInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3384,12 +3416,6 @@ func (ec *executionContext) unmarshalInputBookingInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "cancelled":
-			var err error
-			it.Cancelled, err = ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		}
 	}
 
@@ -3501,6 +3527,36 @@ func (ec *executionContext) unmarshalInputHarvestInput(ctx context.Context, obj 
 		case "supplyUnit":
 			var err error
 			it.SupplyUnit, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputHarvestUpdateInput(ctx context.Context, obj interface{}) (models.HarvestUpdateInput, error) {
+	var it models.HarvestUpdateInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "seasonNumber":
+			var err error
+			it.SeasonNumber, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "newSupply":
+			var err error
+			it.NewSupply, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3688,11 +3744,6 @@ func (ec *executionContext) _Booking(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "cancelled":
-			out.Values[i] = ec._Booking_cancelled(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "createdAt":
 			out.Values[i] = ec._Booking_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3813,6 +3864,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateFarmHarvests":
 			out.Values[i] = ec._Mutation_updateFarmHarvests(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateFarmHarvestSupply":
+			out.Values[i] = ec._Mutation_updateFarmHarvestSupply(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4381,6 +4437,10 @@ func (ec *executionContext) marshalNFarm2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋd
 
 func (ec *executionContext) unmarshalNFarmInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐFarmInput(ctx context.Context, v interface{}) (models.FarmInput, error) {
 	return ec.unmarshalInputFarmInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNHarvestUpdateInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐHarvestUpdateInput(ctx context.Context, v interface{}) (models.HarvestUpdateInput, error) {
+	return ec.unmarshalInputHarvestUpdateInput(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNID2int(ctx context.Context, v interface{}) (int, error) {

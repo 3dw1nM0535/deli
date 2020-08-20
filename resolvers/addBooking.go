@@ -13,7 +13,6 @@ func (r *mutationResolver) AddBooking(ctx context.Context, input *models1.Bookin
 		Deposit:   input.Deposit,
 		Token:     input.Token,
 		Delivered: input.Delivered,
-		Cancelled: input.Cancelled,
 	}
 	r.ORM.DB.Create(&newBooking)
 	return newBooking, nil

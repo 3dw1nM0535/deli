@@ -34,7 +34,6 @@ type Booking {
   deposit: String!
   token: Int!
   delivered: Boolean!
-  cancelled: Boolean!
   createdAt: Time!
   updatedAt: Time!
 }

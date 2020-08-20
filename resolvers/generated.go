@@ -36,6 +36,10 @@ type Resolver struct {
  *  panic("not implemented")
  *}
  *
+ *func (r *mutationResolver) UpdateFarmHarvestSupply(ctx context.Context, input models1.HarvestUpdateInput) (*models.Season, error) {
+ *  panic("not implemented")
+ *}
+ *
  *func (r *mutationResolver) AddBooking(ctx context.Context, input *models1.BookingInput) (*models.Booking, error) {
  *  panic("not implemented")
  *}
