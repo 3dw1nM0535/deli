@@ -15,6 +15,15 @@ type BookingsQueryInput struct {
 	Token         int    `json:"token"`
 }
 
+type CancellationUpdateInput struct {
+	BookingID    string `json:"bookingId"`
+	SeasonNumber int    `json:"seasonNumber"`
+	Token        int    `json:"token"`
+	NewSupply    int    `json:"newSupply"`
+	NewVolume    int    `json:"newVolume"`
+	NewDeposit   string `json:"newDeposit"`
+}
+
 type FarmInput struct {
 	ID        string `json:"id"`
 	Size      string `json:"size"`

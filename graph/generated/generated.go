@@ -72,6 +72,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AddBooking              func(childComplexity int, input *models.BookingInput) int
 		AddFarm                 func(childComplexity int, input models.FarmInput) int
+		UpdateAfterCancellation func(childComplexity int, input models.CancellationUpdateInput) int
 		UpdateFarmHarvestSupply func(childComplexity int, input models.HarvestUpdateInput) int
 		UpdateFarmHarvests      func(childComplexity int, input *models.HarvestInput) int
 		UpdateFarmPlantings     func(childComplexity int, input models.PlantingInput) int
@@ -114,6 +115,7 @@ type MutationResolver interface {
 	UpdateFarmHarvests(ctx context.Context, input *models.HarvestInput) (*models1.Season, error)
 	UpdateFarmHarvestSupply(ctx context.Context, input models.HarvestUpdateInput) (*models1.Season, error)
 	AddBooking(ctx context.Context, input *models.BookingInput) (*models1.Booking, error)
+	UpdateAfterCancellation(ctx context.Context, input models.CancellationUpdateInput) (bool, error)
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
@@ -275,6 +277,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddFarm(childComplexity, args["input"].(models.FarmInput)), true
+
+	case "Mutation.updateAfterCancellation":
+		if e.complexity.Mutation.UpdateAfterCancellation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateAfterCancellation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateAfterCancellation(childComplexity, args["input"].(models.CancellationUpdateInput)), true
 
 	case "Mutation.updateFarmHarvestSupply":
 		if e.complexity.Mutation.UpdateFarmHarvestSupply == nil {
@@ -590,6 +604,15 @@ input BookingsQueryInput {
   token: Int!
 }
 
+input CancellationUpdateInput {
+  bookingId: ID!
+  seasonNumber: Int!
+  token: Int!
+  newSupply: Int!
+  newVolume: Int!
+  newDeposit: String!
+}
+
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/mutation/mutation.graphql", Input: `type Mutation {
   addFarm(input: FarmInput!): Farm!
@@ -599,6 +622,7 @@ input BookingsQueryInput {
   updateFarmHarvests(input: HarvestInput): Season!
   updateFarmHarvestSupply(input: HarvestUpdateInput!): Season!
   addBooking(input: BookingInput): Booking!
+  updateAfterCancellation(input: CancellationUpdateInput!): Boolean!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
@@ -677,6 +701,20 @@ func (ec *executionContext) field_Mutation_addFarm_args(ctx context.Context, raw
 	var arg0 models.FarmInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNFarmInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐFarmInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateAfterCancellation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.CancellationUpdateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNCancellationUpdateInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐCancellationUpdateInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1662,6 +1700,47 @@ func (ec *executionContext) _Mutation_addBooking(ctx context.Context, field grap
 	res := resTmp.(*models1.Booking)
 	fc.Result = res
 	return ec.marshalNBooking2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐBooking(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateAfterCancellation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateAfterCancellation_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateAfterCancellation(rctx, args["input"].(models.CancellationUpdateInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3446,6 +3525,54 @@ func (ec *executionContext) unmarshalInputBookingsQueryInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCancellationUpdateInput(ctx context.Context, obj interface{}) (models.CancellationUpdateInput, error) {
+	var it models.CancellationUpdateInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "bookingId":
+			var err error
+			it.BookingID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "seasonNumber":
+			var err error
+			it.SeasonNumber, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "newSupply":
+			var err error
+			it.NewSupply, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "newVolume":
+			var err error
+			it.NewVolume, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "newDeposit":
+			var err error
+			it.NewDeposit, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputFarmInput(ctx context.Context, obj interface{}) (models.FarmInput, error) {
 	var it models.FarmInput
 	var asMap = obj.(map[string]interface{})
@@ -3874,6 +4001,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "addBooking":
 			out.Values[i] = ec._Mutation_addBooking(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateAfterCancellation":
+			out.Values[i] = ec._Mutation_updateAfterCancellation(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4382,6 +4514,10 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNCancellationUpdateInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐCancellationUpdateInput(ctx context.Context, v interface{}) (models.CancellationUpdateInput, error) {
+	return ec.unmarshalInputCancellationUpdateInput(ctx, v)
 }
 
 func (ec *executionContext) marshalNFarm2githubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx context.Context, sel ast.SelectionSet, v models1.Farm) graphql.Marshaler {

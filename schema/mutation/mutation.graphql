@@ -6,4 +6,5 @@ type Mutation {
   updateFarmHarvests(input: HarvestInput): Season!
   updateFarmHarvestSupply(input: HarvestUpdateInput!): Season!
   addBooking(input: BookingInput): Booking!
+  updateAfterCancellation(input: CancellationUpdateInput!): Boolean!
 }

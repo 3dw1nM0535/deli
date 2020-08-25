@@ -44,6 +44,10 @@ type Resolver struct {
  *  panic("not implemented")
  *}
  *
+ *func (r *mutationResolver) UpdateAfterCancellation(ctx context.Context, input models1.CancellationUpdateInput) (bool, error) {
+ *  panic("not implemented")
+ *}
+ *
  *func (r *queryResolver) Hello(ctx context.Context) (string, error) {
  *  panic("not implemented")
  *}
