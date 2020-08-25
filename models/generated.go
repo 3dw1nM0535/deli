@@ -62,6 +62,13 @@ type PreparationInput struct {
 	Fertilizer   string `json:"fertilizer"`
 }
 
+type ReceivershipUpdateInput struct {
+	BookingID        string `json:"bookingId"`
+	NewBookerVolume  int    `json:"newBookerVolume"`
+	NewBookerDeposit string `json:"newBookerDeposit"`
+	Delivered        bool   `json:"delivered"`
+}
+
 type SeasonUpdateInput struct {
 	Token  int    `json:"token"`
 	Season string `json:"season"`

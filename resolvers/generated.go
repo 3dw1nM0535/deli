@@ -48,6 +48,10 @@ type Resolver struct {
  *  panic("not implemented")
  *}
  *
+ *func (r *mutationResolver) UpdateAfterReceivership(ctx context.Context, input models1.ReceivershipUpdateInput) (bool, error) {
+ *  panic("not implemented")
+ *}
+ *
  *func (r *queryResolver) Hello(ctx context.Context) (string, error) {
  *  panic("not implemented")
  *}

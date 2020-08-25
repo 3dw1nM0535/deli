@@ -68,3 +68,9 @@ input CancellationUpdateInput {
   newDeposit: String!
 }
 
+input ReceivershipUpdateInput {
+  bookingId: ID!
+  newBookerVolume: Int!
+  newBookerDeposit: String!
+  delivered: Boolean!
+}
