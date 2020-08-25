@@ -20,18 +20,10 @@ func (r *mutationResolver) UpdateAfterCancellation(ctx context.Context, input mo
 		notFound := errors.New("not found")
 		return false, notFound
 	}
-	r.ORM.DB.Model(&booking).Updates(&models.Booking{
-		Deposit: input.NewDeposit,
-		Volume:  input.NewVolume,
-	})
 	booking.Volume = input.NewVolume
 	booking.Deposit = input.NewDeposit
-	if booking.Volume == 0 {
-		booking.Delivered = false
-	}
 	r.ORM.DB.Save(&booking)
-	r.ORM.DB.Model(&season).Update(&models.Season{
-		HarvestYield: input.NewSupply,
-	})
+	season.HarvestYield = input.NewSupply
+	r.ORM.DB.Save(&season)
 	return true, nil
 }
