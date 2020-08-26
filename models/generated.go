@@ -33,6 +33,12 @@ type FarmInput struct {
 	Owner     string `json:"owner"`
 }
 
+type HarvestBookersInput struct {
+	Token        int `json:"token"`
+	SeasonNumber int `json:"seasonNumber"`
+	NoOfBookers  int `json:"noOfBookers"`
+}
+
 type HarvestInput struct {
 	SeasonNumber int    `json:"seasonNumber"`
 	Token        int    `json:"token"`

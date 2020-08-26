@@ -21,6 +21,7 @@ type Season struct {
 	ExpectedYield string `gorm:"type:varchar(50);"`
 	SeedSupplier  string `gorm:"type:varchar(255);"`
 	HarvestYield  int    `gorm:"type:integer;"`
+	NoOfBookers   int    `gorm:"type:integer;"`
 	HarvestUnit   string `gorm:"type:varchar(100);"`
 	HarvestPrice  string `gorm:"type:varchar(255);"`
 }

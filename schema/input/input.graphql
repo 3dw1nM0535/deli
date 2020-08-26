@@ -74,3 +74,10 @@ input ReceivershipUpdateInput {
   newBookerDeposit: String!
   delivered: Boolean!
 }
+
+input HarvestBookersInput {
+  token: Int!
+  seasonNumber: Int!
+  noOfBookers: Int!
+}
+

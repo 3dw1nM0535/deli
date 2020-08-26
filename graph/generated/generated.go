@@ -79,6 +79,7 @@ type ComplexityRoot struct {
 		UpdateFarmPlantings     func(childComplexity int, input models.PlantingInput) int
 		UpdateFarmPreparations  func(childComplexity int, input models.PreparationInput) int
 		UpdateFarmSeason        func(childComplexity int, input models.SeasonUpdateInput) int
+		UpdateHarvestBookers    func(childComplexity int, input models.HarvestBookersInput) int
 	}
 
 	Query struct {
@@ -97,6 +98,7 @@ type ComplexityRoot struct {
 		HarvestUnit   func(childComplexity int) int
 		HarvestYield  func(childComplexity int) int
 		ID            func(childComplexity int) int
+		NoOfBookers   func(childComplexity int) int
 		SeasonNumber  func(childComplexity int) int
 		Seed          func(childComplexity int) int
 		SeedSupplier  func(childComplexity int) int
@@ -118,6 +120,7 @@ type MutationResolver interface {
 	AddBooking(ctx context.Context, input *models.BookingInput) (*models1.Booking, error)
 	UpdateAfterCancellation(ctx context.Context, input models.CancellationUpdateInput) (bool, error)
 	UpdateAfterReceivership(ctx context.Context, input models.ReceivershipUpdateInput) (bool, error)
+	UpdateHarvestBookers(ctx context.Context, input models.HarvestBookersInput) (*models1.Season, error)
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (string, error)
@@ -364,6 +367,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateFarmSeason(childComplexity, args["input"].(models.SeasonUpdateInput)), true
 
+	case "Mutation.updateHarvestBookers":
+		if e.complexity.Mutation.UpdateHarvestBookers == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateHarvestBookers_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateHarvestBookers(childComplexity, args["input"].(models.HarvestBookersInput)), true
+
 	case "Query.getBookings":
 		if e.complexity.Query.GetBookings == nil {
 			break
@@ -457,6 +472,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Season.ID(childComplexity), true
+
+	case "Season.noOfBookers":
+		if e.complexity.Season.NoOfBookers == nil {
+			break
+		}
+
+		return e.complexity.Season.NoOfBookers(childComplexity), true
 
 	case "Season.seasonNumber":
 		if e.complexity.Season.SeasonNumber == nil {
@@ -633,6 +655,13 @@ input ReceivershipUpdateInput {
   newBookerDeposit: String!
   delivered: Boolean!
 }
+
+input HarvestBookersInput {
+  token: Int!
+  seasonNumber: Int!
+  noOfBookers: Int!
+}
+
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/mutation/mutation.graphql", Input: `type Mutation {
   addFarm(input: FarmInput!): Farm!
@@ -644,6 +673,7 @@ input ReceivershipUpdateInput {
   addBooking(input: BookingInput): Booking!
   updateAfterCancellation(input: CancellationUpdateInput!): Boolean!
   updateAfterReceivership(input: ReceivershipUpdateInput!): Boolean!
+  updateHarvestBookers(input: HarvestBookersInput!): Season!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/query/query.graphql", Input: `type Query {
@@ -679,6 +709,7 @@ type Season {
   harvestYield: Int!
   harvestUnit: String!
   harvestPrice: String!
+  noOfBookers: Int!
   createdAt: Time!
   updatedAt: Time!
 }
@@ -820,6 +851,20 @@ func (ec *executionContext) field_Mutation_updateFarmSeason_args(ctx context.Con
 	var arg0 models.SeasonUpdateInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNSeasonUpdateInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐSeasonUpdateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateHarvestBookers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.HarvestBookersInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNHarvestBookersInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐHarvestBookersInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1819,6 +1864,47 @@ func (ec *executionContext) _Mutation_updateAfterReceivership(ctx context.Contex
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_updateHarvestBookers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateHarvestBookers_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateHarvestBookers(rctx, args["input"].(models.HarvestBookersInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models1.Season)
+	fc.Result = res
+	return ec.marshalNSeason2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐSeason(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2410,6 +2496,40 @@ func (ec *executionContext) _Season_harvestPrice(ctx context.Context, field grap
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Season_noOfBookers(ctx context.Context, field graphql.CollectedField, obj *models1.Season) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Season",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NoOfBookers, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Season_createdAt(ctx context.Context, field graphql.CollectedField, obj *models1.Season) (ret graphql.Marshaler) {
@@ -3697,6 +3817,36 @@ func (ec *executionContext) unmarshalInputFarmInput(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputHarvestBookersInput(ctx context.Context, obj interface{}) (models.HarvestBookersInput, error) {
+	var it models.HarvestBookersInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "seasonNumber":
+			var err error
+			it.SeasonNumber, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "noOfBookers":
+			var err error
+			it.NoOfBookers, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputHarvestInput(ctx context.Context, obj interface{}) (models.HarvestInput, error) {
 	var it models.HarvestInput
 	var asMap = obj.(map[string]interface{})
@@ -4126,6 +4276,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateHarvestBookers":
+			out.Values[i] = ec._Mutation_updateHarvestBookers(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4295,6 +4450,11 @@ func (ec *executionContext) _Season(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "harvestPrice":
 			out.Values[i] = ec._Season_harvestPrice(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "noOfBookers":
+			out.Values[i] = ec._Season_noOfBookers(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -4690,6 +4850,10 @@ func (ec *executionContext) marshalNFarm2ᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋd
 
 func (ec *executionContext) unmarshalNFarmInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐFarmInput(ctx context.Context, v interface{}) (models.FarmInput, error) {
 	return ec.unmarshalInputFarmInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNHarvestBookersInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐHarvestBookersInput(ctx context.Context, v interface{}) (models.HarvestBookersInput, error) {
+	return ec.unmarshalInputHarvestBookersInput(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNHarvestUpdateInput2githubᚗcomᚋ3dw1nM0535ᚋByteᚋmodelsᚐHarvestUpdateInput(ctx context.Context, v interface{}) (models.HarvestUpdateInput, error) {

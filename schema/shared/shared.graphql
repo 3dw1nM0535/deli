@@ -23,6 +23,7 @@ type Season {
   harvestYield: Int!
   harvestUnit: String!
   harvestPrice: String!
+  noOfBookers: Int!
   createdAt: Time!
   updatedAt: Time!
 }
