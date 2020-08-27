@@ -9,4 +9,5 @@ type Mutation {
   updateAfterCancellation(input: CancellationUpdateInput!): Boolean!
   updateAfterReceivership(input: ReceivershipUpdateInput!): Boolean!
   updateHarvestBookers(input: HarvestBookersInput!): Season!
+  updateBookingStatus(input: BookingStatusInput!): Booking!
 }

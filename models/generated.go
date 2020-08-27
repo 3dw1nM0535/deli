@@ -10,6 +10,11 @@ type BookingInput struct {
 	Delivered bool   `json:"delivered"`
 }
 
+type BookingStatusInput struct {
+	ID        string `json:"id"`
+	Delivered bool   `json:"delivered"`
+}
+
 type BookingsQueryInput struct {
 	BookerAddress string `json:"bookerAddress"`
 	Token         int    `json:"token"`

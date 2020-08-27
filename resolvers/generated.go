@@ -4,7 +4,6 @@ package resolvers
 
 import (
 	"github.com/3dw1nM0535/Byte/db"
-
 	graph "github.com/3dw1nM0535/Byte/graph/generated"
 )
 
@@ -54,6 +53,10 @@ type Resolver struct {
  *}
  *
  *func (r *mutationResolver) UpdateHarvestBookers(ctx context.Context, input models1.HarvestBookersInput) (*models.Season, error) {
+ *  panic("not implemented")
+ *}
+ *
+ *func (r *mutationResolver) UpdateBookingStatus(ctx context.Context, input models1.BookingStatusInput) (*models.Booking, error) {
  *  panic("not implemented")
  *}
  *

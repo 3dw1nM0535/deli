@@ -81,3 +81,8 @@ input HarvestBookersInput {
   noOfBookers: Int!
 }
 
+input BookingStatusInput {
+  id: ID!
+  delivered: Boolean!
+}
+
