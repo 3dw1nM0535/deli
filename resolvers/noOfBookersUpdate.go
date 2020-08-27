@@ -14,7 +14,7 @@ func (r *mutationResolver) UpdateHarvestBookers(ctx context.Context, input model
 		notFound := errors.New("not found")
 		return nil, notFound
 	}
-	season.NoOfBookers = season.NoOfBookers + input.NoOfBookers
+	season.NoOfBookers = input.NoOfBookers
 	r.ORM.DB.Save(&season)
 	return season, nil
 }

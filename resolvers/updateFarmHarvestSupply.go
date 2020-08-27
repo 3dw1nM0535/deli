@@ -14,8 +14,7 @@ func (r *mutationResolver) UpdateFarmHarvestSupply(ctx context.Context, input mo
 		notFound := errors.New("not found")
 		return nil, notFound
 	}
-	r.ORM.DB.Model(&season).Update(&models.Season{
-		HarvestYield: input.NewSupply,
-	})
+	season.HarvestYield = input.NewSupply
+	r.ORM.DB.Save(&season)
 	return season, nil
 }
