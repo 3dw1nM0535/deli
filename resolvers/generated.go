@@ -4,6 +4,7 @@ package resolvers
 
 import (
 	"github.com/3dw1nM0535/Byte/db"
+
 	graph "github.com/3dw1nM0535/Byte/graph/generated"
 )
 
@@ -73,6 +74,26 @@ type Resolver struct {
  *}
  *
  *func (r *queryResolver) GetBookings(ctx context.Context, input models1.BookingsQueryInput) ([]*models.Booking, error) {
+ *  panic("not implemented")
+ *}
+ *
+ *func (r *queryResolver) GetDormantFarms(ctx context.Context) ([]*models.Farm, error) {
+ *  panic("not implemented")
+ *}
+ *
+ *func (r *queryResolver) GetPreparingFarms(ctx context.Context) ([]*models.Farm, error) {
+ *  panic("not implemented")
+ *}
+ *
+ *func (r *queryResolver) GetPlantingFarms(ctx context.Context) ([]*models.Farm, error) {
+ *  panic("not implemented")
+ *}
+ *
+ *func (r *queryResolver) GetCropGrowthFarms(ctx context.Context) ([]*models.Farm, error) {
+ *  panic("not implemented")
+ *}
+ *
+ *func (r *queryResolver) GetHarvestingFarms(ctx context.Context) ([]*models.Farm, error) {
  *  panic("not implemented")
  *}
  *

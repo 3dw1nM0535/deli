@@ -3,5 +3,10 @@ type Query {
   getFarms: [Farm]!
   getSeasons(input: SeasonsQueryInput!): [Season]!
   getBookings(input: BookingsQueryInput!): [Booking]!
+  getDormantFarms: [Farm]!
+  getPreparingFarms: [Farm]!
+  getPlantingFarms: [Farm]!
+  getCropGrowthFarms: [Farm]!
+  getHarvestingFarms: [Farm]!
 }
 

@@ -84,10 +84,15 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetBookings func(childComplexity int, input models.BookingsQueryInput) int
-		GetFarms    func(childComplexity int) int
-		GetSeasons  func(childComplexity int, input models.SeasonsQueryInput) int
-		Hello       func(childComplexity int) int
+		GetBookings        func(childComplexity int, input models.BookingsQueryInput) int
+		GetCropGrowthFarms func(childComplexity int) int
+		GetDormantFarms    func(childComplexity int) int
+		GetFarms           func(childComplexity int) int
+		GetHarvestingFarms func(childComplexity int) int
+		GetPlantingFarms   func(childComplexity int) int
+		GetPreparingFarms  func(childComplexity int) int
+		GetSeasons         func(childComplexity int, input models.SeasonsQueryInput) int
+		Hello              func(childComplexity int) int
 	}
 
 	Season struct {
@@ -129,6 +134,11 @@ type QueryResolver interface {
 	GetFarms(ctx context.Context) ([]*models1.Farm, error)
 	GetSeasons(ctx context.Context, input models.SeasonsQueryInput) ([]*models1.Season, error)
 	GetBookings(ctx context.Context, input models.BookingsQueryInput) ([]*models1.Booking, error)
+	GetDormantFarms(ctx context.Context) ([]*models1.Farm, error)
+	GetPreparingFarms(ctx context.Context) ([]*models1.Farm, error)
+	GetPlantingFarms(ctx context.Context) ([]*models1.Farm, error)
+	GetCropGrowthFarms(ctx context.Context) ([]*models1.Farm, error)
+	GetHarvestingFarms(ctx context.Context) ([]*models1.Farm, error)
 }
 type SeasonResolver interface {
 	ID(ctx context.Context, obj *models1.Season) (string, error)
@@ -405,12 +415,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetBookings(childComplexity, args["input"].(models.BookingsQueryInput)), true
 
+	case "Query.getCropGrowthFarms":
+		if e.complexity.Query.GetCropGrowthFarms == nil {
+			break
+		}
+
+		return e.complexity.Query.GetCropGrowthFarms(childComplexity), true
+
+	case "Query.getDormantFarms":
+		if e.complexity.Query.GetDormantFarms == nil {
+			break
+		}
+
+		return e.complexity.Query.GetDormantFarms(childComplexity), true
+
 	case "Query.getFarms":
 		if e.complexity.Query.GetFarms == nil {
 			break
 		}
 
 		return e.complexity.Query.GetFarms(childComplexity), true
+
+	case "Query.getHarvestingFarms":
+		if e.complexity.Query.GetHarvestingFarms == nil {
+			break
+		}
+
+		return e.complexity.Query.GetHarvestingFarms(childComplexity), true
+
+	case "Query.getPlantingFarms":
+		if e.complexity.Query.GetPlantingFarms == nil {
+			break
+		}
+
+		return e.complexity.Query.GetPlantingFarms(childComplexity), true
+
+	case "Query.getPreparingFarms":
+		if e.complexity.Query.GetPreparingFarms == nil {
+			break
+		}
+
+		return e.complexity.Query.GetPreparingFarms(childComplexity), true
 
 	case "Query.getSeasons":
 		if e.complexity.Query.GetSeasons == nil {
@@ -701,6 +746,11 @@ input BookingStatusInput {
   getFarms: [Farm]!
   getSeasons(input: SeasonsQueryInput!): [Season]!
   getBookings(input: BookingsQueryInput!): [Booking]!
+  getDormantFarms: [Farm]!
+  getPreparingFarms: [Farm]!
+  getPlantingFarms: [Farm]!
+  getCropGrowthFarms: [Farm]!
+  getHarvestingFarms: [Farm]!
 }
 
 `, BuiltIn: false},
@@ -2128,6 +2178,176 @@ func (ec *executionContext) _Query_getBookings(ctx context.Context, field graphq
 	res := resTmp.([]*models1.Booking)
 	fc.Result = res
 	return ec.marshalNBooking2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐBooking(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getDormantFarms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetDormantFarms(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Farm)
+	fc.Result = res
+	return ec.marshalNFarm2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getPreparingFarms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetPreparingFarms(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Farm)
+	fc.Result = res
+	return ec.marshalNFarm2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getPlantingFarms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetPlantingFarms(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Farm)
+	fc.Result = res
+	return ec.marshalNFarm2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getCropGrowthFarms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetCropGrowthFarms(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Farm)
+	fc.Result = res
+	return ec.marshalNFarm2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getHarvestingFarms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetHarvestingFarms(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models1.Farm)
+	fc.Result = res
+	return ec.marshalNFarm2ᚕᚖgithubᚗcomᚋ3dw1nM0535ᚋByteᚋdbᚋmodelsᚐFarm(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4462,6 +4682,76 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getBookings(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getDormantFarms":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getDormantFarms(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getPreparingFarms":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getPreparingFarms(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getPlantingFarms":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getPlantingFarms(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getCropGrowthFarms":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getCropGrowthFarms(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getHarvestingFarms":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getHarvestingFarms(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
