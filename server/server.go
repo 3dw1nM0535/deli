@@ -15,13 +15,12 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var host, port string
+var port string
 var options []option.Option
 var c gin.HandlerFunc
 
 func init() {
 	godotenv.Load()
-	host = utils.MustGetEnv("SERVER_HOST")
 	port = utils.MustGetEnv("SERVER_PORT")
 
 	c = cors.Default()
@@ -55,7 +54,7 @@ func Run(orm *db.ORM) {
 
 	s := &http.Server{
 		Handler: r,
-		Addr:    host + ":" + port,
+		Addr:    ":" + port,
 	}
 
 	s.SetKeepAlivesEnabled(true)
