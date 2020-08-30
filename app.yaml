@@ -1,0 +1,21 @@
+runtime: go114
+
+env_variable:
+  SERVER_HOST=127.0.0.1
+  SERVER_PORT=4483
+  DBHOST=/cloudsql/wide-episode-286220:asia-east2:taxa-instance
+  DBUSER=taxa-p0c
+  DBPASS=taxap0c1234
+  DBNAME=octopu5
+  SSLMODE_ENABLED=disable
+  DBPORT=5432
+  LOGGING_STATUS=true
+  GIN_MODE=release
+
+handlers:
+  - url: .*
+    secure: always
+    script: auto
+
+main: ./cmd
+
