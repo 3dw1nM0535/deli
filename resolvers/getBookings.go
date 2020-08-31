@@ -8,6 +8,6 @@ import (
 
 func (r *queryResolver) GetBookings(ctx context.Context, input models1.BookingsQueryInput) ([]*models.Booking, error) {
 	bookings := []*models.Booking{}
-	r.ORM.DB.Where("booker = ? AND token = ?", input.BookerAddress, input.Token).Find(&bookings)
+	r.ORM.DB.Where("token = ?", input.Token).Find(&bookings)
 	return bookings, nil
 }

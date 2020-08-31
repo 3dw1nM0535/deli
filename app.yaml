@@ -1,0 +1,12 @@
+runtime: go114
+
+env_variables:
+  PORT: 8080
+  DBHOST: ec2-35-174-88-65.compute-1.amazonaws.com
+  DBUSER: fmndklljujnqrl
+  DBPASS: 6670cb9f48d3680794b1c3c241f6a75e3cd0041577969de402aebdbed5e70d28
+  DBNAME: d6liihav7g94g9
+  DBPORT: 5432
+  SSLMODE_ENABLED: require
+  LOGGING_STATUS: true
+  GIN_MODE: release

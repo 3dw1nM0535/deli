@@ -21,7 +21,7 @@ var c gin.HandlerFunc
 
 func init() {
 	godotenv.Load()
-	port = utils.MustGetEnv("SERVER_PORT")
+	port = utils.MustGetEnv("PORT")
 
 	c = cors.Default()
 

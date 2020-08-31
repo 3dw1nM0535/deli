@@ -16,8 +16,7 @@ type BookingStatusInput struct {
 }
 
 type BookingsQueryInput struct {
-	BookerAddress string `json:"bookerAddress"`
-	Token         int    `json:"token"`
+	Token int `json:"token"`
 }
 
 type CancellationUpdateInput struct {

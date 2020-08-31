@@ -55,7 +55,6 @@ input BookingInput {
 }
 
 input BookingsQueryInput {
-  bookerAddress: String!
   token: Int!
 }
 

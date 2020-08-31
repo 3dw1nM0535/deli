@@ -695,7 +695,6 @@ input BookingInput {
 }
 
 input BookingsQueryInput {
-  bookerAddress: String!
   token: Int!
 }
 
@@ -4022,12 +4021,6 @@ func (ec *executionContext) unmarshalInputBookingsQueryInput(ctx context.Context
 
 	for k, v := range asMap {
 		switch k {
-		case "bookerAddress":
-			var err error
-			it.BookerAddress, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "token":
 			var err error
 			it.Token, err = ec.unmarshalNInt2int(ctx, v)
