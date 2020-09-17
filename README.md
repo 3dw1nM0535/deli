@@ -1,3 +1,3 @@
-# taxa-PoC State API
+# mkulima-PoC State API
 
-taxa proof-of-concept state GraphQL API
+Mkulima proof-of-concept state GraphQL API
