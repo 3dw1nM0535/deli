@@ -1,3 +1,3 @@
-# mkulima-PoC State API
+# colaxa-PoC State API
 
-Mkulima proof-of-concept state GraphQL API
+Colaxa proof-of-concept state GraphQL API
