@@ -1,3 +1,3 @@
-# colaxa-PoC State API
+# reap-PoC State API
 
-Colaxa proof-of-concept state GraphQL API
+reap proof-of-concept state GraphQL API
